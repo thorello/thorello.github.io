@@ -68,7 +68,6 @@
             <p class="text-lg text-gray-400 mt-2">Navegue entre Conhecimentos Específicos e Gerais</p>
         </header>
 
-        <!-- Tab Navigation -->
         <div class="mb-8 border-b border-gray-700">
             <nav class="-mb-px flex space-x-6" aria-label="Tabs">
                 <button id="tab-especificos"
@@ -83,25 +82,105 @@
         </div>
 
         <main>
-            <!-- Navigation Links for Específicos -->
             <div id="nav-container-especificos" class="mb-10 p-4 bg-gray-800 rounded-xl shadow-lg">
                 <h2 class="text-xl font-bold mb-4 text-center text-gray-200">Navegar para:</h2>
                 <div id="toc-especificos" class="flex flex-wrap gap-3 justify-center"></div>
             </div>
-            <!-- Navigation Links for Gerais -->
             <div id="nav-container-gerais" class="mb-10 p-4 bg-gray-800 rounded-xl shadow-lg hidden">
                 <h2 class="text-xl font-bold mb-4 text-center text-gray-200">Navegar para:</h2>
                 <div id="toc-gerais" class="flex flex-wrap gap-3 justify-center"></div>
             </div>
 
-            <!-- Content Panel for Conhecimentos Específicos -->
             <div id="content-especificos" class="tab-panel space-y-12"></div>
-            <!-- Content Panel for Conhecimentos Gerais -->
             <div id="content-gerais" class="tab-panel space-y-12 hidden"></div>
         </main>
     </div>
 
     <script>
+        // --- NOVO: Template do prompt armazenado em uma constante ---
+        const PROMPT_TEMPLATE = `Assuma o papel de um examinador sênior da banca Cebraspe. Sua missão é me treinar no conteúdo abaixo, seguindo rigorosamente todas as instruções.
+Conteúdo a ser abordado: [variável x]
+Estrutura Obrigatória por Conceito: Para cada conceito central dentro do tópico, você deve seguir, sem exceção, a seguinte estrutura:
+TEORIA-ALVO: Apresente o conceito de forma densa e direta, destacando os pontos nevrálgicos e as nuances que a Cebraspe costuma usar para elaborar questões (diferenças sutis entre termos, exceções à regra, etc.).
+ANALOGIA POKÉMON: Crie uma analogia curta e objetiva usando o universo Pokémon para simplificar e fixar o conceito teórico.
+ASSERTIVA DE PROVA: Elabore um item no formato "Certo ou Errado", exatamente como a Cebraspe faria. A assertiva deve ser complexa, contendo um erro sutil, uma generalização indevida, uma troca de conceitos ou uma "pegadinha" clássica da banca.
+ANÁLISE DO EXAMINADOR: Forneça o gabarito ("CERTO" ou "ERRADO") e, em seguida, um parágrafo de comentário técnico, dissecando a assertiva. Explique por que ela está certa ou errada, aponte qual foi a maldade/pegadinha utilizada e qual conhecimento era necessário para não cair no erro.
+Regras de Interação e Formatação:
+Interação: A resposta deve ser longa, completa e segmentada. Na primeira mensagem, informe o número total de partes da resposta completa. Aguarde meu comando "next" ou “go” para apresentar o próximo conceito. Não use introduções, saudações ou formalidades. Comece imediatamente com o primeiro ponto do conteúdo solicitado. Avise no fim de cada resposta em que situação da resposta está. Ex: se tiver dez respostas e estiver na terceira resposta, informe no fim da resposta: Resposta 3 de 10.
+Formatação Padrão (Markdown): Todas as respostas devem seguir, rigorosamente, o seguinte template para garantir a padronização:
+### **TÉCNICA/CONCEITO: [Insira o Nome da Técnica ou Conceito Aqui]**
+---
+#### **TEORIA-ALVO**
+[Texto da teoria]
+#### **ANALOGIA POKÉMON**
+[Texto da analogia]
+#### **ASSERTIVA DE PROVA**
+**(CESPE/CEBRASPE - [Fonte Fictícia ou Adaptada])**
+> [Texto da assertiva]
+#### **ANÁLISE DO EXAMINADOR**
+**GABARITO: [CERTO ou ERRADO]**
+Após a última resposta, diga: para criar o material de estudo, digite “go”. após este comando, coloque o conteúdo na íntegra rigorosamente neste formato de exemplo:
+todosOsDados.push({
+    tituloPrincipal: [Aqui vai o nome do "Conteúdo a ser abordado" sem a primeira parte pois é o nome do tópico] ,
+    conceitos: [
+        {
+            id: 1,
+            titulo: "Lorem Ipsum",
+            teoria: \`
+                <p><strong>Lorem ipsum</strong> dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                incididunt ut labore et dolore magna aliqua. Faucibus pulvinar elementum integer enim neque volutpat
+                ac.</p>
+                <ul>
+                    <li>Massa tincidunt dui ut ornare lectus sit amet.</li>
+                    <li>Egestas erat imperdiet sed euismod nisi porta lorem mollis.</li>
+                    <li>Nunc sed id semper risus in hendrerit gravida.</li>
+                </ul>\`,
+            analogiaPokemon: \`Vulputate dignissim suspendisse in est ante in. Convallis a cras semper auctor neque vitae tempus. Orci eu lobortis elementum nibh tellus molestie nunc non blandit.\`,
+            assertiva: {
+                fonte: "(CESPE/CEBRASPE - Concurso Fictício/2025 - Adaptada)",
+                texto: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nisi est sit amet facilisis magna etiam."
+            },
+            analise: {
+                gabarito: "ERRADO",
+                explicacao: "Massa tincidunt dui ut ornare lectus sit amet. Egestas erat imperdiet sed euismod nisi porta lorem mollis. Nunc sed id semper risus in hendrerit gravida."
+            }
+        },
+        {
+            id: 2,
+            titulo: "Lorem Ipsum",
+            teoria: \`<p><strong>Duis aute irure</strong> dolor in reprehenderit in voluptate velit esse cillum dolore eu
+                fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
+                deserunt mollit anim id est laborum.</p>\`,
+            analogiaPokemon: \`Purus sit amet luctus venenatis lectus magna fringilla. Nibh praesent tristique magna sit amet purus. Mattis aliquam faucibus purus in massa tempor nec feugiat nisl.\`,
+            assertiva: {
+                fonte: "(CESPE/CEBRASPE - Concurso Fictício/2025 - Adaptada)",
+                texto: "Purus sit amet luctus venenatis lectus magna fringilla. Nibh praesent tristique magna sit amet purus gravida quis."
+            },
+            analise: {
+                gabarito: "CERTO",
+                explicacao: "Mattis aliquam faucibus purus in massa tempor nec feugiat nisl. Ut aliquam purus sit amet luctus venenatis. Nunc sed id semper risus in hendrerit gravida."
+            }
+        },
+        {
+            id: 3,
+            titulo: "Lorem Ipsum",
+            teoria: \`<p><strong>Sed ut perspiciatis</strong> unde omnis iste natus error sit voluptatem accusantium
+                doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
+                architecto beatae vitae dicta sunt explicabo.</p>\`,
+            analogiaPokemon: \`Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.\`,
+            assertiva: {
+                fonte: "(CESPE/CEBRASPE - Concurso Fictício/2025 - Adaptada)",
+                texto: "Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora."
+            },
+            analise: {
+                gabarito: "ERRADO",
+                explicacao: "Incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam."
+            }
+        }
+        // ADICIONE MAIS CONCEITOS AQUI SEGUINDO O MESMO FORMATO
+    ]
+});`;
+
         const allContent = {
             especificos: [
                 {
@@ -272,14 +351,28 @@
             ]
         };
 
-        // --- CHANGE: Modified createCopyButton to accept the full text to copy directly ---
         function createCopyButton(textToCopy, title) {
             const button = document.createElement('button');
-            button.className = 'absolute top-1/2 right-0 -translate-y-1/2 p-2 text-gray-400 hover:text-blue-400 active:text-blue-500 transition-colors duration-200 rounded-full hover:bg-gray-700';
+            button.className = 'absolute top-1/2 left-0 -translate-y-1/2 p-2 text-gray-400 hover:text-blue-400 active:text-blue-500 transition-colors duration-200 rounded-full hover:bg-gray-700';
             button.title = title;
             button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
-            // --- CHANGE: The onclick event now calls copyToClipboard with the pre-formatted string ---
             button.onclick = () => copyToClipboard(textToCopy);
+            return button;
+        }
+
+        // --- NOVO: Função para criar o botão de cópia com prompt (raio) ---
+        function createPromptCopyButton(textToCopy) {
+            const button = document.createElement('button');
+            // Posicionado um pouco à direita do primeiro botão ('left-10')
+            button.className = 'absolute top-1/2 left-10 -translate-y-1/2 p-2 text-gray-400 hover:text-yellow-400 active:text-yellow-500 transition-colors duration-200 rounded-full hover:bg-gray-700';
+            button.title = 'Copiar como Prompt para IA';
+            // SVG do ícone de raio
+            button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`;
+            button.onclick = () => {
+                // Concatena o texto do item com o template do prompt
+                const fullPrompt = PROMPT_TEMPLATE.replace('[variável x]', textToCopy);
+                copyToClipboard(fullPrompt);
+            };
             return button;
         }
 
@@ -317,17 +410,19 @@
                     const subtitleWrapper = document.createElement('div');
                     subtitleWrapper.className = 'relative';
                     const subtitleEl = document.createElement('h3');
-                    subtitleEl.className = 'text-lg font-semibold text-blue-400 mb-3 pr-12';
+
+                    // --- MUDANÇA: Padding aumentado para 'pl-20' para dar espaço aos dois botões ---
+                    subtitleEl.className = 'text-lg font-semibold text-blue-400 mb-3 pl-20';
                     subtitleEl.textContent = item.subtitle;
 
-                    // --- CHANGE: Prepare the text for the subtitle's copy button ---
                     const subtitleTextToCopy = `${section.title} - ${item.subtitle}`;
                     subtitleWrapper.appendChild(subtitleEl);
                     subtitleWrapper.appendChild(createCopyButton(subtitleTextToCopy, 'Copiar Subtítulo'));
+                    // --- NOVO: Adiciona o botão de raio ---
+                    subtitleWrapper.appendChild(createPromptCopyButton(subtitleTextToCopy));
                     itemWrapper.appendChild(subtitleWrapper);
 
                     if (item.text && item.text.trim() !== "") {
-                        // --- CHANGE: Split all text content by semicolon to create individual copyable items ---
                         const subItems = item.text.split(';');
 
                         const subItemsContainer = document.createElement('div');
@@ -340,14 +435,17 @@
                             subItemWrapper.className = 'relative ml-4';
 
                             const p = document.createElement('p');
-                            p.className = 'text-gray-400 pr-12';
+
+                            // --- MUDANÇA: Padding aumentado para 'pl-20' ---
+                            p.className = 'text-gray-400 pl-20';
                             p.textContent = cleanSubItemText;
 
-                            // --- CHANGE: Construct the full string for this specific item ---
                             const itemTextToCopy = `${section.title} - ${item.subtitle} - ${cleanSubItemText}`;
 
                             subItemWrapper.appendChild(p);
                             subItemWrapper.appendChild(createCopyButton(itemTextToCopy, 'Copiar Item'));
+                            // --- NOVO: Adiciona o botão de raio ---
+                            subItemWrapper.appendChild(createPromptCopyButton(itemTextToCopy));
                             subItemsContainer.appendChild(subItemWrapper);
                         });
                         itemWrapper.appendChild(subItemsContainer);
@@ -360,7 +458,6 @@
             });
         }
 
-        // --- CHANGE: Simplified copyToClipboard to accept the final text directly ---
         function copyToClipboard(textToCopy) {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(textToCopy).then(showToast).catch(err => fallbackCopy(textToCopy));
@@ -420,6 +517,7 @@
 
         // Initial render
         document.addEventListener('DOMContentLoaded', () => {
+            // Dados de exemplo reduzidos para facilitar o teste
             renderContent('content-especificos', 'toc-especificos', allContent.especificos);
             renderContent('content-gerais', 'toc-gerais', allContent.gerais);
             setActiveTab(tabEpecificosBtn, contentEpecificos, navEpecificos, tabGeraisBtn, contentGerais, navGerais);
