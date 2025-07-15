@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conteúdo de Estudo - Conhecimentos Específicos e Gerais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .copy-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            background-color: #4ade80;
+            /* green-400 */
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            z-index: 1000;
+        }
+
+        .copy-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .tab-button.active {
+            border-color: #60a5fa;
+            /* blue-400 */
+            color: #60a5fa;
+            /* text-blue-400 */
+            background-color: #1f2937;
+            /* bg-gray-800 */
+        }
+
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-300">
+
+    <div id="copy-toast" class="copy-notification">Texto copiado com sucesso!</div>
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white">Conteúdo de Estudo</h1>
+            <p class="text-lg text-gray-400 mt-2">Navegue entre Conhecimentos Específicos e Gerais</p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="mb-8 border-b border-gray-700">
+            <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                <button id="tab-especificos"
+                    class="tab-button whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-lg text-gray-400 hover:text-blue-400 hover:border-blue-400">
+                    Conhecimentos Específicos
+                </button>
+                <button id="tab-gerais"
+                    class="tab-button whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-lg text-gray-400 hover:text-blue-400 hover:border-blue-400">
+                    Conhecimentos Gerais
+                </button>
+            </nav>
+        </div>
+
+        <main>
+            <!-- Navigation Links for Específicos -->
+            <div id="nav-container-especificos" class="mb-10 p-4 bg-gray-800 rounded-xl shadow-lg">
+                <h2 class="text-xl font-bold mb-4 text-center text-gray-200">Navegar para:</h2>
+                <div id="toc-especificos" class="flex flex-wrap gap-3 justify-center"></div>
+            </div>
+            <!-- Navigation Links for Gerais -->
+            <div id="nav-container-gerais" class="mb-10 p-4 bg-gray-800 rounded-xl shadow-lg hidden">
+                <h2 class="text-xl font-bold mb-4 text-center text-gray-200">Navegar para:</h2>
+                <div id="toc-gerais" class="flex flex-wrap gap-3 justify-center"></div>
+            </div>
+
+            <!-- Content Panel for Conhecimentos Específicos -->
+            <div id="content-especificos" class="tab-panel space-y-12"></div>
+            <!-- Content Panel for Conhecimentos Gerais -->
+            <div id="content-gerais" class="tab-panel space-y-12 hidden"></div>
+        </main>
+    </div>
+
+    <script>
+        const allContent = {
+            especificos: [
+                {
+                    title: "ENGENHARIA DE SOFTWARE",
+                    items: [
+                        { subtitle: "Gerenciamento de processos de negócio", text: "modelagem de processos; técnicas de análise de processo; desenho e melhoria de processos; integração de processos; business process modeling and notation (BPMN)." },
+                        { subtitle: "Engenharia de requisitos", text: "conceitos básicos; técnicas de elicitação de requisitos; gerenciamento de requisitos; especificação de requisitos; histórias de usuário; técnicas de validação de requisitos; prototipação; produto mínimo viável." },
+                        { subtitle: "Engenharia de usabilidade", text: "conceitos básicos e aplicações; critérios, recomendações e guias de estilo; análise de requisitos de usabilidade e responsividade; métodos para avaliação de usabilidade; design de interface e de experiência do usuário." },
+                        { subtitle: "Metodologias e práticas de desenvolvimento ágeis", text: "4.1. Scrum, Extreme Programming (XP), Kanban, lean development e TDD; 4.2. Qualidade de software." },
+                        { subtitle: "Análise e projeto orientados a objetos", text: "conceitos fundamentais, análise, modelagem e padrões de projeto; análise e projeto orientados a objetos; polimorfismo, herança, abstração e encapsulamento." },
+                        { subtitle: "Gestão de projetos e produtos de software", text: "gestão de backlog, gestão de dívida técnica, técnicas de priorização, técnicas de estimativas (story points, análise de pontos de função)." },
+                        { subtitle: "Testes", text: "conceitos básicos e aplicações; tipos de testes; análise estática de código fonte (SonarQube); testes automatizados e manuais." },
+                    ]
+                },
+                {
+                    title: "LINGUAGENS E TECNOLOGIAS DE PROGRAMAÇÃO",
+                    items: [
+                        { subtitle: "Fundamentos", text: "lógica de programação; operadores e expressões; estruturas de controle, seleção, repetição e desvio." },
+                        { subtitle: "Estruturas de dados", text: "listas, pilhas, filas, árvores; métodos de ordenação, pesquisa e hashing, estrutura de arquivos." },
+                        { subtitle: "Paradigmas de programação", text: "programação orientada a objetos; compiladores e interpretadores." },
+                        { subtitle: "Linguagem e ambientes de programação Java", text: "4.1. Noções de servidores de aplicação Java; 4.2. Eclipse; 4.3. Programação avançada em Java: JEE (JSP/Servlets, EJB, JNDI, JDBC), JavaBeans, Struts2, Hibernate, Framework Spring, Web Services, testes de unidade com JUnit, Ant, Maven, padrões de projeto JEE." },
+                        { subtitle: "Desenvolvimento de sistemas Web", text: "HTML, AJAX, XML, Web Services, CSS, JavaScript, DHTML." },
+                        { subtitle: "Tecnologias e práticas frontend web", text: "HTML5, CSS3, JavaScript, Ajax, framework Angular, WebSocket e Single Page Application (SPA)." },
+                        { subtitle: "Linguagem Python", text: "sintaxe, variáveis, tipos de dados e estruturas de controle de fluxo. Estruturas de dados, funções e arquivos." },
+                        { subtitle: "Desenvolvimento com containers", text: "Docker, OCI, Kubernetes, Boas práticas para desenvolvimento com containers, Orquestração de containers, Arquitetura altamente distribuída, Content Delivery Networks (CDNs)." },
+                        { subtitle: "Gerência de configuração de software", text: "versionamento (Git e GitLab), merge, branch, pipeline; Gitflow, desenvolvimento colaborativo; CI/CD (GitLab CI)." },
+                    ]
+                },
+                {
+                    title: "BANCOS DE DADOS",
+                    items: [
+                        { subtitle: "Bancos de dados relacionais", text: "sistemas gerenciadores de banco de dados (Oracle, conceitos básicos e noções de administração); SQL (structured query language); PL/SQL conceitos e comandos; controle de proteção, integridade, concorrência e bloqueio de transações." },
+                        { subtitle: "Banco de dados NoSQL", text: "key/value; orientados a documentos; grafos." },
+                        { subtitle: "Técnicas para detecção de problemas e otimização de desempenho", text: "do SGBD e de consultas SQL." },
+                        { subtitle: "Arquitetura e aplicações de data warehouse", text: "ETL e Olap; técnicas de modelagem e otimização de bases de dados multidimensionais." },
+                        { subtitle: "Business intelligence", text: "processo de coleta, organização, análise e compartilhamento de informações; dashboards (painéis e visualização de dados)." },
+                        { subtitle: "Ferramentas de busca, indexação e análise de dados", text: "Elasticsearch, Logstash e Kibana." },
+                        { subtitle: "Noções de big data e data lake", text: "" },
+                    ]
+                },
+                {
+                    title: "INFRAESTRUTURA DE TI",
+                    items: [
+                        { subtitle: "Redes de Computadores", text: "1.1. Tecnologias de rede de computadores: Ethernet, fibra ótica, wireless e redes móveis; 1.2. Tipos e topologias de rede: LAN, WAN, VLAN; 1.3. Elementos de interconexão de redes e computadores: roteadores, switches, hubs, gateways, repetidores; 1.4. Redes TCP/IP: 1.4.1. Protocolos TCP e UPD; 1.4.2. Classes de redes TCP/IP; 1.4.3. Endereçamento de redes TCP/IP; 1.4.4. NAT - Network Address Translator; 1.5. Protocolos e serviços de rede: DNS, DHCP, SMTP, FTP, HTTP, NSMP, TLS, SSH, RADIUS, VPN; 1.6. Utilitários de análise e diagnóstico de redes Windows: ping, tracert, netstat, whois, ipconfig, net user, net session, net share." },
+                        { subtitle: "Virtualização", text: "conceitos básicos." },
+                        { subtitle: "Tecnologias de armazenamento", text: "3.1. Mídias de armazenamento: HDD, SSD, Fitas LTO; 3.2. Tecnologias de conexão entre dispositivos e computadores: IDE, SATA, SCSI, Iscsi, Fibre Channel, NVME; 3.3. Sistemas de arquivos: NTFS, FAT32, EXT2, EXT3, EXT4, BTRFS; 3.4. Tecnologias de compartilhamento de arquivos e dispositivos: SMB, NFS, CIFS; 3.5. Storages; 3.6. Conceitos de SAN e NAS; 3.7. RAID - tipos, características e aplicações; 3.8. Backup e restauração: políticas e tipos de backup (integral, incremental, diferencial)." },
+                        { subtitle: "Sistemas Operacionais e Serviços de Rede", text: "4.1. MS Windows (Server 2016 e superiores e Windows 10 e superiores): 4.1.1. Instalação e configuração; 4.1.2. Controle de usuários; 4.1.3. Ferramentas de administração...; 4.1.4. Sistema de arquivos...; 4.1.5. Windows Defender Firewall; 4.1.6. Conexão de Área de Trabalho Remota; 4.1.7. Internet Information Services (IIS); 4.1.8. Remote Desktop Services (RDS); 4.2. Sistemas operacionais baseados em GNU/Linux: 4.2.1. Instalação e configuração; 4.2.2. Controle de usuários; 4.2.3. Comandos básicos de shell e scripts; 4.2.4. Sistema de arquivos: permissões e compartilhamento de arquivos e pastas (SAMBA); 4.3. MS Active Directory: 4.3.1. Conceitos básicos...; 4.3.2. Gerenciamento de grupos e usuários; 4.3.3. Políticas de rede; 4.3.4. Protocolo LDAP." },
+                    ]
+                },
+                {
+                    title: "SEGURANÇA DA INFORMAÇÃO",
+                    items: [
+                        { subtitle: "Conceitos básicos", text: "confidencialidade, integridade, disponibilidade, autenticidade e não repúdio." },
+                        { subtitle: "Métodos de autenticação e autorização", text: "autenticação de múltiplos fatores (MFA), protocolos de autenticação OAuth 2.0, OpenID Connect e JWT (JSON Web Tokens)." },
+                        { subtitle: "Ameaças e vulnerabilidades em aplicações", text: "injection (SQL, LDAP), cross-site scripting (XSS), quebra de autenticação e gerenciamento de sessão, referência insegura a objetos, cross-site request forgery, armazenamento inseguro de dados criptografados." },
+                        { subtitle: "Segurança de aplicativos web", text: "conceitos de segurança de aplicativos web, análise de vulnerabilidades em aplicações web, metodologia open web application security project (OWASP), técnicas de proteção de aplicações web." },
+                        { subtitle: "Prevenção e combate a ataques a redes de computadores", text: "como DDoS, DoS, DNS spoofing, eavesdropping, phishing, brute force, port scanning." },
+                        { subtitle: "Criptografia e proteção de dados", text: "em trânsito e em repouso; sistemas criptográficos simétricos e assimétricos e principais protocolos." },
+                        { subtitle: "Tecnologias de segurança", text: "firewalls, sistemas de detecção e prevenção de intrusões, antivírus, antispam." },
+                        { subtitle: "Assinatura e certificação digital", text: "" },
+                        { subtitle: "Lei nº 13.709/2018 (Lei Geral de Proteção de Dados Pessoais) e alterações.", text: "" },
+                    ]
+                },
+                {
+                    title: "GESTÃO E GOVERNANÇA DE TI",
+                    items: [
+                        { subtitle: "Planejamento e gestão estratégicos de TI", text: "PETI, PDTI e indicadores de desempenho de TI." },
+                        { subtitle: "Gerenciamento de projetos (PMBOK 7ª edição)", text: "conceitos básicos, estrutura e objetivos." },
+                        { subtitle: "Gerenciamento de serviços (ITIL V4)", text: "conceitos básicos, estrutura e objetivos." },
+                        { subtitle: "Governança de TI (COBIT 2019)", text: "conceitos básicos, estrutura e objetivos." },
+                        { subtitle: "Qualidade de software", text: "CMMI, MPS/BR." },
+                        { subtitle: "Norma NBR ISO/IEC nº 38500:2018", text: "" },
+                        { subtitle: "Lei nº 12.527/2011 (Lei de Acesso à Informação)", text: "" },
+                    ]
+                },
+                {
+                    title: "FISCALIZAÇÃO DE CONTRATOS DE TI",
+                    items: [
+                        { subtitle: "Gestão de contratação de soluções de TI", text: "" },
+                        { subtitle: "Lei nº 14.133/2021 e suas alterações.", text: "" },
+                        { subtitle: "Elaboração e fiscalização de contratos de tecnologia da informação", text: "3.1. Critérios de remuneração por esforço versus produto; 3.2. Cláusulas e indicadores de nível de serviço; 3.3. Papel do fiscalizador do contrato; 3.4. Papel do preposto da contratada; 3.5. Acompanhamento da execução contratual; 3.6. Registro e notificação de irregularidades; 3.7. Definição e aplicação de penalidades e sanções administrativas." },
+                    ]
+                },
+                {
+                    title: "AUDITORIA GOVERNAMENTAL, COMPLIANCE, GESTÃO DE RISCO E GOVERNANÇA",
+                    items: [
+                        { subtitle: "Compliance aplicado à gestão pública", text: "1.1. Conceito, princípios e normas." },
+                        { subtitle: "Auditoria governamental", text: "2.1. Controle interno; 2.2. Auditoria de regularidade, auditoria financeira e auditoria operacional; 2.3. Instrumentos de fiscalização: 2.3.1. Auditoria, levantamento, monitoramento, acompanhamento e inspeção; 2.4. Planejamento de auditoria." },
+                        { subtitle: "Gestão de riscos no setor público", text: "" },
+                        { subtitle: "Plano de auditoria baseado no risco", text: "4.1. Atividades preliminares; 4.2. Determinação de escopo; 4.3. Materialidades, risco e relevância; 4.4. Exame e avaliação do controle interno; 4.5. Risco inerente, de controle e de detecção; 4.6. Risco de auditoria; 4.7. Matriz de planejamento; 4.8. Programas de auditoria; 4.9. Papéis de trabalho; 4.10. Testes de auditoria; 4.11. Importância da amostragem estatística em auditoria." },
+                        { subtitle: "Execução da auditoria", text: "5.1. Técnicas e procedimentos: exame documental, inspeção física, conferência de cálculos, observação, entrevista, circularização, conciliações, análise de contas contábeis, revisão analítica." },
+                        { subtitle: "Evidências", text: "6.1. Caracterizações de achados de auditoria; 6.2. Matrizes de achados e matriz de responsabilização." },
+                        { subtitle: "Comunicação dos resultados", text: "7.1. Relatório de auditoria." },
+                        { subtitle: "Monitoramento", text: "" },
+                        { subtitle: "Documentação da auditoria", text: "" },
+                        { subtitle: "Supervisão e controle de qualidade", text: "" },
+                        { subtitle: "ISSAIs (30, 100, 200, 300, 400, 3.000 e 3.100)", text: "" },
+                        { subtitle: "Governança no setor público", text: "12.1. Papel e importância; 12.2. Governança, transparência e accountability; 12.3. Governança e governabilidade; 12.4. Princípios da governança pública." },
+                        { subtitle: "Utilização da IA como ferramenta de apoio à auditoria", text: "" },
+                    ]
+                }
+            ],
+            gerais: [
+                {
+                    title: "CONTROLE DA ADMINISTRAÇÃO PÚBLICA",
+                    items: [
+                        { subtitle: "Conceito, tipos e formas de controle.", text: "" },
+                        { subtitle: "Controles interno e externo.", text: "" },
+                        { subtitle: "Controle parlamentar.", text: "" },
+                        { subtitle: "Controle pelos tribunais de contas.", text: "" },
+                        { subtitle: "Controle social e os tribunais de contas.", text: "" },
+                        { subtitle: "Controle administrativo.", text: "" },
+                        { subtitle: "Recurso de administração.", text: "" },
+                        { subtitle: "Reclamação.", text: "" },
+                        { subtitle: "Lei de Improbidade Administrativa (Lei nº 8.429/1992 e suas alterações).", text: "" },
+                        { subtitle: "Controle da atividade financeira do Estado: espécies e sistemas.", text: "" },
+                        { subtitle: "Lei nº 14.133/2021.", text: "" },
+                        { subtitle: "Lei Complementar nº 101/2000 (Lei de Responsabilidade Fiscal).", text: "" },
+                        { subtitle: "Constituição do Estado do Rio Grande do Sul (artigos 70 a 77).", text: "" },
+                        { subtitle: "Lei Orgânica do TCE/RS (Lei estadual nº 11.424/2000).", text: "" },
+                        { subtitle: "Regimento Interno do Tribunal de Contas do Estado do Rio Grande do Sul (Resolução TCE/RS nº 1.028/2015).", text: "" },
+                    ]
+                },
+                {
+                    title: "ADMINISTRAÇÃO ORÇAMENTÁRIA E FINANCEIRA",
+                    items: [
+                        { subtitle: "Orçamento público", text: "1.1. Conceito; 1.2. Técnicas orçamentárias; 1.3. Princípios orçamentários; 1.4. Ciclo orçamentário; 1.5. Processo orçamentário." },
+                        { subtitle: "Orçamento público no Brasil", text: "2.1. Sistema de planejamento e de orçamento federal; 2.2. Plano plurianual; 2.3. Diretrizes orçamentárias; 2.4. Orçamento anual; 2.5. Sistema e processo de orçamentação; 2.6. Classificações orçamentárias; 2.7. Estrutura programática; 2.8. Créditos ordinários e adicionais." },
+                        { subtitle: "Programação e execução orçamentária e financeira", text: "3.1. Descentralização orçamentária e financeira; 3.2. Acompanhamento da execução; 3.3. Sistemas de informações; 3.4. Alterações orçamentárias." },
+                        { subtitle: "Receita pública", text: "4.1. Conceito e classificações; 4.2. Estágios; 4.3. Fontes; 4.4. Dívida ativa." },
+                        { subtitle: "Despesa pública", text: "5.1. Conceito e classificações; 5.2. Estágios; 5.3. Restos a pagar; 5.4. Despesas de exercícios anteriores; 5.5. Dívida flutuante e fundada; 5.6. Suprimento de fundos." },
+                        { subtitle: "Lei Complementar nº 101/2000 e suas alterações (Lei de Responsabilidade Fiscal).", text: "" },
+                        { subtitle: "Lei nº 4.320/1964 e suas alterações.", text: "" },
+                    ]
+                },
+                {
+                    title: "DIREITO CONSTITUCIONAL",
+                    items: [
+                        { subtitle: "Constituição da República Federativa do Brasil de 1988", text: "1.1. Conceito, classificação, princípios fundamentais, emendas constitucionais." },
+                        { subtitle: "Direitos e garantias fundamentais", text: "2.1. Direitos e deveres individuais e coletivos, direitos sociais, nacionalidade, cidadania, direitos políticos, partidos políticos." },
+                        { subtitle: "Organização político-administrativa", text: "3.1. União, estados, Distrito Federal e municípios." },
+                        { subtitle: "Administração pública", text: "4.1. Disposições gerais, servidores públicos." },
+                        { subtitle: "Poder Legislativo", text: "5.1. Congresso Nacional, Câmara dos Deputados, Senado Federal, deputados e senadores." },
+                        { subtitle: "Poder Executivo", text: "6.1. Atribuições do presidente da República e dos ministros de Estado." },
+                        { subtitle: "Poder Judiciário", text: "7.1. Disposições gerais; 7.2. Órgãos do Poder Judiciário; 7.2.1. Competências; 7.3. Conselho Nacional de Justiça (CNJ); 7.3.1. Composição e competência." },
+                        { subtitle: "Funções essenciais à Justiça", text: "8.1. Ministério Público, advocacia e defensoria públicas." },
+                    ]
+                },
+                {
+                    title: "DIREITO ADMINISTRATIVO",
+                    items: [
+                        { subtitle: "Estado, governo e administração pública.", text: "" },
+                        { subtitle: "Direito administrativo.", text: "" },
+                        { subtitle: "Ato administrativo.", text: "" },
+                        { subtitle: "Poderes da administração pública", text: "4.1. Hierárquico, disciplinar, regulamentar e de polícia; 4.2. Uso e abuso do poder." },
+                        { subtitle: "Regime jurídico-administrativo", text: "5.1. Conceito; 5.2. Princípios expressos e implícitos da administração pública." },
+                        { subtitle: "Responsabilidade civil do Estado.", text: "" },
+                        { subtitle: "Serviços públicos.", text: "" },
+                        { subtitle: "Organização administrativa", text: "8.1. Centralização, descentralização, concentração e desconcentração; 8.2. Administração direta e indireta." },
+                        { subtitle: "Controle da administração pública", text: "9.1. Controle exercido pela administração pública; 9.2. Controle judicial; 9.3. Controle legislativo; 9.4. Improbidade administrativa." },
+                        { subtitle: "Processo administrativo.", text: "" },
+                        { subtitle: "Licitações e contratos administrativos.", text: "" },
+                        { subtitle: "Agente público.", text: "" },
+                        { subtitle: "Cargo, emprego e função pública.", text: "" },
+                        { subtitle: "Lei Complementar Estadual nº 10.098/1994, que dispõe sobre o Estatuto e Regime Jurídico Único dos Servidores Públicos Civis do Estado do Rio Grande do Sul.", text: "" },
+                    ]
+                }
+            ]
+        };
+
+        // --- CHANGE: Modified createCopyButton to accept the full text to copy directly ---
+        function createCopyButton(textToCopy, title) {
+            const button = document.createElement('button');
+            button.className = 'absolute top-1/2 right-0 -translate-y-1/2 p-2 text-gray-400 hover:text-blue-400 active:text-blue-500 transition-colors duration-200 rounded-full hover:bg-gray-700';
+            button.title = title;
+            button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+            // --- CHANGE: The onclick event now calls copyToClipboard with the pre-formatted string ---
+            button.onclick = () => copyToClipboard(textToCopy);
+            return button;
+        }
+
+        function renderContent(contentContainerId, tocContainerId, data) {
+            const contentContainer = document.getElementById(contentContainerId);
+            const tocContainer = document.getElementById(tocContainerId);
+            contentContainer.innerHTML = '';
+            tocContainer.innerHTML = '';
+
+            data.forEach(section => {
+                const sectionId = section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+                const navLink = document.createElement('a');
+                navLink.href = `#${sectionId}`;
+                navLink.textContent = section.title;
+                navLink.className = 'nav-link bg-gray-700 hover:bg-blue-500 text-gray-300 hover:text-white font-medium py-2 px-4 rounded-lg shadow-sm';
+                tocContainer.appendChild(navLink);
+
+                const sectionEl = document.createElement('section');
+                sectionEl.id = sectionId;
+                sectionEl.className = "pt-4";
+
+                const titleEl = document.createElement('h2');
+                titleEl.className = 'text-2xl sm:text-3xl font-bold text-white pb-3 mb-6 border-b-2 border-blue-500';
+                titleEl.textContent = section.title;
+                sectionEl.appendChild(titleEl);
+
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'space-y-6';
+
+                section.items.forEach(item => {
+                    const itemWrapper = document.createElement('div');
+                    itemWrapper.className = 'bg-gray-800 p-5 rounded-xl shadow-lg';
+
+                    const subtitleWrapper = document.createElement('div');
+                    subtitleWrapper.className = 'relative';
+                    const subtitleEl = document.createElement('h3');
+                    subtitleEl.className = 'text-lg font-semibold text-blue-400 mb-3 pr-12';
+                    subtitleEl.textContent = item.subtitle;
+
+                    // --- CHANGE: Prepare the text for the subtitle's copy button ---
+                    const subtitleTextToCopy = `${section.title} - ${item.subtitle}`;
+                    subtitleWrapper.appendChild(subtitleEl);
+                    subtitleWrapper.appendChild(createCopyButton(subtitleTextToCopy, 'Copiar Subtítulo'));
+                    itemWrapper.appendChild(subtitleWrapper);
+
+                    if (item.text && item.text.trim() !== "") {
+                        // --- CHANGE: Split all text content by semicolon to create individual copyable items ---
+                        const subItems = item.text.split(';');
+
+                        const subItemsContainer = document.createElement('div');
+                        subItemsContainer.className = "space-y-3 mt-2";
+                        subItems.forEach(subItemText => {
+                            const cleanSubItemText = subItemText.trim();
+                            if (cleanSubItemText === "") return;
+
+                            const subItemWrapper = document.createElement('div');
+                            subItemWrapper.className = 'relative ml-4';
+
+                            const p = document.createElement('p');
+                            p.className = 'text-gray-400 pr-12';
+                            p.textContent = cleanSubItemText;
+
+                            // --- CHANGE: Construct the full string for this specific item ---
+                            const itemTextToCopy = `${section.title} - ${item.subtitle} - ${cleanSubItemText}`;
+
+                            subItemWrapper.appendChild(p);
+                            subItemWrapper.appendChild(createCopyButton(itemTextToCopy, 'Copiar Item'));
+                            subItemsContainer.appendChild(subItemWrapper);
+                        });
+                        itemWrapper.appendChild(subItemsContainer);
+                    }
+                    itemsContainer.appendChild(itemWrapper);
+                });
+
+                sectionEl.appendChild(itemsContainer);
+                contentContainer.appendChild(sectionEl);
+            });
+        }
+
+        // --- CHANGE: Simplified copyToClipboard to accept the final text directly ---
+        function copyToClipboard(textToCopy) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(showToast).catch(err => fallbackCopy(textToCopy));
+            } else {
+                fallbackCopy(textToCopy);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                if (document.execCommand('copy')) showToast();
+            } catch (err) {
+                console.error('Fallback: Unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById('copy-toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Tab switching logic
+        const tabEpecificosBtn = document.getElementById('tab-especificos');
+        const tabGeraisBtn = document.getElementById('tab-gerais');
+        const contentEpecificos = document.getElementById('content-especificos');
+        const contentGerais = document.getElementById('content-gerais');
+        const navEpecificos = document.getElementById('nav-container-especificos');
+        const navGerais = document.getElementById('nav-container-gerais');
+
+        function setActiveTab(activeBtn, activeContent, activeNav, inactiveBtn, inactiveContent, inactiveNav) {
+            activeContent.classList.remove('hidden');
+            activeNav.classList.remove('hidden');
+            inactiveContent.classList.add('hidden');
+            inactiveNav.classList.add('hidden');
+            activeBtn.classList.add('active');
+            inactiveBtn.classList.remove('active');
+        }
+
+        tabEpecificosBtn.addEventListener('click', () => {
+            setActiveTab(tabEpecificosBtn, contentEpecificos, navEpecificos, tabGeraisBtn, contentGerais, navGerais);
+        });
+
+        tabGeraisBtn.addEventListener('click', () => {
+            setActiveTab(tabGeraisBtn, contentGerais, navGerais, tabEpecificosBtn, contentEpecificos, navEpecificos);
+        });
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', () => {
+            renderContent('content-especificos', 'toc-especificos', allContent.especificos);
+            renderContent('content-gerais', 'toc-gerais', allContent.gerais);
+            setActiveTab(tabEpecificosBtn, contentEpecificos, navEpecificos, tabGeraisBtn, contentGerais, navGerais);
+        });
+    </script>
+</body>
+
+</html>
