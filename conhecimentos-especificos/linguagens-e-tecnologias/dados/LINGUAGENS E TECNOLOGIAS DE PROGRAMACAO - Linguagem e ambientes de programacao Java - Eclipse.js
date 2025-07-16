@@ -1,4 +1,4 @@
-const todosOsDados = {
+todosOsDados.push({
     tituloPrincipal: "Linguagem e ambientes de programação Java - 4.2. Eclipse",
     conceitos: [
         {
@@ -142,4 +142,4 @@ const todosOsDados = {
             }
         }
     ]
-};
+});

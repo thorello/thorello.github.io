@@ -1,4 +1,3 @@
-const todosOsDados = [];
 todosOsDados.push({
     tituloPrincipal: "Linguagem e ambientes de programação Java - 4.1. Noções de servidores de aplicação Java",
     conceitos: [
