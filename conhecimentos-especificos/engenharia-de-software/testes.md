@@ -1,3 +1,142 @@
+### Olá, futuro(a) aprovado(a)\! Vamos inspecionar os Conceitos de Testes para que você passe no controle de qualidade do Cebraspe.
+
+Pense em teste de software como o **processo de controle de qualidade de um carro novo** 🚗, desde a planta do motor até o test-drive final com o cliente.
+
+-----
+
+### \#\#\# Conceitos Básicos: A Linguagem da Oficina
+
+Para encontrar problemas, primeiro precisamos saber nomeá-los.
+
+  * **A Cadeia do Desastre:**
+
+    1.  **Erro:** Um engenheiro, cansado, desenha o parafuso do motor com a medida errada. (Ação humana).
+    2.  **Defeito (Bug):** O parafuso com a medida errada que foi instalado no motor. (O problema no produto).
+    3.  **Falha:** Você liga o carro e o motor quebra. (A manifestação externa do defeito).
+
+  * **Verificação vs. Validação:**
+
+      * **Verificação:** "Estamos construindo o carro **corretamente**?" (A montagem seguiu a planta e as especificações?). É uma checagem de conformidade.
+      * **Validação:** "Estamos construindo o carro **certo**?" (O carro atende às necessidades da família que vai comprá-lo?). É uma checagem de adequação ao uso.
+
+  * **Os 7 Princípios do Teste (A Sabedoria do Inspetor-Chefe):**
+
+    1.  **Teste mostra a presença de defeitos:** A inspeção pode provar que o carro tem defeitos, mas nunca pode garantir que ele é 100% perfeito.
+    2.  **Teste exaustivo é impossível:** É impossível testar o carro em todas as estradas do mundo, com todos os climas e motoristas possíveis.
+    3.  **Teste antecipado:** É muito mais barato corrigir um erro na planta do motor do que fazer um recall de 10.000 carros.
+    4.  **Defeitos se agrupam:** Geralmente, a maioria dos problemas se concentra em algumas partes específicas do carro, como o sistema elétrico.
+    5.  **Paradoxo do Pesticida:** Se você testar o carro sempre na mesma pista, com o tempo, esse teste não encontrará novos defeitos. É preciso variar os testes.
+    6.  **Teste depende do contexto:** Testar um carro de Fórmula 1 é diferente de testar um carro popular.
+    7.  **Falácia da ausência de erros:** Não adianta o carro não ter nenhum defeito mecânico se ele for horrível de dirigir ou não couber a família do cliente.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Causalidade:** A banca vai dizer que todo defeito gera uma falha. **ERRADO\!** Um parafuso errado (defeito) em uma parte pouco usada do carro pode nunca quebrar (gerar uma falha).
+> >   * **Verificação vs. Validação:** A pegadinha clássica\! **Verificação = seguir a planta**. **Validação = agradar o cliente**. Revisar um documento é verificação. Fazer um test-drive é validação.
+> >   * A banca vai usar os princípios para te enganar. "Com testes suficientes, podemos garantir um software livre de defeitos". **ERRADO\!** (Viola o Princípio 1).
+
+-----
+
+### \#\#\# Tipos de Testes: As Etapas e os Focos da Inspeção
+
+A inspeção do carro acontece em vários estágios (níveis) e com vários objetivos (tipos).
+
+  * **Níveis de Teste (Quando testamos):**
+
+      * **Teste de Unidade:** Testar só o motor, na bancada, antes de instalá-lo no chassi.
+      * **Teste de Integração:** Testar se o motor se encaixa e funciona bem com a caixa de câmbio.
+      * **Teste de Sistema:** Testar o carro completo, já montado, na pista de testes da fábrica.
+      * **Teste de Aceitação:** O cliente faz o test-drive final para decidir se leva o carro para casa.
+          * **Teste Alfa:** O cliente faz o test-drive na pista da fábrica, com os engenheiros observando.
+          * **Teste Beta:** A fábrica empresta o carro para o cliente usar no seu dia a dia por uma semana e dar seu feedback.
+
+  * **Tipos de Teste (O que e como testamos):**
+
+      * **Caixa-Branca:** O inspetor tem a planta completa do motor e verifica cada peça interna.
+      * **Caixa-Preta:** O inspetor não entende de mecânica. Ele só entra no carro, gira a chave, acelera e freia para ver se o carro funciona, sem abrir o capô.
+      * **Teste de Performance:** Colocar o carro no limite para ver se ele aguenta (teste de estresse).
+      * **Teste de Regressão:** Depois de trocar os pneus (uma mudança), você liga o rádio, o ar-condicionado e os faróis novamente para garantir que a troca dos pneus não quebrou algo que já funcionava.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Alfa vs. Beta:** A diferença é o **ambiente** e o **controle**. **Alfa** = na fábrica, controlado. **Beta** = na rua, com o cliente, sem controle.
+> >   * **Stubs e Drivers:** Para testar a integração do rádio (nível superior) sem ter os alto-falantes (nível inferior), usamos um fone de ouvido no lugar (**Stub**). Para testar só os alto-falantes sem o rádio, usamos um MP3 player para gerar o som (**Driver**). A banca vai trocar esses nomes.
+
+-----
+
+### \#\#\# Testes Automatizados: Robôs Inspetores
+
+  * **O Conceito:** Usar robôs para fazer a inspeção. Um robô pode abrir e fechar a porta do carro um milhão de vezes para testar a durabilidade, algo que seria impossível para um humano.
+  * **Pirâmide de Automação de Testes:** A estratégia de como usar os robôs.
+      * **BASE (Larga): Testes de Unidade.** Muitos e muitos testes de robôs para cada parafuso e pecinha do motor. São rápidos e baratos.
+      * **MEIO: Testes de Integração.** Menos testes, para checar se as peças grandes se conectam.
+      * **TOPO (Estreito): Testes de UI.** Pouquíssimos testes com um robô-piloto que "dirige" o carro inteiro. São lentos, caros e quebram fácil.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Automação substitui tudo?** **ERRADO\!** Robôs são ótimos para tarefas repetitivas, mas péssimos para avaliar a "sensação de dirigir" ou se o design do painel é agradável. Testes de usabilidade e exploratórios ainda precisam de humanos.
+> >   * A banca vai descrever uma estratégia que foca em testes de UI (o "cone de sorvete"). **ERRADO\!** É um anti-padrão. A boa prática é focar na base da pirâmide.
+
+-----
+
+### \#\#\# Testes Manuais: A Percepção do Inspetor Humano
+
+  * **O Conceito:** Usar a inteligência, intuição e experiência de um inspetor humano.
+  * **Técnicas Principais:**
+      * **Teste Exploratório:** Um piloto de testes experiente pega o carro sem roteiro e vai para a pista "explorar" os limites do carro, descobrindo problemas que ninguém pensou em testar.
+      * **Teste de Usabilidade:** Colocar uma pessoa comum para dirigir o carro e ver se ela consegue ligar o rádio sem precisar ler o manual.
+      * **Teste Ad-hoc ("Teste do Macaco"):** O inspetor entra no carro e começa a apertar todos os botões ao mesmo tempo, de forma aleatória, só para ver se o sistema trava.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Exploratório vs. Ad-hoc:** Não são a mesma coisa. **Ad-hoc** é aleatório e sem anotações. **Exploratório** é sistemático; o piloto aprende sobre o carro enquanto testa e anota suas descobertas para guiar os próximos passos.
+
+-----
+
+### \#\#\# Análise Estática: Inspecionando a Planta Baixa
+
+  * **O Conceito:** Usar um software especialista para analisar a **planta do motor (o código-fonte) antes mesmo de construir a primeira peça**. O motor **não é ligado** (o código não é executado).
+  * **SonarQube (O Software Inspetor de Plantas):** Ele lê a planta e aponta problemas:
+      * **Bugs:** "Este parafuso está com a medida errada na planta. Vai quebrar."
+      * **Vulnerabilidades:** "A fiação do alarme está desenhada de forma exposta. Um ladrão pode cortá-la."
+      * **Code Smells (Maus Cheiros):** "Esta parte da planta está tão confusa que nenhum mecânico vai conseguir fazer a manutenção depois. Não é um erro, mas é um 'mau cheiro' de problema futuro."
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Análise Estática vs. Dinâmica:** A banca vai dizer que o SonarQube liga o motor para achar defeitos. **ERRADO\!** Análise **estática** = analisar a planta. Análise **dinâmica** = ligar o motor e ver o que acontece.
+> >   * **Bug vs. Code Smell:** **Bug** = erro que fará o carro falhar. **Code Smell** = um design ruim na planta que vai dificultar a manutenção do carro no futuro.
+> >   * **Cobertura de Código:** O SonarQube mostra qual percentual do motor foi ligado durante os testes de unidade, mas ele **não executa** esses testes. Ele apenas **importa e exibe** o relatório gerado por outra ferramenta.
+
+### \#\#\# Mapa Mental: O Modelo V de Testes
+
+```mermaid
+%%{init: {"theme": "toko-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "Processo de Desenvolvimento (Construindo o Carro)"
+        A["Definição dos Requisitos<br>(O sonho do cliente)"] --> B["Design do Sistema<br>(Planta geral do carro)"];
+        B --> C["Design dos Componentes<br>(Planta do motor)"];
+        C --> D["Codificação<br>(Construir as peças)"];
+    end
+
+    subgraph "Processo de Testes (Inspecionando o Carro)"
+        H["Teste de Aceitação<br>Valida ↔ A"] --> G["Teste de Sistema<br>Valida ↔ B"];
+        G --> F["Teste de Integração<br>Valida ↔ C"];
+        F --> E["Teste de Unidade<br>Valida ↔ D"];
+    end
+
+    A -- "Verificação (Análise Estática)" --> B
+    B -- "Verificação" --> C
+    C -- "Verificação" --> D
+    
+    style H fill:#313149,stroke:#bb9af7
+    style G fill:#313149,stroke:#bb9af7
+    style F fill:#313149,stroke:#bb9af7
+    style E fill:#313149,stroke:#bb9af7
+
+    D -- Ativa --> E
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Testes: Conceitos básicos
 
