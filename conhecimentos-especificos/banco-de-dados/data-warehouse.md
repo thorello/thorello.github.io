@@ -108,3 +108,73 @@
 > > * **Índices em DW:** O tipo de índice é importante. Em tabelas de dimensão com baixa cardinalidade (e.g., 'sexo', 'estado civil'), **índices bitmap** são frequentemente mais eficientes em espaço e desempenho que os tradicionais B-Tree.
 > > * **Agregação:** A criação de agregados é um trade-off clássico: aumenta a necessidade de armazenamento e o tempo de carga (ETL), mas **acelera drasticamente** o tempo de consulta. A banca pode questionar esse trade-off.
 > > * **Particionamento:** O principal benefício do particionamento é o *partition pruning* (ou eliminação de partição), a capacidade do SGBD de escanear apenas as partições relevantes para uma consulta, em vez da tabela inteira.
+> 
+
+```mermaid
+flowchart TD
+    %% Estilo para os subgrafos
+    style E1 fill:#e0f2f7,stroke:#039be5,stroke-width:2px,color:#000
+    style E2 fill:#f1f8e9,stroke:#66bb6a,stroke-width:2px,color:#000
+    style E3 fill:#fffde7,stroke:#fdd835,stroke-width:2px,color:#000
+    style E4 fill:#ffe0b2,stroke:#ffb74d,stroke-width:2px,color:#000
+    style E5 fill:#ede7f6,stroke:#9575cd,stroke-width:2px,color:#000
+    style E6 fill:#fbe9e7,stroke:#ffab91,stroke-width:2px,color:#000
+
+    %% Etapa 1: Origem
+    subgraph E1 [**1. Dados Operacionais ⚙️**]
+        Fontes(("Sistemas OLTP"))
+        ERP((ERP))
+        CRM((CRM))
+        Planilhas([Planilhas])
+        Fontes --- ERP & CRM & Planilhas
+    end
+
+    %% Etapa 2: ETL
+    subgraph E2 [**2. Processo ETL 🔄**]
+        Extract["Extração 📥"]
+        Transform["Transformação ✨"]
+        Load["Carga 📤"]
+        Extract --> Transform --> Load
+    end
+
+    %% Etapa 3: DW
+    subgraph E3 [**3. Data Warehouse 🏛️**]
+        DW(("DW"))
+        Assunto["Orientado a Assunto"]
+        Integrado["Integrado"]
+        Historico["Histórico"]
+        NaoVolatil["Não Volátil"]
+        ModelagemDW["Modelagem Dimensional"]
+        DW --> Assunto & Integrado & Historico & NaoVolatil & ModelagemDW
+    end
+
+    %% Etapa 4: OLAP
+    subgraph E4 [**4. Análise OLAP 📊**]
+        Cubo(("Cubo OLAP"))
+        Drill["Drill-down/\nRoll-up"]
+        SliceDice["Slice & Dice"]
+        Pivot["Pivot"]
+        Cubo --> Drill & SliceDice & Pivot
+    end
+
+    %% Etapa 5: BI
+    subgraph E5 [**5. Aplicações de BI 💡**]
+        Relatorios["Relatórios"]
+        Dashboards["Dashboards"]
+        DataMining["Data Mining"]
+        AdHoc["Análises Ad Hoc"]
+        Relatorios & Dashboards & DataMining & AdHoc
+    end
+
+    %% Etapa 6: Decisão
+    subgraph E6 [**6. Tomada de Decisão ✅**]
+        Decisao(("Decisão"))
+    end
+
+    %% Conexões Principais
+    E1 --> E2 --> E3 --> E4 --> E5 --> E6
+    E3 -- Modela --> E4
+    E4 -- Analisa --> E5
+    E5 --> E6
+```
+
