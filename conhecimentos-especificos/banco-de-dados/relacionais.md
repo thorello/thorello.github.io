@@ -1,3 +1,126 @@
+
+### Olá, futuro(a) aprovado(a)! Vamos construir uma base sólida sobre Bancos de Dados Relacionais para você gabaritar qualquer questão do Cebraspe.
+
+Pense em um banco de dados relacional como um **prédio de escritórios gigante e super organizado** 🏢. Cada conceito que vamos ver é uma parte desse prédio, desde a planta baixa até as regras de segurança.
+
+---
+
+### ### Conceitos Básicos: A Planta Baixa do Prédio
+
+Tudo começa com a estrutura fundamental do nosso prédio.
+
+* **Relação (Tabela):** É um **andar inteiro** do prédio, dedicado a um departamento. Ex: o andar do "RH".
+* **Tupla (Linha):** É a **pasta de um único funcionário** nesse andar.
+* **Atributo (Coluna):** É um **campo de informação** dentro da pasta do funcionário. Ex: `Nome`, `Salário`.
+* **Domínio:** São as **regras de preenchimento** de um campo. Ex: o campo `Salário` só aceita números positivos.
+
+#### As Chaves: Os Crachás de Identificação 🔑
+
+Para saber quem é quem e onde cada um trabalha, usamos diferentes tipos de "crachás".
+
+* **Superchave:** Qualquer combinação de informações que identifique um funcionário sem erro (ex: `CPF` + `Nome`).
+* **Chave Candidata:** O jeito mais eficiente de identificar alguém. Tanto o `CPF` quanto o `ID do Funcionário` são ótimos candidatos a crachá principal.
+* **Chave Primária (PK):** O crachá **oficial** escolhido pela empresa. Ex: o `ID do Funcionário`. É único e obrigatório para todos.
+* **Chave Estrangeira (FK):** É uma informação em uma pasta que aponta para outra. Ex: o campo `ID_do_Departamento` na pasta do funcionário. Ele cria a **ligação** entre o funcionário e o andar onde ele trabalha.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Terminologia:** A banca usa os nomes formais! Lembre-se: **Relação = Tabela**, **Tupla = Linha**, **Atributo = Coluna**.
+> > * **Chaves Primárias vs. Candidatas:** Uma tabela pode ter várias chaves **candidatas** (vários jeitos de identificar unicamente uma linha), mas só pode ter **uma única chave primária**, que é a candidata escolhida para ser a oficial.
+> > * **Chave Estrangeira Nula:** Uma chave estrangeira **pode** ser nula! Isso pode representar um funcionário que ainda não foi alocado a nenhum departamento, por exemplo.
+
+---
+
+### ### SQL: A Linguagem Oficial do Prédio
+
+Para dar ordens e pedir informações no prédio, usamos uma linguagem padrão, a SQL. Ela tem "dialetos" diferentes para cada tipo de tarefa.
+
+| Subconjunto | O que faz? | Comandos Principais | Analogia no Prédio |
+| :--- | :--- | :--- | :--- |
+| **DML** (Manipulação) | Lida com os **dados** dentro das pastas. | `SELECT`, `INSERT`, `UPDATE`, `DELETE` | "Traga-me um arquivo", "Crie um novo arquivo". |
+| **DDL** (Definição) | Lida com a **estrutura** do prédio. | `CREATE`, `ALTER`, `DROP` | "Construa um novo andar", "Demolir uma sala". |
+| **DCL** (Controle) | Lida com a **segurança** e o acesso. | `GRANT`, `REVOKE` | "Dê a chave desta sala para o estagiário". |
+| **TCL** (Transação) | Gerencia **grupos de operações**. | `COMMIT`, `ROLLBACK` | "Salve tudo que fiz", "Desfaça a besteira que fiz". |
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **`WHERE` vs. `HAVING`:** A pegadinha clássica! **`WHERE`** filtra as pastas **individuais** ("traga as pastas de quem ganha mais de 5 mil"). **`HAVING`** filtra os **grupos** de pastas ("dos departamentos com mais de 10 pessoas, traga-me aqueles cuja média salarial é maior que 8 mil").
+> > * **`DROP` vs. `TRUNCATE` vs. `DELETE`:** **`DELETE`** joga fora algumas pastas (e pode ser desfeito). **`TRUNCATE`** joga fora TODAS as pastas de um andar de uma vez (muito rápido, geralmente não pode ser desfeito). **`DROP`** DEMOLE o andar inteiro, com pastas, mesas e tudo.
+> > * **`INNER JOIN` vs. `LEFT JOIN`:** **`INNER JOIN`** só mostra funcionários que estão em um departamento que existe. **`LEFT JOIN`** mostra TODOS os funcionários, mesmo aqueles que estão sem departamento (o campo do departamento virá como `NULL`).
+
+---
+
+### ### Integridade e Proteção: As Regras de Segurança do Prédio
+
+Para o prédio funcionar direito, ele precisa de regras e segurança.
+
+* **Integridade de Domínio:** Garante que no campo `Salário` só entrem números.
+* **Integridade de Entidade:** Garante que todo funcionário tenha um crachá de identificação único (a chave primária).
+* **Integridade Referencial:** Garante que você não pode registrar um funcionário no "Departamento 99" se esse andar não existe. O `ID_do_Departamento` (FK) tem que apontar para um andar real.
+    * **Ações Referenciais:** O que fazer se um andar for demolido? `CASCADE` (demite todo mundo do andar junto), `SET NULL` (os funcionários ficam "sem departamento"), `RESTRICT` (proíbe a demolição se ainda tiver gente no andar).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * A banca vai perguntar o que acontece com os "filhos" (registros na tabela com a FK) quando o "pai" (o registro com a PK) é apagado. A resposta é: **depende da ação referencial definida** (`CASCADE`, `SET NULL`, etc.).
+> > * A banca pode classificar `GRANT` como DML. **ERRADO!** `GRANT` é **DCL**, pois lida com permissões, não com os dados em si.
+
+---
+
+### ### Controle de Transação e Concorrência: Evitando o Caos nos Arquivos
+
+O que acontece quando várias pessoas tentam mexer na mesma pasta ao mesmo tempo? O sistema precisa controlar a concorrência.
+
+* **Propriedades ACID (As Leis de Ouro da Transação):**
+    * **A**tomicidade: "Tudo ou nada". Uma transferência bancária (débito + crédito) ou funciona por completo, ou é totalmente desfeita.
+    * **C**onsistência: As regras do prédio nunca são violadas.
+    * **I**solamento: Duas pessoas mexendo na mesma pasta não veem a bagunça uma da outra em tempo real.
+    * **D**urabilidade: Depois de salvar (`COMMIT`), a alteração é permanente, mesmo que a luz do prédio acabe.
+
+* **Anomalias de Concorrência (Quando o Isolamento Falha):**
+    * **Leitura Suja:** Você vê alguém escrevendo algo na pasta, mas depois a pessoa apaga. Você leu lixo.
+    * **Leitura Não Repetível:** Você lê uma informação. Alguém altera e salva. Você lê de novo e a informação mudou.
+    * **Leitura Fantasma:** Você conta 5 pastas na gaveta. Alguém adiciona uma nova. Você conta de novo e tem 6. Um "fantasma" apareceu.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Não Repetível vs. Fantasma:** Em **Leitura Não Repetível**, uma linha que você já leu **muda de valor**. Em **Leitura Fantasma**, **novas linhas aparecem** na sua recontagem.
+> > * **Compatibilidade de Bloqueios:** Várias pessoas podem ter uma "chave para ler" (Bloqueio Compartilhado) a mesma pasta. Mas se uma pessoa pega a "chave para escrever" (Bloqueio Exclusivo), ninguém mais pode nem ler nem escrever até ela terminar.
+
+---
+
+### ### Administração, Oracle e PL/SQL: O Síndico e suas Ferramentas
+
+* **DBA (O Síndico do Prédio):** É o administrador. Ele cuida de tudo: instalações, segurança, backups, otimização.
+* **Oracle:** Uma "marca" famosa de sistema para construir prédios de escritório.
+* **PL/SQL:** Uma linguagem de programação especial que funciona dentro dos prédios Oracle. Com ela, o síndico pode criar rotinas automatizadas, como um "procedimento para contratar novo funcionário" que já cria a pasta, define o crachá e aloca a sala, tudo de uma vez.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Backup Incremental vs. Diferencial:** **Incremental** copia o que mudou desde o **último backup de qualquer tipo**. **Diferencial** copia o que mudou desde o **último backup COMPLETO**.
+> > * **Bloco PL/SQL:** A seção `DECLARE` (variáveis) e `EXCEPTION` (erros) são opcionais. A seção `BEGIN...END;` (comandos) é obrigatória.
+
+### ### Mapa Mental: A Estrutura do Mundo Relacional
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["🏛️ Modelo Relacional<br>(A Planta Baixa)"]
+    A --> B["Conceitos<br>Relação, Tupla, Atributo"]
+    A --> C["🔑 Chaves<br>(PK, FK)"]
+
+    D["🗣️ SQL<br>(A Linguagem do Prédio)"]
+    D --> E["DML<br>(SELECT, INSERT...)"]
+    D --> F["DDL<br>(CREATE, DROP...)"]
+    D --> G["DCL<br>(GRANT, REVOKE)"]
+    D --> H["TCL<br>(COMMIT, ROLLBACK)"]
+
+    I["📜 Regras e Segurança"]
+    I --> J["Restrições de Integridade<br>(Domínio, Entidade, Referencial)"]
+    I --> K["Propriedades ACID<br>(Atomicidade, Consistência...)"]
+
+    subgraph "Operações no Prédio"
+    direction LR
+    D -- Opera sobre --> B
+    I -- Protege --> B
+    end
+````
+
+
 ### **Classe:** A
 
 ### **Conteúdo:** Relacionais: Conceitos Básicos do Modelo Relacional
