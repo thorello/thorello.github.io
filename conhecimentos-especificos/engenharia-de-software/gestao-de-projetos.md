@@ -1,3 +1,123 @@
+### Olá, futuro(a) aprovado(a)\! Vamos entrar no mundo Ágil e desvendar a Gestão de Backlog para você acelerar na prova do Cebraspe.
+
+Pense no desenvolvimento de um produto ágil como **planejar e executar uma longa viagem de van com um grupo de amigos** 🚐. O **Backlog** é o roteiro da sua viagem.
+
+-----
+
+### \#\#\# Gestão de Backlog: O Roteiro da Viagem
+
+  * **Product Backlog (O Roteiro Completo):** É a lista de desejos gigante e única para a viagem inteira, colada na parede da van. Contém tudo: "Visitar o Grand Canyon", "Abastecer a van", "Comprar um chapéu de cowboy". Quem manda nessa lista, decidindo o que é mais importante e o que vem primeiro, é o **Product Owner (PO)**, o "dono da viagem".
+
+  * **Um Bom Roteiro é DEEP:**
+
+      * **D**etailed appropriately (Detalhado na medida certa): Os próximos destinos da lista estão super detalhados (endereços, horários). Os destinos do final da viagem são só ideias vagas.
+      * **E**stimated (Estimado): Cada item da lista tem uma estimativa de esforço. "Visitar o Grand Canyon" é grande. "Parar para um lanche" é pequeno.
+      * **E**mergent (Emergente): O roteiro não é fixo\! Se vocês descobrem um festival de música no caminho, o PO pode adicionar isso à lista.
+      * **P**rioritized (Priorizado): A lista está ordenada. O item mais importante e valioso está sempre no topo.
+
+  * **Backlog Refinement (Refinando o Roteiro):** É a atividade contínua de juntar a galera para conversar sobre os próximos destinos da lista, adicionando detalhes e estimativas para que eles estejam prontos para a próxima etapa da viagem.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Quem manda no Roteiro?** A banca vai dizer que é o Scrum Master ou o time. **ERRADO\!** A palavra final sobre a ordem e o conteúdo do Product Backlog é **exclusivamente do Product Owner (PO)**.
+> >   * **O Roteiro é Estático?** A banca vai dizer que o backlog é definido no início e não muda. **ERRADO\!** Sua natureza **emergente** (mutável) é a essência da agilidade.
+> >   * **Refinamento é um Evento Formal?** A banca vai colocar o refinamento como um dos eventos oficiais do Scrum. **ERRADO\!** É uma **atividade contínua**, não um evento formal como a Sprint Planning ou a Daily Scrum.
+
+-----
+
+### \#\#\# Técnicas de Priorização: Decidindo o Próximo Destino
+
+Como o PO decide o que é mais importante? Ele usa técnicas\!
+
+  * **MoSCoW:** Separa os desejos em 4 baldes:
+
+      * **M - Must-have (Tem que ter):** "Colocar gasolina na van". Se não fizermos, a viagem para.
+      * **S - Should-have (Deveria ter):** "Parar para almoçar". Muito importante, mas na pior das hipóteses, comemos um salgadinho.
+      * **C - Could-have (Poderia ter):** "Parar para tirar foto de uma estátua gigante". Seria legal, mas não é o fim do mundo se não der.
+      * **W - Won't-have (Não vai ter... desta vez):** "Fazer um desvio de 500km para ver um museu". O grupo concorda em deixar para outra viagem.
+
+  * **Modelo Kano (Para Satisfação dos Viajantes):**
+
+      * **Atributos Básicos:** Os freios da van. Ninguém fica feliz com eles, mas todos ficam furiosos se falharem.
+      * **Atributos de Performance:** O consumo de combustível. Quanto menos gastar, mais felizes todos ficam.
+      * **Atributos de Encantamento:** Descobrir que a van tem Wi-Fi grátis. Ninguém esperava, e todos amam\!
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dar um exemplo e pedir a classificação. "Um site de e-commerce processar pagamentos é um atributo de encantamento no modelo Kano". **ERRADO\!** É um atributo **básico**. Sem isso, o site é inútil.
+
+-----
+
+### \#\#\# Estimativas: Adivinhando o Esforço de Cada Trecho
+
+  * **Story Points (Pontos de História):** É a forma como o time estima o "esforço" de cada trecho da viagem. **Não é tempo\!** É uma medida **relativa** que combina distância, dificuldade do terreno e cansaço.
+
+      * "Dirigir 100km no asfalto liso" = **2 pontos**.
+      * "Dirigir 50km numa estrada de terra esburacada e com neblina" = **8 pontos**.
+        O segundo trecho é mais curto, mas o esforço (complexidade, risco, trabalho) é muito maior.
+
+  * **Planning Poker:** A técnica para estimar. Todos na van mostram uma carta com um número de Story Points ao mesmo tempo. Se os valores forem muito diferentes, o grupo discute ("Você esqueceu que essa estrada tem muitas curvas\!") até chegar a um consenso.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Story Points NÃO SÃO HORAS\!** A pegadinha mais batida. A banca vai dizer que "1 ponto equivale a 8 horas". **ERRADO\!** É uma medida **abstrata e relativa**, única para cada time.
+> >   * O objetivo da estimativa ágil não é ter uma data exata, mas sim entender a complexidade e permitir o cálculo da **Velocidade** da equipe (quantos pontos a equipe faz por semana), o que ajuda em previsões futuras.
+
+-----
+
+### \#\#\# Dívida Técnica: As "Gambiarras" na Van
+
+  * **O Conceito:** É a "gambiarra" que você faz para não parar a viagem. Em vez de consertar o vazamento de óleo (a solução correta), você decide ir completando o óleo a cada parada (a solução rápida). Essa escolha gera uma **dívida**.
+  * **Os "Juros":** A dívida cobra juros. Completar o óleo toda hora te atrasa e suja o motor, podendo causar um problema maior lá na frente.
+  * **Refatoração (Pagar a Dívida):** É parar a viagem por meio dia e levar a van a um mecânico para consertar o vazamento de verdade.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Dívida Técnica vs. Bug:** Não são a mesma coisa. **Bug** é o motor quebrado. **Dívida técnica** é o motor funcionando com uma gambiarra, o que o torna mais difícil e arriscado de manter.
+> >   * **Dívida pode ser Estratégica:** A banca pode dizer que toda dívida é incompetência. **ERRADO\!** Às vezes, fazer uma "gambiarra" consciente para não perder um show incrível é uma decisão **prudente e deliberada**.
+
+-----
+
+### \#\#\# Análise de Pontos de Função (APF): Medindo o Tamanho da Viagem
+
+  * **O Conceito:** APF é um método formal para medir o **tamanho funcional** de um software, da perspectiva do usuário. É como medir a "grandeza" da sua viagem, não em km, mas em "funções" que ela entrega.
+  * **Componentes:**
+      * **Funções de Dados:** Onde você guarda informações.
+          * **ALI (Arquivo Lógico Interno):** Seu diário de bordo, mantido **dentro** da van.
+          * **AIE (Arquivo de Interface Externa):** O guia de viagens que você consulta, mas que é mantido **fora** da van.
+      * **Funções de Transação:** O que você faz com as informações.
+          * **EE (Entrada Externa):** Anotar um novo gasto no seu diário de bordo.
+          * **SE (Saída Externa):** Gerar um relatório de gastos para os amigos.
+          * **CE (Consulta Externa):** Usar um app no celular para ver a previsão do tempo.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **APF mede TAMANHO, não ESFORÇO\!** A pegadinha mestre. A banca vai dizer que PF mede horas. **ERRADO\!** PF mede o tamanho da funcionalidade. Depois, você pode usar esse tamanho para estimar o esforço, mas são coisas diferentes.
+> >   * **APF vs. Story Points:** **APF** é um método formal e padronizado. **Story Points** é uma medida informal, relativa e específica de cada time.
+
+### \#\#\# Mapa Mental: O Fluxo do Backlog na Viagem Ágil
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["🚐 Product Backlog<br>(Roteiro completo da viagem)<br>Ordenado pelo PO"]
+
+    subgraph "Sprint (Uma semana de viagem)"
+        B["Sprint Planning<br>(Escolher o próximo trecho)"]
+        C["📜 Sprint Backlog<br>(Itens escolhidos + Plano)"]
+        D["Daily Scrum<br>(Reunião diária no café da manhã)"]
+        E["➡️ Execução da Sprint<br>(Dirigir e visitar lugares)"]
+        F["🎁 Incremento<br>(Parte da viagem concluída!)"]
+    end
+
+    A -- Itens do topo --> B;
+    B --> C;
+    C --> E;
+    D -- Sincroniza --> E;
+    E --> F;
+```
+
+
 ### **Classe:** B
 ### **Conteúdo:** Gestão de Projetos: Gestão de backlog
 
