@@ -1,3 +1,77 @@
+### Olá, futuro(a) aprovado(a)! Vamos decifrar as ISSAIs, as regras de ouro da auditoria governamental.
+
+Pense no auditor do setor público como um **médico especialista em saúde de organizações públicas** 👨‍⚕️. As ISSAIs são o conjunto de manuais e o código de ética que esse médico precisa seguir para fazer um diagnóstico preciso e confiável.
+
+---
+
+### ### ISSAI 30 e 100: O Juramento e o Manual Básico do Médico-Auditor
+
+Antes de se especializar, todo médico precisa de uma base sólida. Na auditoria, essa base são as ISSAI 30 e 100.
+
+* #### **ISSAI 30 - O Código de Ética (O "Juramento de Hipócrates" do Auditor)**
+    É o conjunto de valores que o auditor jura seguir. Ele promete:
+    1.  **Integridade:** Ser honesto e justo, sem "puxar a sardinha" para ninguém.
+    2.  **Independência e Objetividade:** Não deixar que amizades ou interesses pessoais interfiram no diagnóstico. O médico não pode deixar de dar uma má notícia só porque o paciente é seu amigo. **Atenção:** A independência precisa ser **de fato** (na mente do auditor) e **de aparência** (o que as outras pessoas veem).
+    3.  **Competência:** Estudar sempre e ter o conhecimento necessário para fazer o diagnóstico certo.
+    4.  **Comportamento Profissional:** Agir de forma que honre a "profissão médica", seguindo as regras.
+    5.  **Confidencialidade e Transparência:** Guardar o segredo do paciente (confidencialidade), mas também ser transparente quando a lei ou o bem maior exigem (ex: reportar uma doença contagiosa).
+
+* #### **ISSAI 100 - Princípios Fundamentais (O "Manual Básico de Diagnóstico")**
+    É a norma **"guarda-chuva"** ☂️. Ela estabelece os princípios básicos que valem para **TODOS** os tipos de "exames" (auditorias). Ela diz que todo diagnóstico precisa ter:
+    * **Ética e independência** (reforçando a ISSAI 30).
+    * **Julgamento profissional, ceticismo e zelo:** O médico precisa usar sua experiência, duvidar de tudo (**ceticismo**) e ser cuidadoso.
+    * **Planejamento baseado em risco:** O médico foca os exames onde há maior risco de doença.
+    * **Documentação:** Anotar tudo no prontuário do paciente.
+
+**Foco Cebraspe:**
+> O **ceticismo profissional** é crucial! A banca vai mostrar um cenário onde o auditor acredita em tudo que o gestor diz. **ERRADO!** O bom médico-auditor ouve o paciente, mas sempre pede exames para confirmar, com uma mente questionadora.
+
+---
+
+### ### Os Tipos de Auditoria: As Especialidades Médicas
+
+Com a base em mãos, nosso médico-auditor pode se especializar. Existem três grandes especialidades, e o Cebraspe adora misturar os objetivos delas.
+
+| Especialidade Médica (Tipo de Auditoria) | Foco Principal | Pergunta-Chave | ISSAI de Referência |
+| :--- | :--- | :--- | :--- |
+| **Auditoria Financeira** 💰 | **Cardiologista** | "O coração financeiro da organização está batendo certo? As demonstrações contábeis (o 'eletrocardiograma') são confiáveis?" | **ISSAI 200** |
+| **Auditoria de Desempenho (Operacional)** 🚀 | **Nutricionista / Fisioterapeuta** | "A organização está em boa forma? Ela está usando seus recursos (nutrientes) da melhor maneira para atingir seus objetivos de saúde (os '3 Es')?" | **ISSAI 300** |
+| **Auditoria de Conformidade** ⚖️ | **Clínico Geral / Médico Legista** | "A organização está seguindo todas as 'prescrições médicas' (as leis e regulamentos) corretamente?" | **ISSAI 400** |
+
+#### Foco Cebraspe: Os "3 Es" e a Segurança Razoável
+
+* **Os "3 Es" da Auditoria de Desempenho:**
+    * **E**conomicidade: Comprar os "remédios" pelo menor preço, sem perder a qualidade.
+    * **E**ficiência: Usar a menor quantidade de "remédio" para obter o máximo de resultado.
+    * **E**ficácia: O "tratamento" alcançou o objetivo de curar o paciente?
+
+* **Segurança Razoável (Auditoria Financeira):** O "eletrocardiograma" (parecer do auditor) atesta com **segurança razoável** que o coração está bem. Não é uma segurança **absoluta**. Sempre existe uma pequena chance de uma anomalia não ter sido detectada, devido às limitações do exame (como o uso de amostragem). A banca vai dizer que a auditoria garante 100% de certeza. **ERRADO!**
+
+### ### Mapa Mental: A Estrutura das ISSAIs
+
+Veja como as principais normas se conectam, formando a base da auditoria governamental.
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD;
+    subgraph "🏛️ FUNDAMENTOS DA AUDITORIA GOVERNAMENTAL"
+    A["📜 ISSAI 100 <br> (Princípios Fundamentais - A Base)"];
+    B["❤️ ISSAI 30 <br> (Código de Ética - Envolve Tudo)"];
+    end
+
+    subgraph "🕵️‍♀️ ESPECIALIDADES (Tipos de Auditoria)"
+        C["💰 Financeira <br> (ISSAI 200)"];
+        D["🚀 Desempenho <br> (ISSAI 300)"];
+        E["⚖️ Conformidade <br> (ISSAI 400)"];
+    end
+
+    A --> C;
+    A --> D;
+    A --> E;
+
+    style B fill:#333,stroke:#ff9e64,stroke-width:2px,stroke-dasharray: 5, 5
+```
+
 ### **Classe:** A
 ### **Conteúdo:** ISSAIs: Princípios Fundamentais e Código de Ética
 
