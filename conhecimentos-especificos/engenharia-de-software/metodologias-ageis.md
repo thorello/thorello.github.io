@@ -1,3 +1,135 @@
+### Olá, futuro(a) aprovado(a)\! Vamos afinar os instrumentos e entender as Metodologias Ágeis para você dar um show na prova do Cebraspe.
+
+Pense no desenvolvimento de software de duas formas: o método tradicional (Cascata) é como uma **orquestra sinfônica**, com uma partitura gigante escrita meses antes, onde ninguém pode mudar uma nota. Já as **Metodologias Ágeis** são como uma **banda de rock na garagem** 🎸: eles têm a ideia da música, mas a criam e a refinam juntos, em sessões de ensaio, adaptando-se à energia do momento.
+
+-----
+
+### \#\#\# Metodologias Ágeis: A Filosofia da Banda de Rock
+
+A agilidade é guiada pelo **Manifesto Ágil**, que tem 4 valores fundamentais:
+
+  * **Indivíduos e interações** mais que processos e ferramentas (A química entre os músicos é mais importante que a marca da guitarra).
+  * **Software em funcionamento** mais que documentação abrangente (Uma música gravada e tocável é mais importante que a partitura perfeita).
+  * **Colaboração com o cliente** mais que negociação de contratos (Conversar com os fãs e o produtor o tempo todo é melhor que ter um contrato rígido).
+  * **Responder a mudanças** mais que seguir um plano (Se o guitarrista cria um riff genial no meio do ensaio, a banda se adapta e muda a música).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **"Mais que" não significa "eliminar":** A banca vai dizer que o ágil abole a documentação e o planejamento. **ERRADO\!** A banda ainda precisa de alguma anotação da melodia e de um plano de ensaio, mas eles **valorizam mais** a música funcionando e a capacidade de improvisar.
+> >   * **Agilidade não é Rapidez:** A banca vai dizer que "ágil" é sinônimo de "rápido". **INCORRETO\!** Ágil é sobre **capacidade de adaptação**. A entrega rápida de valor é uma consequência, não o objetivo principal.
+
+-----
+
+### \#\#\# Scrum: Organizando os Ensaios da Banda
+
+O Scrum é o framework mais famoso para organizar os ensaios da banda de rock.
+
+  * **Os Papéis (A Banda):**
+
+      * **Product Owner (PO):** O **produtor musical**. Ele conhece o mercado, representa os fãs e decide qual música tem mais chance de virar hit, ou seja, ele gerencia e prioriza a lista de ideias de músicas (**Product Backlog**).
+      * **Scrum Master (SM):** O **roadie / técnico de som experiente**. Ele não toca, não compõe, nem manda na banda. Ele garante que os amplificadores funcionem, remove distrações e ensina a banda a usar o Scrum para ensaiar melhor. É um líder-servidor.
+      * **Developers:** Os **músicos**. Eles compõem, tocam e gravam as músicas.
+
+  * **Os Eventos (A Rotina de Ensaios):**
+
+      * **Sprint:** A "semana de gravação", um período fixo (time-box) de até um mês onde a mágica acontece.
+      * **Sprint Planning:** A reunião na segunda-feira para decidir: "Quais músicas vamos gravar esta semana?".
+      * **Daily Scrum:** A "passagem de som" de 15 minutos, todo dia, **só para os músicos**, para sincronizar o trabalho.
+      * **Sprint Review:** O "showcase" de sexta-feira, onde a banda toca o que gravou na semana para o produtor e alguns fãs (stakeholders) para pegar feedback.
+      * **Sprint Retrospective:** A conversa da banda depois do showcase, **só entre eles e o Scrum Master**, para discutir: "Como podemos ensaiar melhor na próxima semana?".
+
+  * **Os Artefatos (As Músicas e as Listas):**
+
+      * **Product Backlog:** A lista com todas as ideias de músicas para o álbum.
+      * **Sprint Backlog:** As partituras e o plano para as músicas que a banda se comprometeu a gravar *nesta* semana.
+      * **Incremento:** As músicas gravadas, mixadas e prontas ao final da semana, que já poderiam tocar no rádio.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Troca de Papéis:** A banca vai dizer que "o Scrum Master gerencia o Product Backlog" (**ERRADO**, é o PO) ou que "o PO participa da Daily Scrum" (**ERRADO**, a Daily é para os Developers).
+> >   * **Cancelamento da Sprint:** Apenas o **Product Owner** (o produtor) tem o poder de cancelar uma semana de gravação se a ideia do álbum mudar drasticamente.
+> >   * **Time-boxes:** Os tempos dos eventos são **máximos**. Uma Sprint Review pode durar menos que 4 horas, mas não mais.
+
+-----
+
+### \#\#\# Qualidade de Software: Garantindo que a Música Soe Bem
+
+No ágil, a qualidade é responsabilidade de todos, o tempo todo.
+
+  * **Refatoração:** Regravar um trecho da guitarra com a mesma melodia, mas de um jeito mais limpo e técnico, **sem mudar o que o ouvinte percebe**.
+  * **Integração Contínua (CI):** Assim que o baixista grava sua parte, ela é imediatamente mixada com a bateria e a guitarra para garantir que tudo soe bem junto.
+  * **Definição de Pronto (DoD):** A checklist da banda: "Uma música só está 'pronta' quando está gravada, mixada, masterizada e com a letra registrada".
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Refatoração não é corrigir bug nem adicionar funcionalidade.** É uma **melhora na estrutura interna** do código (da música) que não altera o comportamento externo.
+> >   * A banca vai citar a **ISO/IEC 25010** e confundir suas características. Lembre-se: `Confiabilidade` (funciona sem falhar) é diferente de `Segurança` (protege contra ataques).
+
+-----
+
+### \#\#\# Extreme Programming (XP): O Jeito "Radical" de Ensaiar
+
+XP é uma metodologia ágil com foco extremo em práticas de engenharia.
+
+  * **Práticas Chave:**
+      * **Programação em Par:** Dois guitarristas em um só amplificador, um tocando a base (piloto) e o outro pensando no solo (navegador), trocando de lugar a todo momento.
+      * **Cliente Presente:** O produtor musical senta no sofá do estúdio **o dia inteiro** com a banda para dar feedback instantâneo.
+      * **Ritmo Sustentável:** A banda ensaia 8 horas por dia e vai para casa. Sem virar noites, para não perder a criatividade.
+      * **Test-Driven Development (TDD):** Detalhado a seguir.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Scrum vs. XP:** **Scrum** é um framework de **gerenciamento**. **XP** é uma metodologia de **engenharia**. Scrum não te diz *como* tocar guitarra, apenas *como organizar* os ensaios. XP te dá técnicas específicas, como a programação em par. Eles podem ser usados juntos\!
+
+-----
+
+### \#\#\# Kanban: Gerenciando o Fluxo de Composição
+
+Kanban é um método para visualizar e otimizar o fluxo de trabalho.
+
+  * **Quadro Kanban:** Um quadro na parede do estúdio com colunas: `Ideias de Músicas` → `Escrevendo a Letra` → `Compondo a Melodia` → `Gravando Demo` → `Pronta`.
+  * **Limitar o Trabalho em Progresso (WIP):** **O conceito mais importante\!** A banda coloca um limite no quadro: "Máximo de 2 músicas na coluna `Compondo a Melodia`". Isso os força a **terminar** uma música antes de começar outra, evitando ter 10 músicas pela metade e nenhuma pronta.
+  * **Fluxo Contínuo:** Diferente do Scrum, não há "semanas de gravação". Assim que uma música fica pronta, a banda imediatamente puxa a próxima ideia da coluna `Ideias`.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Kanban vs. Scrum:** **Scrum** é iterativo (ciclos fixos, Sprints). **Kanban** é um fluxo contínuo. Scrum tem papéis definidos; Kanban não. Scrum limita o trabalho pela capacidade da Sprint; Kanban limita pelo **WIP**.
+> >   * **O objetivo do Kanban é LIMITAR o WIP**, não maximizá-lo. Limitar o trabalho em andamento revela os gargalos e melhora a velocidade geral de entrega.
+
+-----
+
+### \#\#\# Lean e TDD: A Filosofia de Eliminar o Desperdício
+
+  * **Lean (Desenvolvimento Enxuto):** É a filosofia de focar 100% no que gera valor para o ouvinte e **eliminar todo o desperdício**. Desperdício pode ser: um solo de flauta de 10 minutos numa música punk; um defeito na gravação que força todo mundo a regravar; 10 músicas pela metade e nenhuma pronta (excesso de WIP).
+
+  * **TDD (Desenvolvimento Guiado por Testes):** Uma prática de XP e qualidade. É o ciclo "Vermelho-Verde-Refatora".
+
+    1.  **Vermelho:** O compositor escreve um teste que falha. Ex: "Testar se a música tem um refrão cativante". (O teste falha, pois o refrão não existe ainda).
+    2.  **Verde:** Ele escreve o refrão **mais simples possível** só para fazer o teste passar.
+    3.  **Refatora:** Agora que funciona, ele melhora o refrão, deixa mais poético, mais técnico, garantindo que o teste continue passando.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dizer que no TDD você escreve o código e depois o teste. **ERRADO\!** O mantra é: **o teste vem primeiro**.
+> >   * TDD não é só uma técnica de teste, é uma técnica de **design**. Ela força o músico a pensar no que a música precisa fazer antes de compô-la, resultando em músicas (código) mais simples e bem estruturadas.
+
+### \#\#\# Mapa Mental: Scrum (Iterativo) vs. Kanban (Fluxo)
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "🎸 Scrum: Ciclos de Gravação"
+        direction LR
+        A["Sprint<br>(1-4 Semanas)"] --> B["Planejamento"] --> C["Execução"] --> D["Revisão<br>(Showcase)"] --> E["Retrospectiva"] --> A
+    end
+
+    subgraph "🌊 Kanban: Fluxo Contínuo de Composição"
+        direction LR
+        G["Ideias"] --> H["Em Andamento<br>🔥 Limite de WIP!"] --> I["Pronto"]
+    end
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Metodologias Ágeis
 
