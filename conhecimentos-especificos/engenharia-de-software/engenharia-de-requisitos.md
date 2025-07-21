@@ -1,3 +1,141 @@
+### Olá, futuro(a) aprovado(a)\! Vamos construir juntos o conhecimento sobre Engenharia de Requisitos para você erguer uma base sólida para a prova do Cebraspe.
+
+Pense na Engenharia de Requisitos como o processo de **projetar e construir uma casa sob encomenda** 🏡. Você é o arquiteto/engenheiro, e seu trabalho é entender o sonho do cliente e transformá-lo em uma planta detalhada para que os construtores possam trabalhar sem erros.
+
+-----
+
+### \#\#\# Fundamentos: O Que é a Casa e Que Tipos de Coisas Ela Tem?
+
+Primeiro, definimos os desejos do cliente.
+
+  * **Requisitos Funcionais (RF):** É **O QUE** a casa deve ter ou fazer. São as funcionalidades.
+
+      * Ex: "A casa deve ter 3 quartos."
+      * Ex: "O portão da garagem deve abrir com controle remoto."
+
+  * **Requisitos Não Funcionais (RNF):** É **COMO** a casa deve ser ou se comportar. São as qualidades e restrições.
+
+      * Ex: "A casa deve ser capaz de suportar um vento de até 150 km/h." (Segurança)
+      * Ex: "A temperatura interna nunca deve passar de 24°C." (Desempenho)
+
+  * **Requisitos de Domínio:** São as regras do "condomínio" ou da prefeitura.
+
+      * Ex: "A fachada da casa deve ser pintada na cor branca ou bege, conforme o regulamento."
+
+  * **Requisitos de Negócio:** É o objetivo principal do cliente ao construir a casa.
+
+      * Ex: "Precisamos de uma casa maior para acomodar a chegada de um novo filho."
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **RF vs. RNF:** A pegadinha clássica\! **Funcional = O QUÊ** (uma função). **Não Funcional = COMO** (uma qualidade ou restrição). A banca vai dizer que "o sistema deve ter login com senha" é um RNF. **ERRADO\!** É um RF, pois descreve uma função. "O sistema deve criptografar a senha" é um RNF, pois descreve *como* a função deve se comportar.
+> >   * **RNF devem ser testáveis:** Dizer que a casa deve ser "confortável" é ruim. Dizer que "a temperatura deve ficar entre 20°C e 24°C" é bom, pois é mensurável e testável.
+
+-----
+
+### \#\#\# Elicitação: Conversando com o Cliente para Descobrir o Sonho
+
+Elicitação é o processo de levantar os requisitos, ou seja, de extrair o sonho da cabeça do cliente.
+
+  * **Entrevistas:** Sentar com o cliente e perguntar: "Como você imagina a cozinha dos seus sonhos?".
+  * **Questionários:** Enviar uma lista de perguntas para toda a família: "Você prefere chuveiro a gás ou elétrico?".
+  * **Observação (Etnografia):** A técnica mais poderosa\! É passar um dia na casa atual do cliente para ver como eles *realmente* vivem. Você percebe que eles nunca usam a sala de jantar e sempre comem na cozinha. Assim você descobre um requisito implícito: projetar uma cozinha ampla com uma boa mesa de refeições.
+  * **Workshops:** Reunir o casal (que discorda sobre ter uma piscina) para que eles cheguem a um consenso.
+  * **Prototipação:** Mostrar uma maquete 3D da casa para o cliente "brincar" e dar um feedback mais concreto.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Técnica certa para o problema certo:** **Entrevistas** geram informação profunda, mas com poucas pessoas. **Questionários** atingem muitas pessoas, mas com pouca profundidade. **Observação** é a melhor técnica para descobrir os **requisitos implícitos**, aquilo que o cliente faz mas não sabe verbalizar.
+> >   * O observador pode alterar o comportamento dos observados (Efeito Hawthorne). O simples fato de você estar lá pode fazer a família usar a sala de jantar que eles nunca usam.
+
+-----
+
+### \#\#\# Especificação: Desenhando a Planta da Casa
+
+Depois de entender o sonho, você precisa colocá-lo no papel.
+
+  * **Linguagem Natural:** Um texto corrido: "Quero uma sala grande, clara...". Fácil de ler, mas muito ambíguo ("o que é 'grande' para você?").
+  * **Notações Gráficas (UML):** A **planta baixa** da casa. É a linguagem universal dos arquitetos.
+      * **Diagrama de Casos de Uso:** Desenhos que mostram as interações: "Morador" → "Abrir Garagem". Foca nos requisitos funcionais.
+      * **Diagrama de Atividades:** Um fluxograma que mostra o passo a passo de uma tarefa, como "a rotina matinal para sair de casa".
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A **ambiguidade** da linguagem natural é seu maior defeito e o alvo preferido da banca.
+> >   * Um **Caso de Uso** não é uma função, é uma interação completa que gera valor para o usuário. "Fazer café" é uma função. "Preparar o café da manhã" é um caso de uso que envolve várias funções.
+> >   * A banca vai trocar a finalidade dos diagramas\! **Casos de Uso = O QUÊ** o sistema faz para o usuário. **Diagramas de Atividades = COMO** um processo funciona.
+
+-----
+
+### \#\#\# Histórias de Usuário: Os "Post-its" do Sonho no Mundo Ágil
+
+No mundo ágil, em vez de uma planta detalhada, o cliente escreve seus desejos em "post-its".
+
+  * **Estrutura:** "**Como um** `<tipo de pessoa>`, **eu quero** `<um desejo>` **para que** `<um benefício seja alcançado>`."
+      * Ex: "**Como um** `chef de cozinha amador`, **eu quero** `uma bancada grande na cozinha` **para que** `eu tenha espaço para preparar minhas receitas complexas`."
+  * **Critérios INVEST:** Um bom post-it (história) é: **I**ndependente, **N**egociável, **V**alioso, **E**stimável, **P**equeno (Sized Appropriately) e **T**estável.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **História de Usuário vs. Caso de Uso:** Histórias são **pequenas, incompletas por design** e focam no **valor** ("para que..."). Casos de Uso são **detalhados** e focam na **interação**.
+> >   * A terceira parte da história ("para que...") é **essencial**, pois explica o valor e ajuda a priorizar o que é mais importante construir primeiro.
+
+-----
+
+### \#\#\# Validação: "É essa a Casa dos Seus Sonhos?"
+
+Antes de construir, você valida a planta com o cliente.
+
+  * **O Conceito:** Garantir que estamos construindo a **casa certa**.
+  * **Técnicas:** Revisar a planta em conjunto, apresentar a maquete 3D (protótipo).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Validação vs. Verificação:** A maior de todas as pegadinhas\!
+> >       * **Validação:** "Estamos construindo a **casa certa**?" (A planta reflete o sonho do cliente?).
+> >       * **Verificação:** "Estamos construindo a **casa de forma certa**?" (Os pedreiros estão seguindo exatamente o que está na planta?).
+> >   * A validação busca erros de requisito **o mais cedo possível**, pois consertar uma parede no lugar errado na planta é infinitamente mais barato do que derrubá-la depois de construída.
+
+-----
+
+### \#\#\# Gerenciamento: Lidando com "Mudei de Ideia\!"
+
+O cliente sempre muda de ideia no meio da obra.
+
+  * **O Conceito:** É o processo para gerenciar as mudanças na planta de forma controlada.
+  * **Controle de Mudanças:** O cliente quer mais um banheiro. Ele preenche uma "solicitação de mudança", o arquiteto analisa o impacto no custo e no prazo, e o "comitê" (o casal) aprova.
+  * **Rastreabilidade:** É a capacidade de rastrear uma parede na planta até a reunião em que o cliente a pediu. Ajuda a entender o porquê de cada decisão e o impacto de cada mudança.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Mudança é Inevitável:** A banca pode sugerir que um bom arquiteto congela o projeto e não aceita mudanças. **ERRADO\!** Um bom arquiteto **aceita que mudanças ocorrerão** e cria um processo para gerenciá-las de forma inteligente.
+
+-----
+
+### \#\#\# MVP e Protótipos: A "Edícula" e a Maquete
+
+  * **Protótipo (A Maquete 🖼️):** Uma maquete, um desenho, um modelo 3D. Serve para **discutir e validar o design**. "Você gosta da janela nesta posição?". Pode ser de baixa fidelidade (um desenho num guardanapo) ou alta fidelidade (um tour virtual). Pode ser descartável ou evolutivo.
+  * **MVP (A Edícula Funcional ⛺):** O cliente não tem certeza se quer morar no campo. Em vez de construir a mansão, você constrói só uma **edícula funcional (o MVP)**. Ela é o **mínimo** necessário para ser **viável**. O cliente se muda para lá e o objetivo é **aprender com o uso real** para validar a hipótese de negócio ("Vale a pena construir a casa inteira aqui?").
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **MVP vs. Protótipo:** Um **protótipo** responde a perguntas de **design** ("Como construir?"). Um **MVP** responde a perguntas de **negócio** ("Deveríamos construir?"). Um MVP é um produto real, usado por clientes reais, focado no aprendizado.
+> >   * **"Mínimo" não significa "de baixa qualidade"**. A edícula precisa ter água, luz e ser segura. O mínimo se refere ao escopo de funcionalidades, não à qualidade.
+
+### \#\#\# Mapa Mental: O Ciclo de Vida do Requisito
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["Sonho do Cliente<br>💡 Necessidade"] --> B["Elicitação<br>🗣️ Entender o Sonho"];
+    B --> C["Análise e Especificação<br>✍️ Desenhar a Planta"];
+    C --> D["Validação<br>🤔 'É isso mesmo?'"];
+    D -- Sim --> E["Gerenciamento<br>🏗️ Controlar Mudanças"];
+    D -- Não --> B;
+    E --> F["✔️ Requisito Aprovado<br>Pronto para Construção"];
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Engenharia de Requisitos: Conceitos básicos
 
