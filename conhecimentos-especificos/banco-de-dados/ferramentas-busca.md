@@ -1,3 +1,116 @@
+### Olá, futuro(a) aprovado(a)! Vamos desvendar o Elastic Stack (ELK) de um jeito que você nunca mais vai esquecer.
+
+Pense no **Elastic Stack** como um **sistema super moderno de um restaurante de luxo** 🍽️, desde a chegada dos ingredientes até a montagem do prato final. Cada componente tem um papel claro e o Cebraspe adora testar se você conhece o fluxo.
+
+---
+
+### ### Elastic Stack: A Visão Geral do Restaurante
+
+O fluxo de trabalho do restaurante (e do Elastic Stack) é a primeira coisa a se memorizar.
+
+* **Beats (Os Entregadores 🛵):** São os entregadores especializados e super leves. Cada um tem uma única função: o `Filebeat` entrega apenas os vegetais (logs), o `Metricbeat` entrega apenas as carnes (métricas). Eles simplesmente **coletam** o ingrediente na fonte e o entregam na cozinha.
+
+* **Logstash (O Sous-Chef na Preparação 👨‍🍳):** É o chef responsável pela estação de preparação. Ele recebe os ingredientes brutos dos entregadores, lava, corta, tempera e padroniza tudo. Ele **transforma** os dados brutos em algo pronto para ser armazenado.
+
+* **Elasticsearch (A Despensa Mágica 🗄️):** É o coração da cozinha. Uma despensa gigante, distribuída e super inteligente. Ela **armazena** todos os ingredientes já preparados em potes etiquetados (documentos JSON), **indexa** tudo e permite uma **busca** incrivelmente rápida. Precisa de "cenoura picada"? A despensa te diz a localização exata em um piscar de olhos.
+
+* **Kibana (O Chef de Finalização 📊):** É o chef que monta o prato para o cliente. Ele **não armazena comida**. Ele olha para dentro da despensa mágica (faz consultas no Elasticsearch), pega os ingredientes que precisa e os arruma de forma bonita e visual em um prato (um **dashboard**).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **O Fluxo é Sagrado:** A banca vai inverter tudo! Lembre-se: **Coleta (Beats) -> Transformação (Logstash) -> Armazenamento (Elasticsearch) -> Visualização (Kibana)**. Kibana **lê** do Elasticsearch, ele não **escreve** nele.
+> > * **ELK Stack:** O nome antigo se refere aos 3 pilares: **E**lasticsearch, **L**ogstash, **K**ibana. Hoje, com os **B**eats, o nome oficial é **Elastic Stack**.
+> > * **Não é um Banco de Dados Relacional:** O forte do Elastic Stack é busca em texto e análise de dados de séries temporais (logs), não transações complexas que exigem ACID.
+
+---
+
+### ### Elasticsearch: A Despensa Mágica por Dentro
+
+O Elasticsearch é o componente principal. Ele é um banco de dados NoSQL do tipo **orientado a documentos**.
+
+* **Terminologia e Arquitetura:**
+    * **Cluster:** A cozinha inteira, com todos os seus equipamentos e funcionários.
+    * **Índice (*Index*):** Uma seção da despensa, como a prateleira de "Legumes".
+    * **Documento (*Document*):** Um único ingrediente na despensa, em um pote etiquetado em formato JSON. Ex: `{ "nome": "Cenoura", "cor": "Laranja" }`.
+    * **Shard (Gaveta):** A prateleira de "Legumes" é tão grande que foi dividida em várias gavetas (`shards`) para ser mais fácil de organizar e procurar. Isso garante a **escalabilidade horizontal** (capacidade de crescer).
+    * **Réplica (*Replica*):** Uma cópia exata de uma gaveta, guardada em outra parte da cozinha. Se uma gaveta quebrar, a cópia (`réplica`) assume. Isso garante a **alta disponibilidade** (à prova de falhas).
+
+* **O Segredo da Velocidade: Índice Invertido**
+    O que torna a busca tão rápida? Em vez de procurar em todos os potes um por um, a despensa tem um **índice invertido**. É como um índice de livro:
+    * `Cenoura`: Encontrada nos potes 1, 15, 87.
+    * `Laranja`: Encontrada nos potes 1, 23, 99.
+    Com uma busca por "Cenoura Laranja", ele instantaneamente cruza as duas listas e te entrega o pote 1.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Escalabilidade vs. Alta Disponibilidade:** A banca vai trocar os conceitos. Lembre-se: **Shards = Escalabilidade**. **Réplicas = Alta Disponibilidade**.
+> > * **Índice Invertido:** É o que torna o Elasticsearch um motor de **busca** e não apenas um banco de dados. É a razão pela qual buscas em texto são absurdamente mais rápidas nele do que um `LIKE '%termo%'` em um banco SQL.
+
+---
+
+### ### Logstash: A Estação de Preparação
+
+O Logstash é o canivete suíço para processamento de dados. Seu pipeline tem 3 estágios:
+
+1.  **Inputs (Entradas):** A doca de recebimento. De onde os ingredientes estão vindo? (`file`, `beats`, `jdbc`...).
+2.  **Filters (Filtros):** A bancada de preparação, o coração do Logstash. Aqui o sous-chef usa suas ferramentas (`grok` para identificar um ingrediente sem etiqueta, `mutate` para cortar e renomear, `date` para carimbar a hora do preparo).
+3.  **Outputs (Saídas):** A esteira que leva o ingrediente pronto para a despensa mágica (`elasticsearch`).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Logstash vs. Beats:** Não são a mesma coisa! **Beats** = entregador leve e rápido. **Logstash** = estação de preparação completa e mais "pesada". Muitas vezes, o Beat entrega para o Logstash.
+> > * **Filtros são a Chave:** Sem a fase de filtro, seria como jogar um frango inteiro com penas e tudo na despensa. A fase de filtro limpa, depena, corta e estrutura o dado para que ele seja útil para análise.
+
+---
+
+### ### Kibana: A Arte de Montar o Prato
+
+O Kibana é a sua janela para os dados no Elasticsearch. Ele **não armazena nada**.
+
+* **Discover:** Espiar dentro de uma gaveta da despensa para ver os ingredientes crus.
+* **Visualize:** Pegar um tipo de ingrediente (ex: todas as frutas vermelhas) e criar um arranjo artístico com eles (um gráfico de pizza).
+* **Dashboard:** O prato final! É um painel que combina vários arranjos (visualizações) para contar uma história completa sobre o estado da cozinha.
+* **Lens:** Uma ferramenta de "arrastar e soltar" que ajuda até mesmo os chefs novatos a criar belos arranjos de forma intuitiva.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Kibana não armazena dados:** A banca vai dizer que o Kibana tem um banco de dados próprio. **ERRADO!** Ele é apenas uma interface web que conversa com a API do Elasticsearch em tempo real.
+> > * **Dashboard vs. Visualização:** Uma **visualização** é um gráfico. Um **dashboard** é uma coleção de vários gráficos em uma única tela.
+
+### ### Mapa Mental: O Fluxo de Dados do Restaurante ELK
+
+Veja o caminho completo do ingrediente (dado) até se tornar um prato (insight).
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD;
+    subgraph "Fontes dos Dados"
+        A["📝<br>Logs"];
+        B["📈<br>Métricas"];
+        C["...<br>Outras Fontes"];
+    end
+
+    subgraph "Coleta"
+        D["🛵<br>Beats"];
+    end
+
+    subgraph "Processamento"
+        E["👨‍🍳<br>Logstash<br>(Filtra e Transforma)"];
+    end
+
+    subgraph "Armazenamento e Busca"
+        F["🗄️<br>Elasticsearch<br>(O Coração do Stack)"];
+    end
+    
+    subgraph "Visualização"
+        G["📊<br>Kibana<br>(Dashboards)"];
+    end
+    
+    A & B & C --> D;
+    D --> E;
+    E --> F;
+    F <--> G;
+
+```
+
+
+
 ### **Classe:** C
 ### **Conteúdo:** Ferramentas de Busca: Elastic Stack (ELK)
 
