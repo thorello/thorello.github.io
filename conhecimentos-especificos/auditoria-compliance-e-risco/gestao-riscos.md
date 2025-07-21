@@ -1,3 +1,108 @@
+### Olá, futuro(a) aprovado(a)! Vamos descomplicar a Gestão de Riscos para o Cebraspe.
+
+Pense na gestão pública como a organização de um gigantesco festival de música gratuito para a cidade. 🎪 A **Gestão de Riscos** é a arte de pensar em tudo que pode dar errado (ou inesperadamente certo!) para garantir que o show seja um sucesso.
+
+---
+
+### ### Fundamentos: O que é Risco e Quem Manda no Jogo?
+
+* **O que é Risco?** Risco é o **efeito da incerteza nos seus objetivos**. O seu objetivo é um festival perfeito. A "incerteza" é: "Será que vai chover?". O "efeito" dessa incerteza é o risco: a chuva pode estragar o evento.
+
+* **Risco vs. Problema (Pegadinha Clássica!):**
+    * **Risco 🌧️:** É um evento **futuro e incerto**. É a *possibilidade* de chuva.
+    * **Problema ⛈️:** É um evento que **já aconteceu**. É a chuva *caindo* no meio do show.
+
+* **Risco não é só coisa ruim!** A definição fala em "efeito da incerteza". A incerteza pode ser:
+    * **Negativa (Ameaça):** O risco de um equipamento de som quebrar.
+    * **Positiva (Oportunidade) ✨:** O risco de um artista famoso, que está de passagem pela cidade, decidir fazer uma participação surpresa. É um "problema bom" que você precisa gerenciar!
+
+A principal regra do jogo no Governo Federal é a **IN Conjunta MP/CGU nº 01/2016**. Pense nela como o "Manual Oficial de Planejamento de Grandes Eventos da Cidade".
+
+---
+
+### ### O Processo: O Passo a Passo do Organizador do Festival
+
+Para gerenciar os riscos do festival, o organizador segue um roteiro lógico. O Cebraspe adora confundir a ordem e os conceitos de cada etapa.
+
+#### 1. Identificação de Riscos 📝
+É o "brainstorming do pessimismo" (e do otimismo!). O que pode acontecer?
+* Chuva forte.
+* Falta de energia.
+* Brigas na multidão.
+* Banheiros químicos insuficientes.
+* O astro principal fica doente.
+* *Oportunidade:* Um patrocinador de última hora quer injetar muito dinheiro.
+
+Nesta fase, você apenas **lista** tudo, sem julgar.
+
+#### 2. Análise de Riscos 🤔
+Agora você pega a lista e começa a medir o tamanho do estrago. Para cada risco, você analisa duas coisas:
+* **Probabilidade:** Qual a chance de acontecer?
+* **Impacto:** Se acontecer, qual será o tamanho do prejuízo (ou do lucro)?
+
+O **Nível do Risco** é basicamente `Probabilidade x Impacto`. Uma chuva leve (baixo impacto) com alta probabilidade pode ser menos preocupante que um furacão (alto impacto) com baixa probabilidade.
+
+#### 3. Avaliação de Riscos 🚦
+Aqui você **compara** o nível do risco que você calculou com os **critérios de risco** (o quanto de risco a "prefeitura" topa correr). É a hora da **decisão** e **priorização**.
+* **Risco de chuva leve:** Nível Baixo. "Ok, tolerável."
+* **Risco de falta de energia:** Nível Alto. "Alerta vermelho! Precisamos fazer algo a respeito."
+
+**Atenção:** A banca vai dizer que **Análise** e **Avaliação** são a mesma coisa. **ERRADO!** Análise é **medir**. Avaliação é **comparar e decidir**.
+
+#### 4. Tratamento de Riscos 🛡️
+Com a lista de riscos priorizados, você decide o que fazer com cada um. Existem 4 estratégias:
+
+| Estratégia de Tratamento | O que é? | Exemplo no Festival 🎪 |
+| :--- | :--- | :--- |
+| **Aceitar / Reter** | Não fazer nada e assumir as consequências. É uma decisão consciente. | Risco de algumas pessoas ficarem entediadas. Você aceita. |
+| **Mitigar / Reduzir** | Tomar medidas para diminuir a probabilidade ou o impacto do risco. | Para o risco de chuva, você **mitiga** o impacto montando grandes tendas. |
+| **Transferir / Compartilhar** | Passar o impacto (geralmente financeiro) para um terceiro. | Para o risco de acidentes, você **transfere** o prejuízo contratando um seguro. |
+| **Evitar / Eliminar** | Desistir da atividade que gera o risco. | Se o risco de um desabamento no local é muito alto, você **evita** o risco cancelando o festival ou mudando para um lugar seguro. |
+
+Depois de tratar o risco, o que sobra é o **Risco Residual**. Você montou as tendas (tratamento), mas ainda existe um pequeno risco de as pessoas se molharem. Esse "risquinho" que sobrou é o residual.
+
+---
+
+### ### As Três Linhas de Defesa: O Time de Segurança do Festival
+
+Para que tudo funcione, as responsabilidades são divididas em um modelo de 3 linhas, como um time de futebol.
+
+#### 🥇 **Primeira Linha: Jogadores em Campo**
+* **Quem são:** Os gestores operacionais. O pessoal que "põe a mão na massa". O gerente do palco, o coordenador dos food trucks, os seguranças na entrada.
+* **O que fazem:** Eles são os **donos dos riscos** das suas áreas. São responsáveis por identificar e gerenciar os riscos no dia a dia. O gerente do palco precisa verificar se os cabos estão seguros.
+
+#### 🥈 **Segunda Linha: O Técnico e a Comissão Técnica**
+* **Quem são:** As áreas especialistas em dar suporte. A equipe de Gestão de Riscos, de Controles Internos, de Segurança da Informação.
+* **O que fazem:** Eles não jogam em campo, mas **criam as regras do jogo e a estratégia**. Eles definem a política de segurança do evento, dão treinamento e supervisionam se os jogadores (1ª linha) estão seguindo o plano.
+
+#### 🥉 **Terceira Linha: O Árbitro de Vídeo (VAR) Independente**
+* **Quem é:** A **Auditoria Interna**.
+* **O que faz:** Ela é **totalmente independente** do time e do técnico. Sua função é avaliar, de forma objetiva, se o jogo está correndo bem. Ela verifica se os jogadores (1ª linha) fizeram o seu trabalho e se a comissão técnica (2ª linha) supervisionou direito. Ela se reporta diretamente ao "presidente do clube" (a alta administração), não ao técnico.
+
+**Foco Cebraspe:** A banca vai misturar os papéis! Ela dirá que o Auditor Interno (3ª linha) é responsável por montar as grades de segurança (tarefa da 1ª linha). **ERRADO!** O auditor avalia, ele não executa o trabalho operacional.
+
+### ### Mapa Mental do Processo de Gestão de Riscos
+
+Para fixar as etapas, veja este fluxo simplificado.
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD;
+    A["📝 Identificar os Riscos <br> (Brainstorming)"] --> B["🤔 Analisar os Riscos <br> (Probabilidade x Impacto)"];
+    B --> C["🚦 Avaliar os Riscos <br> (Comparar com Critérios)"];
+    C --> D{"O nível do risco<br>é aceitável?"};
+    D --> |✅ Sim| E["👍 Aceitar e Monitorar"];
+    D --> |❌ Não| F["🛡️ Decidir o Tratamento"];
+    subgraph "Opções de Tratamento"
+        direction LR
+        F --> G["Mitigar"];
+        F --> H["Transferir"];
+        F --> I["Evitar"];
+    end
+    G & H & I --> J["😌 Risco Residual <br> (O que sobrou após o tratamento)"];
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Gestão de Riscos: Estrutura e Processo no Setor Público
 
