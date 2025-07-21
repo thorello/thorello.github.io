@@ -1,3 +1,144 @@
+### Olá, futuro(a) aprovado(a)\! Vamos descomplicar a Engenharia de Usabilidade para você garantir aqueles pontos preciosos na prova do Cebraspe.
+
+Pense em Usabilidade e Experiência do Usuário como o processo de **projetar, criar e avaliar uma ferramenta de cozinha perfeita**, como um descascador de batatas inovador. 🥔
+
+-----
+
+### \#\#\# Conceitos Básicos de Usabilidade: O Descascador Funciona Bem?
+
+A usabilidade responde à pergunta: "O quão bom é este descascador para descascar batatas?". Segundo a norma ISO 9241-11, ela tem 3 pilares:
+
+  * **Eficácia:** O descascador consegue tirar a casca da batata? Sim ou não? É sobre **concluir a tarefa**.
+  * **Eficiência:** Com que esforço ele faz isso? Você descasca uma batata em 10 segundos ou em 2 minutos? É sobre **recursos gastos** (tempo, esforço).
+  * **Satisfação:** Você gostou de usar o descascador? Ele foi confortável na sua mão ou te deu calos? É sobre a **percepção subjetiva**.
+
+Lembre-se que tudo isso depende do **Contexto de Uso**. Um descascador perfeito para um chef profissional destro (usuário) pode ser horrível para um cozinheiro amador canhoto (outro usuário). A usabilidade não é absoluta\!
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Eficácia vs. Eficiência:** A banca vai trocar os dois\! **Eficácia** = Conseguiu? (Sim/Não). **Eficiência** = Gastou quanto tempo/esforço? (Medida de recursos).
+> >   * **Usabilidade é Relativa:** A banca pode dizer que um sistema é "inerentemente usável". **ERRADO\!** A usabilidade sempre depende de quem usa, para fazer o quê e em qual situação (o contexto de uso).
+
+-----
+
+### \#\#\# Experiência do Usuário (UX): A Jornada Completa com o Descascador
+
+A Experiência do Usuário (UX) é um conceito muito mais amplo. Não é só sobre o ato de descascar a batata.
+
+  * **O que é UX?** É a **jornada completa** e os **sentimentos** do usuário com o descascador. Começa **antes** de usar (ver a embalagem bonita na loja), continua **durante** o uso (o prazer de ver a casca saindo fininha) e vai até **depois** do uso (a facilidade de lavar e guardar a ferramenta).
+  * **Usabilidade vs. UX:** A usabilidade é uma parte da UX. Um descascador pode ser usável (descasca a batata), mas ter uma UX ruim (é feio, difícil de limpar e quebra fácil).
+  * **UI vs. UX:** A **UI (Interface do Usuário)** é a parte física do descascador: a cor e o formato do cabo, o material da lâmina. A **UX** é a experiência e a emoção que essa UI proporciona.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **UX e Usabilidade NÃO são sinônimos:** A banca vai dizer que UX é apenas a facilidade de uso. **ERRADO\!** Isso é usabilidade. UX é a **experiência emocional e holística**.
+> >   * **UI e UX NÃO são sinônimos:** A banca vai dizer que um bom UX é fazer uma interface bonita. **INCOMPLETO\!** Uma UI bonita é só um pedaço da UX. De que adianta um descascador de ouro (UI bonita) se ele não descasca nada (péssima usabilidade e, consequentemente, péssima UX)?
+
+-----
+
+### \#\#\# Heurísticas de Nielsen: Os 10 Mandamentos do Bom Design
+
+As heurísticas de Jakob Nielsen são como os **10 mandamentos para criar boas ferramentas**. São guias práticos para evitar problemas comuns.
+
+1.  **Visibilidade do estado do sistema:** O descascador tem um indicador que mostra quando a lâmina está ficando cega.
+2.  **Correspondência com o mundo real:** O movimento para usar o descascador é intuitivo, como o de uma faquinha.
+3.  **Controle e liberdade do usuário:** Se você começa a descascar do lado errado, é fácil parar e corrigir.
+4.  **Consistência e padrões:** Todos os descascadores da mesma marca funcionam de forma parecida.
+5.  **Prevenção de erros:** O design tem um protetor que impede seu dedo de escorregar para a lâmina.
+6.  **Reconhecimento em vez de memorização:** Você olha para ele e já sabe como usar, sem precisar ler um manual.
+7.  **Flexibilidade e eficiência:** É fácil de usar para novatos e chefs experientes podem usá-lo muito rápido.
+8.  **Estética e design minimalista:** Sem partes desnecessárias que só servem para acumular sujeira.
+9.  **Ajuda na recuperação de erros:** Se a batata trava na lâmina, é fácil de destravar.
+10. **Ajuda e documentação:** A embalagem tem um pequeno diagrama mostrando o melhor ângulo para usar.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai mostrar um **cenário de erro** (ex: um site com um link que não parece um link) e perguntar **qual heurística foi violada** (neste caso, "Reconhecimento em vez de memorização" e talvez "Consistência e padrões").
+> >   * **Prevenção vs. Recuperação de Erros:** Prevenir é criar um design que **evita** o erro. Recuperar é dar uma **boa mensagem de erro** depois que ele já aconteceu. A prevenção é sempre melhor.
+
+-----
+
+### \#\#\# Análise de Requisitos de Usabilidade: Entendendo os Cozinheiros
+
+Antes de projetar o descascador, você precisa entender quem vai usá-lo.
+
+  * **Personas:** Você cria perfis de usuários fictícios, mas baseados na realidade.
+      * **"Dona Maria, 65 anos, tem artrite nas mãos"**: Precisa de um cabo ergonômico e macio.
+      * **"Chef Carlos, 28 anos, descasca 10kg de batatas por dia"**: Precisa de uma ferramenta super rápida e durável.
+  * **Análise de Tarefas:** Você detalha passo a passo como uma pessoa descasca uma batata para identificar onde estão as dificuldades.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Persona não é um usuário real:** É um **arquétipo**, uma representação de um grupo de usuários.
+> >   * Requisitos de usabilidade (ex: "O Chef Carlos deve conseguir descascar 1kg de batatas em menos de 3 minutos") são **requisitos não funcionais**.
+
+-----
+
+### \#\#\# Avaliação de Usabilidade: Testando o Descascador
+
+Com um protótipo do descascador em mãos, é hora de avaliar se ele é bom.
+
+  * **Métodos de Inspeção (sem usuários):**
+      * **Avaliação Heurística:** Um **especialista** em design pega o descascador e o avalia contra as 10 Heurísticas de Nielsen, apontando as falhas teóricas.
+  * **Métodos de Teste (com usuários):**
+      * **Teste de Usabilidade:** Você chama a **Dona Maria e o Chef Carlos** (usuários reais), dá o descascador e um saco de batatas para eles e **observa** como eles usam, medindo tempo, erros e frustrações.
+      * **Protocolo Think-Aloud (Pensar Alto):** Você pede para eles irem falando em voz alta tudo o que pensam enquanto usam a ferramenta.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A diferença mais importante: **Inspeção = Especialista avalia**. **Teste = Usuário final usa**. A banca vai dizer que avaliação heurística é um teste. **ERRADO\!** É uma inspeção.
+> >   * O objetivo do teste não é perguntar ao usuário se ele "gostou", mas **observar seu comportamento** para descobrir os problemas.
+
+-----
+
+### \#\#\# Design de Interface (UI): Desenhando o Descascador
+
+A UI é a aparência e a forma da ferramenta.
+
+  * **Affordance:** A qualidade de um objeto que sugere seu uso. O cabo do descascador tem um formato que "pede" para ser segurado de uma certa maneira.
+  * **Feedback:** A resposta da ferramenta à sua ação. O som e a sensação da lâmina cortando a casca confirmam que você está fazendo o movimento certo.
+  * **Wireframe, Mockup e Protótipo:**
+      * **Wireframe:** Um esboço do descascador em um guardanapo (só a estrutura).
+      * **Mockup:** Um modelo 3D estático no computador, com cores e texturas.
+      * **Protótipo Interativo:** Um modelo físico impresso em 3D que você pode segurar na mão.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * Decore a hierarquia dos protótipos: **Wireframe (esqueleto) → Mockup (visual estático) → Protótipo (visual + interativo)**.
+> >   * **Affordance** é um conceito chave de design. Um link em um site que não tem nenhuma indicação visual de que é clicável (sem sublinhado, sem cor diferente) tem um *affordance* ruim.
+
+### \#\#\# Mapa Mental: A Relação entre UX e Usabilidade
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["⭐ Experiência do Usuário (UX)<br>(A Jornada Completa)"]
+    
+    subgraph "Componentes da UX"
+        B["🎯 Usabilidade<br>(É fácil de usar?)"]
+        C["🎨 Desejabilidade<br>(Eu quero isso?)"]
+        D["🔒 Credibilidade<br>(Eu confio nisso?)"]
+        E["... e outros"]
+    end
+
+    subgraph "Pilares da Usabilidade (ISO 9241-11)"
+        F["✔️ Eficácia<br>(Consegue fazer?)"]
+        G["⏱️ Eficiência<br>(Com que esforço?)"]
+        H["😊 Satisfação<br>(Gostou da experiência?)"]
+    end
+    
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    
+    B --> F
+    B --> G
+    B --> H
+
+```
+
+
 ### **Classe:** C
 ### **Conteúdo:** Engenharia de Usabilidade: Conceitos básicos
 
