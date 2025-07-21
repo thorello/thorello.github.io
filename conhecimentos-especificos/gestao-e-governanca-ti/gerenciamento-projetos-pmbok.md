@@ -1,3 +1,101 @@
+### Olá, futuro(a) aprovado(a)! Vamos desmistificar o novo Guia PMBOK® 7ª Edição para você gerenciar sua aprovação no Cebraspe.
+
+Pense no Gerenciamento de Projetos de duas formas. O jeito antigo (**PMBOK 6ª Edição**) era como seguir a **receita de bolo da vovó, escrita na pedra** 📜. Você tinha que seguir 49 passos exatos, na ordem exata, para o bolo sair certo. Já o novo jeito (**PMBOK 7ª Edição**) é como participar de um **reality show de culinária com um chef mestre** 🧑‍🍳. Ele não te dá uma receita fixa, mas te ensina os **princípios da boa culinária** para que você possa criar qualquer prato, adaptando-se aos ingredientes que tem na bancada.
+
+---
+
+### ### A Mudança de Paradigma: Da Receita de Bolo aos Princípios do Chef
+
+Essa é a mudança mais radical e o ponto que o Cebraspe mais vai explorar.
+
+| Característica | PMBOK® 6ª Edição (A Receita da Vovó) | PMBOK® 7ª Edição (Os Princípios do Chef) |
+| :--- | :--- | :--- |
+| **Foco** | **Processos Prescritivos** | **Princípios e Entrega de Valor** |
+| **Abordagem** | "COMO fazer" (49 processos, 10 áreas) | "O QUÊ e POR QUE fazer" (12 princípios, 8 domínios) |
+| **Flexibilidade** | Baixa (Receita rígida) | Alta (Adapte a técnica ao prato) |
+| **Sucesso do Projeto** | Entregar no escopo, prazo e custo | **Entregar VALOR** para o negócio |
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Prescritivo vs. Baseado em Princípios:** A banca vai afirmar que "o PMBOK 7 detalha 49 processos". **ERRADO!** Isso é a 6ª edição. A 7ª edição é **não prescritiva** e se baseia em **princípios** que guiam o comportamento.
+> > * **Foco em Valor:** O sucesso não é mais só cumprir a "tripla restrição" (escopo, tempo, custo). Um projeto pode estourar o orçamento e ainda ser um sucesso se o **valor** que ele entregou para a organização foi imenso.
+
+---
+
+### ### O Sistema de Entrega de Valor e os 12 Princípios: A Filosofia do Chef
+
+A 7ª edição coloca o projeto dentro de um **Sistema para Entrega de Valor**. Pense nisso como a "filosofia do restaurante": tudo o que a cozinha (projetos, programas) faz deve contribuir para a reputação e o sucesso do restaurante (a estratégia da organização).
+
+Para cozinhar bem dentro dessa filosofia, o chef mestre ensina **12 Princípios** que devem guiar a mentalidade da sua equipe.
+
+1.  **Administração (*Stewardship*):** Seja um chef responsável e cuidadoso com os ingredientes e com a cozinha.
+2.  **Equipe:** Crie uma cozinha colaborativa, onde todos se ajudam.
+3.  **Partes Interessadas:** Converse sempre com os clientes e o dono do restaurante.
+4.  **Valor:** Foque em fazer um prato delicioso que o cliente vai amar.
+5.  **Pensamento Sistêmico:** Entenda que mexer na receita da sobremesa pode impactar o prato principal.
+6.  **Liderança:** Inspire e motive sua equipe, não apenas dê ordens.
+7.  **Adaptação:** Se faltou um ingrediente, adapte a receita com o que você tem.
+8.  **Qualidade:** Use ingredientes de qualidade e siga as boas práticas de higiene em todo o processo.
+9.  **Complexidade:** Saiba como lidar com pratos complexos e com clientes indecisos.
+10. **Risco:** Tenha um plano B caso o forno quebre no meio do preparo.
+11. **Adaptabilidade e Resiliência:** Seja rápido para se adaptar a um pedido de última hora e resiliente para se recuperar se um prato queimar.
+12. **Mudança:** Aceite que o cliente pode mudar de ideia e esteja pronto para adaptar o prato.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * A banca vai dar um cenário e perguntar qual princípio se aplica. Ex: "Customizar a abordagem do projeto para a cultura da empresa" se refere ao princípio da **Adaptação**.
+> > * Os princípios são **diretrizes**, não uma lista de tarefas. Eles guiam a mentalidade, não são um passo a passo.
+
+---
+
+### ### Domínios de Desempenho e a Caixa de Ferramentas: As Estações da Cozinha
+
+O PMBOK 7 troca as antigas "Áreas de Conhecimento" por 8 **Domínios de Desempenho**. Pense neles como as **estações de trabalho da sua cozinha**, áreas de foco que precisam estar funcionando bem o tempo todo, de forma integrada.
+
+* **Os 8 Domínios (As Estações da Cozinha):**
+    1.  **Partes Interessadas:** A estação de atendimento ao cliente.
+    2.  **Equipe:** A área de gestão de pessoal e motivação da cozinha.
+    3.  **Abordagem de Desenvolvimento:** Decidir se o prato será *à la carte* (preditivo) ou um *menu degustação* (adaptativo).
+    4.  **Planejamento:** A estação de *mise en place*, onde você organiza todos os ingredientes e passos.
+    5.  **Trabalho do Projeto:** O fogão, a chapa, onde o trabalho é efetivamente feito.
+    6.  **Entrega:** A estação de montagem e finalização do prato.
+    7.  **Medição:** O painel que mostra o tempo de preparo e a temperatura dos pratos.
+    8.  **Incerteza:** A estação de gerenciamento de crises e riscos (o extintor de incêndio).
+
+* **Adaptação, Modelos, Métodos e Artefatos (A Caixa de Ferramentas do Chef 🧰):**
+    * Esta seção do guia é a **caixa de ferramentas e a despensa do chef**. Ela não diz "você *deve* usar uma faca de cerâmica". Em vez disso, ela diz "aqui estão vários tipos de facas, panelas e temperos que você *pode* usar".
+    * Cabe à equipe, pelo princípio da **Adaptação**, escolher as melhores ferramentas (métodos e artefatos) para o prato (projeto) que estão preparando.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Domínios vs. Áreas de Conhecimento:** A banca vai misturar os nomes. "Gerenciamento de Custos" era uma **Área de Conhecimento** da 6ª Ed. Na 7ª Ed., as atividades de custo estão dentro dos domínios **Planejamento** e **Medição**.
+> > * **Domínios não são Fases:** As estações da cozinha trabalham **ao mesmo tempo e de forma integrada**, não uma depois da outra.
+> > * **Uso de Artefatos:** A banca vai dizer que "o PMBOK 7 obriga o uso do Termo de Abertura do Projeto". **ERRADO!** O PMBOK 7 diz que a necessidade de qualquer artefato deve ser decidida pela equipe através da **adaptação**.
+
+### ### Mapa Mental: A Nova Estrutura do PMBOK® 7
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["🎯 Sistema para Entrega de Valor<br>(Foco do Restaurante)"]
+
+    subgraph "Fundamentos"
+        B["📜 12 Princípios<br>(A Filosofia do Chef)"]
+    end
+    
+    subgraph "Execução"
+        C["🍳 8 Domínios de Desempenho<br>(As Estações da Cozinha)"]
+    end
+
+    subgraph "Ferramentas"
+        D["🧰 Adaptação<br>Modelos, Métodos e Artefatos"]
+    end
+
+    A --> B
+    A --> C
+    B -- Guiam as Ações em --> C
+    C -- Utilizam --> D
+
+```
+
+
 ### **Classe:** B
 ### **Conteúdo:** Gerenciamento de Projetos: Fundamentos e o Guia PMBOK® 7ª Edição
 
