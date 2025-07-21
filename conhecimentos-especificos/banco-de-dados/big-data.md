@@ -1,3 +1,91 @@
+### Olá, futuro(a) aprovado(a)! Vamos mergulhar no universo de Big Data e Data Lakes sem medo de se afogar em termos técnicos.
+
+Pense em **Big Data** como tentar beber água de um hidrante de bombeiro 🚒. É muita água, vindo muito rápido e de todos os tipos (às vezes com areia, às vezes limpa). As ferramentas antigas, como um copo de vidro (bancos de dados tradicionais), simplesmente não dão conta.
+
+---
+
+### ### Big Data: Os Famosos "Vs"
+
+Big Data não é só sobre o tamanho da água. São 5 características, os "5 Vs", que o definem. O Cebraspe adora cobrar isso!
+
+| O "V" | O que é? | Analogia do Hidrante 🚒 |
+| :--- | :--- | :--- |
+| **Volume** 📚 | A **quantidade** de dados. É muita, muita coisa. | A quantidade absurda de água jorrando do hidrante, medida em milhões de litros. |
+| **Velocidade** 💨 | A **rapidez** com que os dados são gerados e chegam. | A velocidade alucinante com que a água sai do hidrante. É um fluxo contínuo. |
+| **Variedade** 🎭 | Os **diferentes tipos** de dados. | A água pode vir misturada com areia (dado não estruturado), folhas (semiestruturado) ou ser purinha (estruturado). |
+| **Veracidade** 🤔 | A **confiabilidade** e a qualidade dos dados. | A água que sai do hidrante é limpa e potável ou está suja e contaminada? Você pode confiar nela? |
+| **Valor** 💰 | A capacidade de **extrair algo útil** desses dados. | Conseguir usar toda essa água para gerar energia para a cidade. É o objetivo final! |
+
+**Foco Cebraspe:**
+> * A banca vai dizer que Big Data é só sobre **Volume**. **ERRADO!** Os 5 "Vs" são um conjunto. A capacidade de lidar com a **Variedade** (vídeos, textos, áudios) e a **Velocidade** (dados em tempo real) é o que realmente define o Big Data.
+> * A tecnologia fundamental por trás disso é o ecossistema **Hadoop**, que permite guardar os dados em vários computadores (HDFS) e processá-los em paralelo (MapReduce).
+
+---
+
+### ### Data Lake vs. Data Warehouse: O Lago e a Fábrica de Água Engarrafada
+
+Para lidar com toda essa "água" de dados, temos duas abordagens principais. O Cebraspe AMA essa comparação.
+
+* #### **Data Warehouse (A Fábrica de Água Engarrafada 💧)**
+    * É o modelo antigo e organizado. Pense numa fábrica da Nestlé.
+    * A fábrica coleta água (dados) de várias fontes.
+    * Ela **filtra, trata e purifica** a água primeiro (**Transforma**).
+    * Depois, ela coloca a água limpa em garrafinhas padronizadas e rotuladas (**Load**).
+    * O processo é **ETL (Extract, Transform, Load)**.
+    * O formato da garrafa é definido antes de encher (`Schema-on-Write`).
+    * **Usuários:** Analistas de negócio que querem uma água limpa e pronta para beber.
+
+* #### **Data Lake (O Grande Lago Natural 🏞️)**
+    * É o modelo novo, flexível e um pouco "selvagem".
+    * Pense num lago gigante. Você simplesmente deixa a água de rios, chuva e córregos (**dados brutos e não tratados**) entrar e se acumular.
+    * Você **não filtra nada antes**. A água fica lá, no seu estado natural.
+    * O processo é **ELT (Extract, Load, Transform)**.
+    * Quando alguém precisa da água (um cientista, um pescador), ele vai até o lago, pega a água que quer e a trata **naquele momento**, para o seu uso específico (`Schema-on-Read`).
+    * **Usuários:** Cientistas de dados que amam ter acesso à água bruta para fazer todo tipo de experimento.
+
+**Tabela Comparativa (Decore isso!)**
+
+| Característica | Data Lake (Lago) | Data Warehouse (Fábrica) |
+| :--- | :--- | :--- |
+| **Dados** | Brutos, formato nativo, "água suja" | Processados, limpos, "água engarrafada" |
+| **Esquema** | `Schema-on-Read` (filtra na hora de usar) | `Schema-on-Write` (filtra antes de guardar) |
+| **Processo** | **ELT** (Extrai, Carrega, Transforma) | **ETL** (Extrai, Transforma, Carrega) |
+| **Agilidade** | Alta (é só jogar a água no lago) | Baixa (precisa criar a garrafa antes) |
+
+#### Foco Cebraspe (A "Pegadinha" do Pântano)
+
+> * A banca vai inverter tudo! Dirá que "Data Lake armazena dados processados" (**ERRADO!**) ou que "Data Warehouse usa Schema-on-Read" (**ERRADO!**).
+> * **O Risco do "Pântano de Dados" (*Data Swamp*)**: Se você só jogar água (dados) no seu lago sem nenhum controle, sem mapa, sem saber de onde veio, ele vira um pântano inútil e fedorento. Um Data Lake sem governança de dados vira um **pântano de dados**, onde ninguém encontra mais nada de valor.
+
+### ### Mapa Mental: O Fluxo dos Dados
+
+Veja visualmente a diferença crucial entre os dois mundos.
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD;
+    A["🌊 Fontes de Dados <br> (Estruturados, Não Estruturados)"];
+
+    subgraph "💧 Data Warehouse (Fábrica)"
+        B["Extrai"];
+        C["Transforma <br> (Limpa e Padroniza)"];
+        D["Carrega"];
+        E["🗄️ Dados Estruturados <br> (Prontos para Análise)"];
+        B --> C --> D --> E;
+    end
+
+    subgraph "🏞️ Data Lake (Lago)"
+        G["Extrai"];
+        H["Carrega <br> (Dados Brutos)"];
+        I["📥 Dados Brutos e Variados <br> (Formato Nativo)"];
+        J["Transforma Sob Demanda <br> (Na hora de usar)"];
+        G --> H --> I --> J;
+    end
+
+    A --> B;
+    A --> G;
+```
+
 ### **Classe:** C
 ### **Conteúdo:** Big Data: Noções Fundamentais
 
