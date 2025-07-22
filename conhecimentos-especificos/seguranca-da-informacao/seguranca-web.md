@@ -1,3 +1,112 @@
+
+### Olá, futuro(a) aprovado(a)\! Vamos erguer as muralhas do seu conhecimento sobre Segurança Web para você defender sua vaga no concurso do Cebraspe.
+
+Pense em segurança de aplicações web como a **defesa de um castelo medieval** 🏰. Sua aplicação é o castelo, seus dados são o tesouro, os usuários são os cidadãos, e os hackers são os inimigos tentando invadir.
+
+-----
+
+### \#\#\# Fundamentos de Segurança Web e OWASP: O Guia de Defesa do Reino
+
+  * **Os Objetivos da Defesa:**
+
+      * **Confidencialidade:** Garantir que só o rei leia os pergaminhos secretos.
+      * **Integridade:** Garantir que ninguém adultere os mapas do reino.
+      * **Disponibilidade:** Garantir que a ponte levadiça esteja sempre funcionando para os cidadãos.
+
+  * **OWASP (A Ordem dos Sábios Conselheiros de Guerra):**
+    É uma comunidade global de especialistas em segurança que estuda as táticas dos inimigos e cria, de graça, os melhores guias de defesa para todos os reinos.
+
+  * **OWASP Top 10 (O Pergaminho dos 10 Maiores Perigos):**
+    É o guia mais famoso da OWASP. Ele lista as **10 táticas de ataque mais críticas e comuns** que os inimigos usam. Não é uma lei, mas um **documento de conscientização** que todo bom rei (desenvolvedor/gestor) deve ler para saber como proteger seu castelo.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dizer que o OWASP Top 10 é uma norma obrigatória ou uma certificação. **ERRADO\!** É um **guia de conscientização**, uma lista de riscos.
+> >   * A banca vai descrever um ataque e perguntar qual pilar da segurança foi violado. Ex: Um ataque que vaza dados de clientes fere a **confidencialidade**. Um que derruba o site fere a **disponibilidade**.
+
+-----
+
+### \#\#\# Análise de Vulnerabilidades: As Táticas Inimigas Mais Comuns
+
+Vamos ver as táticas do pergaminho da OWASP que o Cebraspe mais gosta.
+
+| Tática Inimiga | Analogia no Castelo | O que é? |
+| :--- | :--- | :--- |
+| **Injeção (SQL Injection)** | O Bilhete Falso | O inimigo envia um bilhete ao mordomo com a ordem: "Traga a lista de compras do 'João' `OU A CHAVE DO TESOURO`". O mordomo, um robô ingênuo, obedece à ordem inteira. |
+| **Quebra de Autenticação** | Senha Fraca no Portão | O inimigo descobre que a senha do portão principal é "1234" ou rouba o crachá de acesso de um guarda. |
+| **Cross-Site Scripting (XSS)** | A Pichação no Mural de Avisos | O inimigo picha um "feitiço" malicioso no mural. Todo cidadão que lê o mural tem seus bolsos magicamente esvaziados (o script executa no navegador da vítima). |
+| **Quebra de Controle de Acesso (IDOR)** | O Guarda Distraído | O cidadão João, do quarto 101, pede para o guarda abrir seu quarto. O inimigo, do quarto 102, vê e pede para o guarda abrir o quarto 101. O guarda abre **sem verificar se ele tem a chave daquele quarto**. |
+| **CSRF** | A Carta Falsa para o Rei | O inimigo sabe que o Rei está logado no "Banco Real". Ele envia uma carta ao Rei: "Clique para ver este mapa\!". Ao clicar, o Rei, sem saber, envia uma ordem forjada para o banco transferir o ouro para o inimigo. |
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **XSS vs. CSRF:** A confusão clássica\!
+> >       * **XSS** explora a confiança do **usuário no site** (o cidadão confia no mural do castelo).
+> >       * **CSRF** explora a confiança do **site no usuário** (o banco confia que a ordem veio do navegador do rei).
+> >   * A causa raiz do **IDOR** é a **falta de checagem de autorização** no servidor. "Esse usuário pode mesmo acessar este recurso?".
+
+-----
+
+### \#\#\# Técnicas de Proteção: As Defesas do Castelo
+
+Para cada tática inimiga, existe uma defesa inteligente.
+
+  * **Validação de Entrada (Revistar todos na entrada):**
+    É a prática de inspecionar tudo o que vem de fora. A melhor abordagem é a **Lista Branca (*Whitelisting*)**:
+
+      * **Lista Negra (Ruim):** "Proibido entrar com espadas e veneno". O inimigo entra com uma bomba, que não estava na lista.
+      * **Lista Branca (Bom):** "Permitido entrar apenas com pão e água". Tudo o mais é barrado. É muito mais seguro.
+
+  * **Codificação de Saída (*Output Encoding*):**
+
+      * **Defesa Principal contra XSS.** Antes de exibir qualquer mensagem no mural de avisos, o escriba do castelo a traduz para um "código seguro" que neutraliza qualquer feitiço pichado, transformando-o em texto inofensivo.
+
+  * **Queries Parametrizadas (*Prepared Statements*):**
+
+      * **Defesa Principal contra SQL Injection.** O mordomo não aceita mais bilhetes abertos. Ele só aceita formulários pré-impressos: `Ação: [________] | Para o Cidadão: [________]`. A tentativa do inimigo de injetar um comando vira apenas um nome de cidadão muito bizarro. O código e os dados são separados.
+
+  * **Tokens Anti-CSRF:**
+
+      * **Defesa Principal contra CSRF.** Para cada ordem importante, o Rei precisa incluir uma "palavra secreta do dia" que só ele e o banco conhecem. Como o inimigo não sabe a palavra secreta, a ordem forjada na carta falsa é inválida.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai testar o mapeamento Defesa vs. Ataque. Decore:
+> >       * **SQL Injection → Queries Parametrizadas**
+> >       * **XSS → Codificação de Saída**
+> >       * **CSRF → Tokens Anti-CSRF**
+> >   * A validação de segurança feita só no navegador do cliente (com JavaScript) é **inútil**, pois o inimigo pode facilmente burlá-la. A validação **deve sempre ser feita no servidor**.
+
+### \#\#\# Mapa Mental: Mapeamento de Ameaças e Defesas
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph LR
+    subgraph "🏰 Castelo (Aplicação Web)"
+        direction TB
+        A["<b>Ameaças (OWASP)</b>"] -- Mitigadas por --> B["<b>Defesas</b>"]
+    end
+
+    subgraph "Táticas Inimigas"
+        INJ["Injeção (SQLi)"]
+        XSS["Cross-Site Scripting (XSS)"]
+        CSRF["CSRF"]
+        IDOR["Quebra de Acesso (IDOR)"]
+    end
+
+    subgraph "Mecanismos de Defesa"
+        QP["Queries Parametrizadas"]
+        OE["Codificação de Saída"]
+        TK["Tokens Anti-CSRF"]
+        AUTHZ["Verificação de Autorização"]
+    end
+
+    INJ -- "Defesa Primária" --> QP
+    XSS -- "Defesa Primária" --> OE
+    CSRF -- "Defesa Primária" --> TK
+    IDOR -- "Defesa Primária" --> AUTHZ
+```
+
 ### **Classe:** A
 ### **Conteúdo:** Segurança Web: Fundamentos e OWASP
 
