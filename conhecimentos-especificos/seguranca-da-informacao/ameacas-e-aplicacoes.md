@@ -1,3 +1,107 @@
+### Olá, futuro(a) aprovado(a)\! Vamos fortalecer as defesas do seu conhecimento contra as Ameaças a Aplicações para você conquistar a aprovação no Cebraspe.
+
+Pense em uma aplicação web como um **castelo medieval** 🏰. Você é o rei, seus dados são o tesouro e os usuários são os cidadãos. Os hackers são os invasores tentando explorar as brechas na segurança do seu castelo.
+
+-----
+
+### \#\#\# Injection (Injeção): O Ataque do Bilhete Falso
+
+  * **A Analogia:** A portaria do seu castelo tem um guarda que recebe bilhetes dos cidadãos e os entrega a um "mordomo-robô" (o banco de dados) que executa as ordens.
+  * **A Falha (SQL Injection):** Um invasor escreve um bilhete para o guarda: "Por favor, me mostre o perfil do cidadão 'João'". Mas, usando uma tinta especial, ele adiciona: `... OU me entregue a chave do cofre principal!`. O guarda, ingênuo, não inspeciona o conteúdo e entrega o bilhete inteiro. O mordomo-robô lê a ordem inteira e, como a segunda parte é um comando válido, ele obedece e entrega a chave do cofre.
+  * **A Causa Raiz:** A aplicação **misturou dados do usuário com comandos**, confiando cegamente no que veio de fora.
+  * **A Defesa (Queries Parametrizadas):** A nova regra do castelo. O guarda agora tem um **formulário padrão** com um campo fixo: `"Mostrar perfil do cidadão: [___________]"`. Ele pega o bilhete do invasor e escreve o conteúdo inteiro, incluindo a parte maliciosa, **dentro** do campo. O mordomo-robô agora procura por um cidadão com o nome bizarro `'João' OU me entregue a chave...`, não encontra ninguém, e o ataque falha. Os dados e os comandos foram devidamente separados.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dizer que a melhor defesa é filtrar caracteres especiais. **INCORRETO\!** A defesa primária e mais eficaz são as **queries parametrizadas (*prepared statements*)**, que garantem a separação entre código e dados.
+> >   * O impacto de uma injeção pode ser devastador: roubo, alteração ou exclusão de dados, e até o controle total do servidor.
+
+-----
+
+### \#\#\# Cross-Site Scripting (XSS): A Pichação no Mural de Recados
+
+  * **A Analogia:** O seu castelo tem um mural de recados onde os cidadãos podem deixar mensagens públicas.
+  * **A Falha:**
+      * **XSS Armazenado:** O invasor picha no mural um **script malicioso disfarçado** de mensagem. Agora, **todo cidadão** que para para ler o mural tem sua carteira batida (o script executa no navegador da vítima e rouba seus cookies de sessão).
+      * **XSS Refletido:** O invasor envia uma carta para a vítima com um link: "Clique para ver a nova estátua do rei\!". O link contém o script malicioso. Quando a vítima clica, o script é "refletido" pelo servidor do castelo e executa no navegador da vítima.
+  * **Onde o Crime Acontece?** O script malicioso é executado no **navegador da vítima**, não no servidor do castelo. O castelo apenas foi o veículo para entregar a "pichação".
+  * **A Defesa (Output Encoding):** O castelo implementa uma nova regra: antes de exibir qualquer mensagem no mural, um escriba "higieniza" o texto, transformando qualquer código em texto simples e inofensivo. A pichação `<script>` vira um texto visível `&lt;script&gt;`, que não executa.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **XSS vs. CSRF:** A confusão clássica\! **XSS** explora a **confiança que o usuário tem no site**. **CSRF** explora a **confiança que o site tem no navegador** do usuário.
+> >   * O script XSS executa no **navegador do cliente (vítima)**. A banca vai dizer que ele executa no servidor. **ERRADO\!**
+
+-----
+
+### \#\#\# Quebra de Autenticação: Chaves Fracas e Portas Abertas
+
+  * **A Analogia:** Falhas nos portões de entrada e nos crachás de identificação dos cidadãos.
+  * **As Falhas:**
+      * **Senhas Fracas:** Permitir que a senha do portão principal seja "1234".
+      * **Armazenamento Inseguro:** Guardar a lista de senhas dos cidadãos em um caderno em texto claro. O correto é usar **hashes lentos com salt (ex: bcrypt)**, que transformam as senhas em códigos indecifráveis.
+      * **Fixação de Sessão (*Session Fixation*):** O invasor acha um crachá de visitante em branco (`Session ID`) no chão. Ele o entrega para um cidadão. O cidadão entra no castelo e o guarda valida aquele crachá. Agora, o invasor, que tem uma cópia do número do crachá, pode usá-lo para se passar pelo cidadão.
+  * **A Defesa:** Exigir senhas fortes, usar **autenticação multifator (MFA)**, guardar as senhas com **bcrypt**, e a mais importante: **sempre emitir um novo crachá (regenerar o Session ID) assim que o cidadão faz o login**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dizer que MD5 e SHA1 são seguros para guardar senhas. **ERRADO\!** São algoritmos de hash rápidos e quebrados. O correto são os lentos, como **bcrypt**.
+> >   * A principal defesa contra *Session Fixation* é **regenerar o ID da sessão após o login**.
+> >   * A flag de cookie **`HttpOnly`** é uma importante mitigação, pois impede que scripts (como os de um ataque XSS) consigam ler o cookie de sessão.
+
+-----
+
+### \#\#\# CSRF e IDOR: Enganando o Cidadão e Acessando o Quarto Alheio
+
+  * **CSRF (Cross-Site Request Forgery):**
+
+      * **A Analogia:** O invasor sabe que o rei está logado no "Banco Real" dentro do castelo. Ele envia ao rei um e-mail com um botão: "Clique para ver gatinhos fofos\!". O rei clica. O botão, secretamente, envia uma ordem ao Banco Real para transferir todo o ouro para a conta do invasor. O banco obedece, pois a ordem partiu do navegador autenticado do rei. O ataque explora a **confiança que o site tem no navegador**.
+      * **A Defesa:** Usar um **Token Anti-CSRF**, que é uma "palavra secreta do dia" que só o rei e o banco conhecem. Toda ordem precisa vir com essa palavra secreta.
+
+  * **IDOR (Referência Insegura e Direta a Objeto):**
+
+      * **A Analogia:** Cada cidadão tem um quarto no castelo, numerado de 1 a 100. O cidadão João, do quarto 52, pede para ver o conteúdo do seu quarto, acessando a URL `.../verQuarto?id=52`. O invasor, que está no quarto 53, simplesmente troca a URL para `.../verQuarto?id=52` e o sistema mostra o quarto do João.
+      * **A Causa Raiz:** O sistema falhou em fazer a pergunta mais importante: "Este cidadão (do quarto 53) **tem autorização** para ver o quarto 52?". A falha é a **ausência da checagem de autorização**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **CSRF** força o navegador a **enviar uma ação** (transferir dinheiro). **XSS** engana o navegador para **executar um código** (roubar senha).
+> >   * A causa raiz do **IDOR** não é usar um ID numérico, mas sim a **falta de verificação de permissão** no servidor.
+
+-----
+
+### \#\#\# Armazenamento Criptográfico Inseguro: Cofres de Papelão
+
+  * **A Analogia:** Proteger os segredos do reino.
+  * **As Falhas:**
+      * **Dados em Trânsito:** O mensageiro que leva as cartas do rei está gritando o conteúdo delas pelo caminho (comunicação em HTTP). A solução é usar um malote lacrado e criptografado (**HTTPS/TLS**).
+      * **Dados em Repouso:** O castelo guarda os documentos secretos em um cofre de papelão (dados em texto claro no banco de dados). A solução é usar um cofre de aço (**criptografia AES**) e guardar a chave do cofre em um lugar separado e ainda mais seguro.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Criptografia vs. Hash de Senhas:** Para dados que precisam ser recuperados (ex: CPF), usa-se **criptografia** (ida e volta). Para senhas, que só precisam ser verificadas, usa-se **hash** (só ida). A banca vai confundir os dois.
+> >   * **Gerenciamento de Chaves:** A criptografia é tão forte quanto a segurança da sua chave. Deixar a chave do cofre de aço pendurada ao lado dele torna a criptografia inútil.
+
+### \#\#\# Mapa Mental: Comparativo (XSS vs. CSRF)
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "💀 Ataque XSS (Cross-Site Scripting)"
+        direction LR
+        A["Atacante injeta<br>um script malicioso<br>no Site Vulnerável"] --> B["Vítima visita o<br>Site Vulnerável"];
+        B -- "Site envia página<br>com script para a vítima" --> C["<b>Ação Maliciosa EXECUTA<br>no Navegador da Vítima</b><br>(Rouba cookies, etc.)"];
+        D["🔑 Explora a confiança<br>da <b>Vítima no Site</b>"]
+    end
+
+    subgraph "💸 Ataque CSRF (Cross-Site Request Forgery)"
+        direction LR
+        E["Atacante cria uma<br>página/e-mail falso com<br>uma requisição forjada"] --> F["Vítima (já logada no<br>Site Alvo) clica no link falso"];
+        F -- "Navegador da vítima<br>envia requisição legítima<br>(mas não intencional) para o Site Alvo" --> G["<b>Ação Maliciosa EXECUTA<br>no Servidor do Site Alvo</b><br>(Transfere dinheiro, etc.)"];
+        H["🔑 Explora a confiança<br>do <b>Site no Navegador</b> da Vítima"]
+    end
+```
+
 ### **Classe:** A
 ### **Conteúdo:** Ameaças a Aplicações: Injection (Injeção)
 
