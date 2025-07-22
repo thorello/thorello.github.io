@@ -1,3 +1,115 @@
+### Olá, futuro(a) aprovado(a)! Vamos abrir as caixas de ferramentas dos Sistemas Operacionais para você construir sua aprovação no Cebraspe.
+
+Pense nos sistemas operacionais como duas caixas de ferramentas diferentes: **GNU/Linux** é a caixa de ferramentas do artesão, totalmente customizável e poderosa. **MS Windows** é a caixa de ferramentas de uma grande marca, super integrada e com uma interface amigável.
+
+---
+
+### ### GNU/Linux: A Caixa de Ferramentas do Artesão
+
+A principal forma de usar essa caixa é através da linha de comando (o *shell*), usando ferramentas precisas.
+
+* **Comandos Essenciais:**
+    * `ls`: Sua **lanterna** para ver o que tem dentro de um diretório.
+    * `cd`: A ferramenta para **mudar** de um compartimento (diretório) para outro.
+    * `mv`: Ferramenta para **mover** ou **renomear** uma peça.
+    * `rm`: A **marreta** para remover uma peça. Cuidado com o `rm -rf`, que é a marreta atômica!
+    * `grep`: A **lupa** para procurar por um texto específico dentro de um manual.
+
+* **O Sistema de Permissões (Os 3 Cadeados):**
+    Cada ferramenta e cada gaveta (arquivo e diretório) tem 3 cadeados: um para o **Dono (u)**, um para o seu **Grupo (g)** de trabalho, e um para **Outros (o)**. Cada cadeado tem 3 posições (permissões):
+
+    | Permissão | Símbolo | Valor (Octal) | O que permite? |
+    | :--- | :-: | :-: | :--- |
+    | **Leitura** | `r` | **4** | **Olhar** o conteúdo da gaveta (arquivo) ou **listar** as ferramentas nela. |
+    | **Escrita** | `w` | **2** | **Colocar ou tirar** ferramentas da gaveta (arquivo). |
+    | **Execução** | `x` | **1** | **Usar** a ferramenta (se for uma furadeira) ou **entrar** na sala (diretório). |
+
+    A permissão `rwxr-xr--` é a soma dos valores: `(4+2+1)(4+0+1)(4+0+0)` = **754**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Permissões em Diretórios:** A banca vai te testar nisso! Para **entrar** em uma sala (diretório) com `cd`, você precisa da permissão de **execução (`x`)**. Para **listar** o que tem dentro com `ls`, precisa de **leitura (`r`)**.
+> > * **Notação Octal:** É obrigatório saber converter de `rwx` para octal e vice-versa. `777` é liberação geral. `700` é acesso exclusivo do dono.
+> > * **Samba:** É o serviço que faz o Linux "falar a língua" do Windows para compartilhar arquivos. Ele usa o protocolo **SMB**, não o NFS, para essa finalidade.
+
+---
+
+### ### MS Windows: A Caixa de Ferramentas da Grande Marca
+
+O Windows tem seu próprio sistema de organização e segurança, o NTFS.
+
+* **Permissões NTFS (Cadeados Granulares):**
+    O sistema de cadeados é mais complexo. Você pode dar permissões super específicas como "Controle Total", "Modificar", "Apenas Leitura", etc.
+    * **Herança:** Se uma gaveta tem um cadeado, qualquer nova ferramenta que você colocar nela "herda" o mesmo cadeado automaticamente.
+    * **A Regra de Ouro da Precedência:** **NEGAR SEMPRE VENCE!** Se um usuário tem duas permissões para a mesma pasta, uma que **Permite** e outra que **Nega**, a permissão final será **Negar**.
+
+* **PowerShell (A Ferramenta Multifuncional a Laser):**
+    É o sucessor moderno do antigo `cmd.exe`. Sua grande diferença é que ele é **orientado a objetos**.
+    * **O que isso significa?** O `cmd` te entrega um relatório em texto sobre as ferramentas. O PowerShell te entrega as **ferramentas reais** na mão, com todas as suas propriedades. Você pode pegar a "furadeira" (objeto) que um comando te deu e passar direto para outro comando que "liga a furadeira na tomada". O nome dos comandos segue o padrão `Verbo-Substantivo` (ex: `Get-Service`, `Stop-Process`).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **NEGAR > PERMITIR:** A banca vai criar um cenário com um usuário em dois grupos com permissões conflitantes. Lembre-se, a permissão de **Negar** sempre terá precedência.
+> > * **PowerShell é Orientado a Objetos:** A banca vai dizer que a única vantagem do PowerShell é ter comandos com nomes diferentes. **ERRADO!** A principal vantagem é sua capacidade de manipular **objetos** em vez de texto, o que o torna infinitamente mais poderoso para automação.
+
+---
+
+### ### MS Active Directory: O Organograma e o Sistema de Crachás da Empresa
+
+O Active Directory (AD) é o cérebro que gerencia a identidade e o acesso em toda a rede de uma empresa.
+
+* **Estrutura Lógica (O Organograma):**
+    * **Floresta:** A corporação inteira.
+    * **Domínio:** Uma grande filial (ex: "Empresa Brasil").
+    * **Unidade Organizacional (UO):** Os departamentos dentro da filial (RH, TI, Vendas). **UOs servem para organizar e aplicar regras (GPOs)**.
+
+* **Estrutura Física (A Planta dos Prédios):**
+    * **Controlador de Domínio (DC):** O servidor principal da filial, que guarda uma cópia da lista de todos os funcionários.
+    * **Site:** Um prédio físico da empresa em uma cidade. Serve para otimizar a comunicação na rede.
+
+* **Políticas de Grupo (GPO - As Regras da Empresa):**
+    É o mecanismo para aplicar configurações de forma centralizada. "Todos os computadores do departamento de Vendas terão o site do CRM como página inicial".
+    * **Ordem de Aplicação (LSDOU):** As regras são aplicadas nesta ordem: **L**ocal → **S**ite → **D**omínio → **U**nidade **O**rganizacional. A última regra aplicada é a que vale em caso de conflito. **A regra mais próxima do funcionário sempre vence**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **UO vs. Grupo:** **Grupos** servem para dar **permissões**. **UOs** servem para **organizar e aplicar GPOs**. Você não aplica uma GPO a um grupo, mas sim a uma UO.
+> > * **LSDOU:** A banca vai criar um cenário com regras conflitantes no Domínio e na UO. A regra da **UO** (a mais específica, mais próxima) vai prevalecer.
+
+---
+
+### ### Serviços de Rede Windows: As Salas Especiais da Empresa
+
+* **IIS (Internet Information Services):** É a **sala do servidor que hospeda o site** público da empresa.
+* **RDS (Remote Desktop Services):** É a tecnologia que permite que os funcionários **trabalhem de casa**, acessando remotamente o computador do escritório como se estivessem sentados na frente dele.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Application Pools (IIS):** É um mecanismo de isolamento. Cada site hospedado no IIS pode rodar em sua "piscina de aplicações" separada. Se um site travar, ele não derruba os outros.
+> > * **RDS vs. Área de Trabalho Remota:** **RDS** é a infraestrutura no servidor que permite múltiplas conexões. A **Área de Trabalho Remota** é o "clientinho" que você usa para se conectar.
+
+### ### Mapa Mental: Precedência de GPOs no Active Directory (LSDOU)
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["Regra da Unidade Organizacional (UO)<br>Ex: 'Proibir USB no TI'"]
+    B["Regra do Domínio<br>Ex: 'Papel de parede da Empresa'"]
+    C["Regra do Site<br>Ex: 'Configurar impressora da filial'"]
+    D["Regra Local<br>Ex: 'Tela de descanso em 5 min'"]
+    
+    subgraph "Hierarquia AD"
+        direction TB
+        B --> A
+        C --> B
+        D --> C
+    end
+
+    E["💻<br>Computador do<br>Departamento de TI"]
+
+    A -- "Aplica por último<br>(<b>VENCE!</b>)" --> E
+    B -- "Aplica antes" --> E
+    C -- "Aplica antes" --> E
+    D -- "Aplica primeiro" --> E
+````
+
+
 ### **Classe:** B
 ### **Conteúdo:** Sistemas Operacionais: GNU/Linux
 
