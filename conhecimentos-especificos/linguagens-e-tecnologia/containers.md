@@ -1,3 +1,117 @@
+### Olá, futuro(a) aprovado(a)\! Vamos desempacotar o universo dos Containers e Kubernetes para você brilhar na prova do Cebraspe.
+
+Pense em containers como a revolução da **entrega de comida por marmitas** 🍱. O jeito antigo, das **Máquinas Virtuais (VMs)**, era como alugar um restaurante inteiro, com cozinha e funcionários, só para preparar um prato. Com containers, a comida já vem pronta, em uma marmita padronizada, leve e que funciona em qualquer lugar.
+
+-----
+
+### \#\#\# Containers, Docker e OCI: A Revolução da Marmita
+
+  * **O que é um Container?**
+    É uma **marmita de software**: um pacote que contém uma aplicação e TODAS as suas dependências (ingredientes, temperos, etc.). Várias marmitas diferentes podem ser transportadas no mesmo caminhão-baú refrigerado (o servidor hospedeiro), **compartilhando o motor e as rodas do caminhão (o kernel do sistema operacional)**. Isso torna os containers muito mais leves e rápidos que as VMs.
+
+  * **Docker (A Empresa que Inventou a Marmita Padrão):**
+    É a plataforma que popularizou os containers.
+
+      * **`Dockerfile`:** A **receita** para montar a marmita. Ex: "1. Pegue arroz. 2. Adicione feijão...".
+      * **Imagem Docker:** O **modelo mestre congelado** da marmita, feito a partir da receita. É um template imutável.
+      * **Container Docker:** A **marmita que foi aquecida** e está pronta para ser consumida. É a instância "viva" da imagem.
+
+  * **Open Container Initiative (OCI):**
+    É a "ANVISA" das marmitas. Um consórcio que criou um **padrão universal** para o formato das marmitas e para o "motor" que as executa. Isso garante que uma marmita feita pelo Docker funcione em um ambiente de um concorrente, como o Podman.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Containers vs. Máquinas Virtuais:** A pegadinha nº 1\!
+> >       * **VM:** Virtualiza o **HARDWARE**. É o restaurante completo, com sua própria cozinha (seu próprio kernel de SO).
+> >       * **Container:** Virtualiza o **SISTEMA OPERACIONAL**. É a marmita, que compartilha a cozinha (o kernel do SO do host).
+> >   * A banca vai dizer que um container Docker tem seu próprio kernel. **ERRADO\!**
+> >   * **Imagem vs. Container:** Lembre-se: **Imagem** é o molde congelado (a "classe"). **Container** é a marmita quente, em execução (o "objeto").
+
+-----
+
+### \#\#\# Orquestração com Kubernetes: Gerenciando a Praça de Alimentação
+
+Gerenciar uma marmita é fácil. Mas e se você for o gerente de uma **praça de alimentação de um shopping gigante**, com milhares de marmitas sendo servidas? Você precisa de um orquestrador.
+
+  * **Kubernetes (K8s):**
+    É o **gerente geral super inteligente da praça de alimentação**. Ele automatiza a implantação, o escalonamento e o gerenciamento de todas as "lojas" (aplicações em container).
+
+  * **Objetos Fundamentais do Kubernetes:**
+
+      * **Pod (A Bandeja):** É a **menor unidade de serviço** do Kubernetes. Pense em uma bandeja. Ela pode ter só a marmita principal (1 container) ou a marmita + um potinho de molho (múltiplos containers). O Kubernetes gerencia **bandejas**, não marmitas individuais.
+      * **Service (O Endereço da Loja):** É o endereço fixo do balcão de uma loja, por exemplo, "Lanchonete do Zé". Mesmo que as bandejas (Pods) com os sanduíches mudem de lugar lá dentro, o cliente sempre pede no mesmo balcão. O Service garante que seu pedido chegue a uma bandeja disponível.
+      * **Deployment (A Ordem do Gerente):** É a ordem do gerente: "Quero que sempre existam **3 bandejas de sanduíche** prontas para servir\!". O Deployment garante que, se uma bandeja cair, uma nova é criada automaticamente para manter o estado desejado.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Kubernetes vs. Docker:** Não são concorrentes diretos. **Docker** cria a marmita. **Kubernetes** gerencia a praça de alimentação cheia de marmitas.
+> >   * A unidade fundamental gerenciada pelo Kubernetes é o **Pod**, não o container diretamente.
+> >   * A interação com o Kubernetes é **declarativa**. Você não diz "faça isso, depois aquilo". Você **declara o estado final desejado** ("quero 3 réplicas") e o Kubernetes se vira para fazer acontecer.
+
+-----
+
+### \#\#\# Arquitetura Distribuída e Boas Práticas: O Cardápio e a Cozinha
+
+  * **Microserviços:** É o modelo da praça de alimentação. Em vez de um restaurante gigante que faz de tudo (monólito), você tem várias lojinhas pequenas e especializadas (pizzaria, temakeria, sorveteria). Cada uma é um microserviço, e os containers são perfeitos para empacotar cada uma dessas lojinhas de forma independente.
+
+  * **Boas Práticas (Como Montar uma Boa Marmita):**
+
+      * **Um Processo por Container:** A marmita de lasanha não deve vir com o sorvete de sobremesa dentro. Cada container tem uma única responsabilidade.
+      * **Imagens Mínimas:** Use a menor embalagem possível (imagens base como `alpine`) para a marmita ficar mais leve e segura.
+      * **Multi-stage Builds:** É como ter duas cozinhas. Uma **cozinha de preparo (build stage)**, cheia de tralha, onde você faz a lasanha. Depois, você pega **apenas a lasanha pronta** e a coloca em uma **marmita de entrega limpa e minimalista (final stage)**. O resultado final é muito mais enxuto.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai perguntar o objetivo do **multi-stage build**. A resposta é: criar uma imagem final de produção **pequena e segura**, sem as ferramentas e dependências desnecessárias do processo de compilação.
+> >   * **Imutabilidade:** Para atualizar a receita da lasanha, você não abre a marmita que está com o cliente e joga mais queijo. Você **cria uma nova versão da imagem (do modelo congelado)** e substitui as marmitas antigas pelas novas.
+
+-----
+
+### \#\#\# CDNs: A Rede de Franquias do Restaurante
+
+  * **CDN (Content Delivery Network):**
+    Uma grande rede de restaurantes, como o McDonald's, não tem uma única cozinha central no mundo. Ela tem **franquias (servidores de borda da CDN)** espalhadas por todas as cidades.
+  * **Funcionamento:** Quando você, em Brasília, pede um Big Mac (acessa um site), o seu pedido não vai para a matriz nos EUA (o servidor de origem). Ele vai para a **franquia do McDonald's do seu bairro**, que já tem os ingredientes (o conteúdo em cache) prontos para montar seu sanduíche na hora. A entrega é muito mais rápida (baixa latência).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A CDN **não substitui** o servidor de origem. A matriz (origem) ainda precisa existir para definir as receitas e mandar os ingredientes para as franquias (CDN).
+> >   * A CDN é ideal para **conteúdo estático** (os ingredientes que não mudam, como pão, carne, picles).
+
+### \#\#\# Mapa Mental: Máquina Virtual vs. Container
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "🏢 Máquina Virtual (O Restaurante Privado)"
+        VM_GUEST_OS["Sistema Operacional Convidado"]
+        VM_APP["Aplicação A"]
+        VM_LIBS["Bibliotecas"]
+        VM_GUEST_OS --> VM_LIBS --> VM_APP
+    end
+
+    subgraph "🍱 Container (A Marmita)"
+        C_APP["Aplicação B"]
+        C_LIBS["Bibliotecas"]
+        C_APP -.-> C_LIBS
+    end
+
+    subgraph "Servidor Físico"
+        HYPERVISOR["Hypervisor"]
+        HOST_OS["Sistema Operacional do Host"]
+        HARDWARE["Hardware Físico"]
+        
+        subgraph "Engine de Container"
+            DOCKER["Docker Engine"]
+        end
+
+        HOST_OS --> HYPERVISOR --> VM_GUEST_OS
+        HOST_OS --> DOCKER --> C_APP & C_LIBS
+        HARDWARE --> HOST_OS
+    end
+```
+
+
 ### **Classe:** B
 ### **Conteúdo:** Containers, Docker e OCI
 
