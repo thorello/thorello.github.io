@@ -1,3 +1,103 @@
+### Olá, futuro(a) aprovado(a)\! Vamos desvendar a nova Lei de Improbidade Administrativa para você não cometer nenhum erro na prova do Cebraspe.
+
+Pense na Lei de Improbidade como o **regulamento interno super rígido de um condomínio** 🏢. A "Administração Pública" é o condomínio, o "agente público" é o síndico, e a lei define as infrações gravíssimas que podem levar à expulsão do síndico e a multas pesadas. A lei foi muito alterada em 2021, e o Cebraspe vai cobrar as novidades\!
+
+-----
+
+### \#\#\# Disposições Gerais: Quem Pode Ser Punido e Com Qual Intenção?
+
+  * **Os Sujeitos da Infração:**
+
+      * **Sujeito Ativo (Quem comete a infração?):**
+        1.  **O Agente Público (O Síndico):** O conceito é super amplo. É qualquer um que trabalha para o condomínio, desde o síndico eleito, passando pelo funcionário contratado, até o estagiário. Vale mesmo se o trabalho for temporário ou sem salário (como o mesário da eleição para síndico).
+        2.  **O Terceiro (O Morador Cúmplice):** Um morador ou uma empresa que **ajuda o síndico a cometer a fraude de propósito**. Ex: o dono da empresa de jardinagem que combina um superfaturamento com o síndico. O morador não pode ser punido sozinho; ele precisa agir em conluio com um agente público.
+
+  * **O Elemento Subjetivo (A Intenção do Infrator):**
+
+      * **A MAIOR MUDANÇA DA LEI\!** Antes, o síndico podia ser punido se causasse um prejuízo por "desleixo" (culpa). Agora não mais.
+      * Para **TODOS** os atos de improbidade, a nova lei exige a comprovação de **DOLO**.
+      * **O que é dolo para a lei?** É a **vontade livre e consciente de alcançar o resultado ilícito**. Não basta querer fazer o ato; é preciso querer o resultado ilegal. Simplesmente desobedecer uma regra, sem a intenção de cometer a ilegalidade, não é mais improbidade.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **A EXIGÊNCIA DE DOLO:** Esta é a pegadinha de ouro\! A banca vai criar um cenário onde um prefeito, por pura incompetência e negligência (culpa), causa um prejuízo milionário. Pela nova lei, isso **NÃO É** mais ato de improbidade. Precisa provar a intenção, o dolo.
+> >   * **Conceito de Agente Público:** A banca vai tentar restringir. Lembre-se, o conceito é **amplo**.
+> >   * **O Terceiro:** O particular só responde se agir junto e com a mesma intenção dolosa do agente público.
+
+-----
+
+### \#\#\# Os Atos de Improbidade: As Infrações Gravíssimas
+
+A lei divide as "infrações" em 3 categorias. Lembre-se, todas agora exigem **DOLO**.
+
+| Tipo de Ato | Artigo | O que é? | Foco Principal | Analogia do Síndico |
+| :--- | :-: | :--- | :--- | :--- |
+| **Enriquecimento Ilícito** | **Art. 9º** | Receber qualquer vantagem patrimonial indevida. | No **GANHO** do agente. | O síndico recebe propina de uma empresa para ganhar a licitação da reforma da piscina. |
+| **Lesão ao Erário** | **Art. 10** | Causar, de propósito, um prejuízo financeiro ao poder público. | No **PREJUÍZO** do condomínio. | O síndico, para favorecer um amigo, contrata uma obra por um preço superfaturado. |
+| **Atentado aos Princípios** | **Art. 11** | Violar os deveres de honestidade, imparcialidade e legalidade. | Na **DESONESTIDADE** da conduta. | O síndico nomeia a própria esposa para um cargo de confiança remunerado no condomínio (nepotismo). |
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Rol Taxativo do Art. 11:** Outra mudança gigante\! Antes, qualquer violação a um princípio da administração poderia ser improbidade. Agora, a conduta precisa estar **expressamente listada** em um dos incisos do Art. 11. Se não estiver na lista, não é improbidade deste tipo.
+> >   * **Lesão ao Erário (Art. 10):** O prejuízo precisa ser **efetivo e comprovado**. Uma mera irregularidade formal que não causou dano financeiro não é mais considerada improbidade deste tipo.
+
+-----
+
+### \#\#\# Sanções e Prescrição: A Punição e o Prazo de Validade
+
+  * **As Sanções (As Punições):**
+    Se condenado, o síndico pode sofrer punições pesadas, como:
+
+      * Perder os bens que adquiriu ilegalmente.
+      * Perder o cargo de síndico.
+      * Ter os direitos políticos suspensos (não pode votar nem ser eleito por um tempo).
+      * Pagar uma multa civil pesada.
+      * Ficar proibido de contratar com o poder público.
+
+  * **Ressarcimento vs. Sanções (A Dívida e a Pena):**
+
+      * A obrigação de **devolver o dinheiro** que foi desviado do condomínio (**ressarcimento**) é **IMPRESCRITÍVEL**. O condomínio pode cobrar essa dívida para sempre.
+      * A aplicação das **outras punições** (perder o cargo, pagar multa, etc.) **PRESCREVE**.
+
+  * **Prescrição (O Prazo para Punir):**
+
+      * **A Grande Mudança da Lei:** O prazo para o Ministério Público entrar com a ação para aplicar as sanções de improbidade é agora de **8 ANOS**, contados a partir da data em que o fato ocorreu.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Imprescritibilidade do Ressarcimento:** A banca vai dizer que a "ação de improbidade é imprescritível". **ERRADO\!** A ação para **aplicar as sanções prescreve em 8 anos**. O que é imprescritível é a ação para pedir o **ressarcimento** do dano.
+> >   * **Quem pode entrar com a ação?** Outra mudança fundamental\! Agora, a ação de improbidade só pode ser proposta pelo **MINISTÉRIO PÚBLICO**. O condomínio (a entidade lesada) pode participar do processo, mas não pode iniciá-lo.
+
+### \#\#\# Mapa Mental: A Nova Lei de Improbidade em Resumo
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["<b>Ato de Improbidade<br>Administrativa</b>"]
+    
+    subgraph "Elemento Subjetivo (A Intenção)"
+        B["🎯<br><b>DOLO</b><br>(Vontade consciente do<br>resultado ilícito)"]
+    end
+
+    subgraph "Tipos de Ato (Todos exigem Dolo)"
+        C["<b>Art. 9º</b><br>Enriquecimento Ilícito"]
+        D["<b>Art. 10</b><br>Lesão ao Erário"]
+        E["<b>Art. 11</b><br>Atentado aos Princípios<br>(Rol Taxativo)"]
+    end
+    
+    subgraph "Consequências"
+        F["⚖️ <b>Sanções</b><br>(Perda de função, multa, etc.)<br>Prescrevem em <b>8 anos</b>"]
+        G["💰 <b>Ressarcimento ao Erário</b><br>(Devolver o dinheiro)<br><b>IMPRESCRITÍVEL</b>"]
+    end
+
+    A -- "Requer obrigatoriamente" --> B
+    B --> C & D & E
+    C & D & E --> F & G
+    
+    style B fill:#c0a0a0,stroke:#f7768e,stroke-width:2px
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Lei de Improbidade Administrativa: Disposições Gerais e Sujeitos
 
