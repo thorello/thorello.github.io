@@ -1,3 +1,106 @@
+### Olá, futuro(a) aprovado(a)\! Vamos organizar o Orçamento Público para que seu nome apareça na lista de despesas com pessoal do Diário Oficial.
+
+Pense no Orçamento Público como o **plano financeiro anual de uma grande família** 👨‍👩‍👧‍👦. Ele define quanto a família (o governo) espera ganhar e como ela pode gastar seu dinheiro para atingir seus objetivos.
+
+-----
+
+### \#\#\# Conceito, Funções e Princípios: A "Constituição Financeira" da Família
+
+  * **O que é o Orçamento?** É o **plano financeiro** da família, aprovado em uma reunião, que se transforma na "lei" da casa para aquele ano.
+
+  * **As 3 Funções do Orçamento (Os Papéis da Família na Sociedade):**
+
+    1.  **Alocativa:** A família paga pela segurança da rua e pela manutenção da praça do bairro (provê bens e serviços públicos).
+    2.  **Distributiva:** A família paga mais impostos porque tem uma renda maior, e parte desse dinheiro financia a escola pública do bairro (ajusta a distribuição de renda).
+    3.  **Estabilizadora:** Em uma crise econômica, a família decide fazer uma reforma em casa para gerar emprego para o pedreiro e o pintor, ajudando a estabilizar a economia local.
+
+  * **Princípios Orçamentários (As Regras de Ouro do Plano):**
+
+      * **Unidade:** A família tem **um único** orçamento, não um para cada membro.
+      * **Universalidade:** **TUDO** o que a família ganha e **TUDO** o que ela gasta tem que estar detalhado no plano.
+      * **Anualidade:** O plano vale por um ano.
+      * **Exclusividade:** O livro do orçamento só pode conter a previsão de ganhos e a autorização de gastos. Não pode ter uma regra no meio dizendo "o filho tem que lavar a louça". As únicas exceções são a autorização para "usar o cheque especial" (operações de crédito) e para "reforçar uma verba" (créditos suplementares).
+      * **Não Afetação:** O salário do pai (impostos) não pode ser "carimbado" para pagar só a conta de luz. Ele vai para um caixa geral para pagar todas as contas da casa. Existem exceções importantes (saúde, educação).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dar um exemplo e pedir a **função do orçamento**. Construir uma estrada = **Alocativa**. Programa de transferência de renda = **Distributiva**.
+> >   * O **Princípio da Exclusividade** e suas exceções são um prato cheio. A LOA não pode criar cargos, por exemplo. Só pode autorizar créditos suplementares e operações de crédito.
+> >   * O **Princípio da Não Afetação** se aplica à receita de **impostos**. As contribuições (como a para a Previdência) já são, por natureza, "carimbadas" (vinculadas).
+
+-----
+
+### \#\#\# Técnicas Orçamentárias e o Ciclo Orçamentário
+
+  * **As Técnicas (A Evolução do Planejamento Familiar):**
+
+      * **Orçamento Tradicional:** O jeito antigo. A família só listava onde gastar: "R$ 1000 para comida, R$ 2000 para aluguel". Não havia foco em objetivos.
+      * **Orçamento-Programa (O Modelo do Brasil 🇧🇷):** O jeito moderno. O plano é organizado por **objetivos**. "Programa: Férias em Família". Ações: "Comprar passagens", "Reservar hotel". O gasto está ligado a um resultado esperado.
+
+  * **O Ciclo Orçamentário (As 4 Estações do Orçamento):**
+
+    1.  **Elaboração:** O **Poder Executivo** (o "chefe da família") prepara a proposta do plano financeiro do próximo ano.
+    2.  **Discussão e Aprovação:** O **Poder Legislativo** (a "reunião de família") discute, faz alterações (emendas) e vota para aprovar o plano, transformando-o em lei.
+    3.  **Execução:** Durante o ano, o **Poder Executivo** arrecada o "salário" e paga as contas, seguindo o plano aprovado.
+    4.  **Controle e Avaliação:** O **Poder Legislativo, com o auxílio do Tribunal de Contas**, (o "vizinho fiscalizador") fica de olho para ver se o Executivo está gastando o dinheiro direitinho.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * O **Orçamento-Programa** é a técnica vigente no Brasil, e sua principal característica é a **integração entre planejamento e orçamento**.
+> >   * Decore os responsáveis por cada fase do ciclo\! **Executivo elabora e executa**. **Legislativo aprova e controla**. A banca vai dizer que o Legislativo executa o orçamento. **ERRADO\!**
+
+-----
+
+### \#\#\# O Processo Orçamentário no Brasil: PPA, LDO e LOA
+
+O planejamento da família é feito com 3 documentos hierárquicos.
+
+  * **PPA (Plano Plurianual - O Sonho de Viagem de 4 Anos 🗺️):**
+    É o plano **estratégico** de médio prazo. "Nos próximos 4 anos, nosso objetivo é conhecer a Europa". Define as grandes **diretrizes, objetivos e metas**.
+
+  * **LDO (Lei de Diretrizes Orçamentárias - O Plano da Viagem do Ano 📝):**
+    É o plano **tático** que faz a **ponte** entre o sonho e a realidade. "Do nosso sonho europeu, a **prioridade para este ano** será a Itália". Ela orienta a elaboração do orçamento do ano.
+
+  * **LOA (Lei Orçamentária Anual - O Orçamento da Viagem 💵):**
+    É o plano **operacional**. "Para a viagem à Itália, vamos gastar R$ X em passagens e R$ Y em hotéis". É o orçamento detalhado.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **A Hierarquia:** A LOA obedece à LDO, que obedece ao PPA. A **LDO é o elo** entre o PPA e a LOA.
+> >   * **Vigência do PPA:** Ele dura 4 anos, mas começa no 2º ano de um governo e termina no 1º do governo seguinte, para garantir a continuidade.
+> >   * **Créditos Adicionais:** São as "verbas extras" para o orçamento. **Suplementar** (reforçar), **Especial** (gasto novo) e **Extraordinário** (urgência).
+
+### \#\#\# Mapa Mental: O Ciclo Orçamentário e Seus Responsáveis
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "Fase 1: Elaboração"
+        A["<b>Poder Executivo</b><br>Prepara o Projeto de Lei<br>Orçamentária (PLOA)"]
+    end
+
+    subgraph "Fase 2: Aprovação"
+        B["<b>Poder Legislativo</b><br>Discute, emenda e vota,<br>transformando em LOA"]
+    end
+
+    subgraph "Fase 3: Execução"
+        C["<b>Poder Executivo</b><br>Arrecada as receitas e<br>realiza as despesas"]
+    end
+
+    subgraph "Fase 4: Controle"
+        D["<b>Poder Legislativo</b><br>com auxílio do<br><b>Tribunal de Contas</b><br>Fiscaliza a execução"]
+    end
+
+    A --> B --> C --> D --> A
+
+    style A fill:#313149,stroke:#bb9af7
+    style B fill:#313149,stroke:#7aa2f7
+    style C fill:#313149,stroke:#7dcfff
+    style D fill:#313149,stroke:#e0af68
+
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Orçamento Público: Conceito, Princípios e Técnicas
 
