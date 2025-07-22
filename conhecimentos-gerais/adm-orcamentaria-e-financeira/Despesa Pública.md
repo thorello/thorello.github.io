@@ -1,3 +1,107 @@
+### Olá, futuro(a) aprovado(a)\! Vamos organizar as contas da Despesa Pública para você fechar o balanço com a sua aprovação no Cebraspe.
+
+Pense na despesa pública como a **gestão do orçamento de uma grande família** 👨‍👩‍👧‍👦. O governo é a família, o dinheiro arrecadado é o salário, e as despesas são as contas e os investimentos que a família precisa fazer.
+
+-----
+
+### \#\#\# Conceito e Classificações: Os Tipos de Contas da Família
+
+Nem todo gasto é igual. A família precisa classificar suas contas.
+
+  * **Despesas Orçamentárias vs. Extraorçamentárias:**
+
+      * **Orçamentárias (As Contas do Mês):** São os gastos previstos no orçamento, pagos com o salário da família. Ex: aluguel, supermercado, escola das crianças.
+      * **Extraorçamentárias (Dinheiro de Terceiros):** É quando a família devolve um dinheiro que não era dela. Ex: Seu vizinho te deu R$ 100 para guardar. Quando você devolve, não é um gasto do seu orçamento, é uma despesa extraorçamentária.
+
+  * **Despesas Correntes vs. Despesas de Capital (Gastar vs. Investir):**
+    Esta é a classificação que o Cebraspe mais ama cobrar\!
+
+      * **Despesas Correntes (Os Gastos do Dia a Dia 🛒):** São as despesas para "manter a casa funcionando". Elas não aumentam o patrimônio da família.
+          * **Custeio:** Conta de luz, supermercado, salário da diarista, material de limpeza.
+          * **Transferências:** A mesada do filho.
+      * **Despesas de Capital (Os Investimentos 🏠):** São os gastos que aumentam o patrimônio da família ou pagam uma dívida grande.
+          * **Investimentos:** Comprar um carro novo, fazer a reforma da cozinha, comprar um computador novo.
+          * **Amortização da Dívida:** Pagar a **parcela PRINCIPAL** do financiamento do apartamento.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A pegadinha clássica: O pagamento dos **JUROS** do financiamento do apartamento é uma despesa **CORRENTE**. O pagamento do **PRINCIPAL** é uma despesa **DE CAPITAL**.
+> >   * "A compra de um novo computador para a repartição" é um investimento, logo, despesa **DE CAPITAL**. "A compra de cartuchos de tinta para a impressora" é material de consumo, logo, despesa **CORRENTE**.
+
+-----
+
+### \#\#\# Estágios da Despesa e Restos a Pagar: O Passo a Passo para Pagar uma Conta
+
+Para pagar uma conta, a família segue 3 passos obrigatórios.
+
+1.  **Empenho (A Promessa de Pagar ✍️):**
+    Chegou a conta de luz. Você olha o valor e **"reserva" o dinheiro** na sua planilha de orçamento. O dinheiro ainda está na sua conta, mas ele já está comprometido. Você criou a obrigação de pagar. É proibido gastar sem antes reservar o dinheiro\!
+
+2.  **Liquidação (A Verificação do Serviço ✔️):**
+    Você verifica se a luz realmente funcionou o mês inteiro sem problemas. Ao confirmar que o serviço foi prestado corretamente, você "liquida" a despesa, ou seja, **reconhece que a dívida é legítima**.
+
+3.  **Pagamento (A Transferência do Dinheiro 💸):**
+    Você entra no aplicativo do banco e efetivamente **paga o boleto**. O dinheiro sai da sua conta.
+
+<!-- end list -->
+
+  * **Restos a Pagar (RAP - A "Conta Virada"):**
+    É a conta que foi **prometida (empenhada)** em um ano, mas que só será paga no ano seguinte.
+      * **Processados:** Você prometeu e **verificou o serviço** (empenhou e liquidou) no ano passado, só faltou pagar. A dívida é certa.
+      * **Não Processados:** Você prometeu pagar (empenhou) no ano passado, mas o serviço só foi entregue este ano, então a verificação (liquidação) ainda não aconteceu.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A ordem é sagrada: **1º Empenho → 2º Liquidação → 3º Pagamento**. A banca VAI inverter isso.
+> >   * **RAP vs. DEA (Despesas de Exercícios Anteriores):** **RAP** é uma conta que foi **empenhada** no ano certo. **DEA** é uma conta do passado que você **esqueceu de empenhar** (a famosa "gaveta").
+
+-----
+
+### \#\#\# Dívida Pública e Suprimento de Fundos: As Dívidas e o "Dinheirinho" para o Café
+
+  * **Dívida Pública:**
+
+      * **Dívida Flutuante (A Fatura do Cartão de Crédito):** Dívidas de curto prazo (vencem em menos de 12 meses). As "contas viradas" (**Restos a Pagar**) entram aqui.
+      * **Dívida Fundada (O Financiamento da Casa):** Dívidas de longo prazo (vencem em mais de 12 meses).
+
+  * **Suprimento de Fundos (O "Dinheiro para o Pãozinho"):**
+    É um regime **excepcional**. Em vez de seguir o passo a passo (empenho-liquidação-pagamento) para comprar um café, o chefe dá um **adiantamento em dinheiro** para um servidor e diz: "vá e compre o que for preciso para a reunião".
+
+      * **Processo Invertido:** O **pagamento** (o adiantamento) vem **antes** da comprovação do gasto.
+      * **Dever de Prestar Contas:** Depois de comprar o café, o servidor é **obrigado** a apresentar as notas fiscais para comprovar como gastou o dinheiro.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Restos a Pagar** fazem parte da **Dívida Flutuante**.
+> >   * O **Suprimento de Fundos** é uma **EXCEÇÃO** ao rito normal da despesa, pois o pagamento antecede a liquidação. A banca vai dizer que ele segue o rito normal. **ERRADO\!**
+
+### \#\#\# Mapa Mental: O Fluxo da Despesa Pública
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["<b>1. Empenho</b><br>✍️ Reserva o dinheiro<br>e cria a obrigação"] --> B["<b>2. Liquidação</b><br>✔️ Verifica se o serviço<br>foi prestado corretamente"];
+    B --> C["<b>3. Pagamento</b><br>💸 Transfere o dinheiro<br>e extingue a obrigação"];
+    
+    subgraph "Fim do Ano (31/12)"
+        D{"A despesa foi<br>paga até 31/12?"}
+        A --> D
+    end
+
+    D -- Sim --> F["✅ Despesa Paga<br>Dentro do Exercício"]
+    D -- Não --> G["🔄 Vira <b>Restos a Pagar (RAP)</b><br>para o próximo ano"]
+
+    subgraph "Tipos de RAP"
+        H["<b>Não Processado</b><br>(Só foi empenhada)"]
+        I["<b>Processado</b><br>(Foi empenhada e liquidada)"]
+    end
+
+    B -.-> I
+    A -.-> H
+    G --> H & I
+
+```
+
 ### **Classe:** A
 ### **Conteúdo:** Despesa Pública: Conceito e Classificações
 
