@@ -1,3 +1,124 @@
+
+### Olá, futuro(a) aprovado(a)\! Vamos organizar as Estruturas de Dados para você encontrar a aprovação na prova do Cebraspe.
+
+Pense nas estruturas de dados como **diferentes formas de organizar os livros em uma biblioteca** 📚. Cada método tem suas vantagens e desvantagens para encontrar, adicionar ou remover um livro.
+
+-----
+
+### \#\#\# Listas: As Estantes da Biblioteca
+
+As listas são a forma mais básica de organizar os livros em sequência.
+
+  * **Lista Sequencial (Uma Estante com Espaços Fixos 📏):**
+
+      * **Como funciona:** Os livros são colocados em uma estante com prateleiras numeradas, um ao lado do outro, em um bloco contínuo.
+      * **Acesso a um livro:** **Super rápido ($O(1)$)**. Se você quer o 5º livro, você vai direto à 5ª posição.
+      * **Adicionar/Remover um livro no meio:** **Um pesadelo ($O(n)$)**. Para colocar um novo livro na 2ª posição, você precisa empurrar todos os outros livros para o lado, um por um.
+
+  * **Lista Encadeada (Uma Caça ao Tesouro 🗺️):**
+
+      * **Como funciona:** Os livros estão espalhados pela biblioteca. Cada livro tem um bilhetinho que diz onde encontrar o próximo livro da série.
+      * **Acesso a um livro:** **Super lento ($O(n)$)**. Para encontrar o 5º livro, você precisa pegar o 1º, ler o bilhete, ir até o 2º, ler o bilhete, e assim por diante.
+      * **Adicionar/Remover um livro no meio:** **Super rápido ($O(1)$)**. Para inserir um novo livro, você só precisa ir até a posição e reescrever dois bilhetinhos para que a corrente aponte para o novo livro.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai trocar as complexidades\! Ela vai afirmar que "o acesso em uma lista encadeada é $O(1)$". **ERRADO\!** É $O(n)$. E que "a inserção em uma lista sequencial é $O(1)$". **ERRADO\!** No meio ou início, é $O(n)$.
+> >   * **Quando usar cada uma?** Se você precisa de **acesso rápido** a qualquer elemento, use **Lista Sequencial**. Se você precisa **inserir e remover** elementos no meio da lista o tempo todo, use **Lista Encadeada**.
+
+-----
+
+### \#\#\# Pilhas (Stacks): A Pilha de Pratos
+
+  * **A Analogia:** Uma **pilha de pratos** sujos ao lado da pia.
+  * **O Princípio:** **LIFO (Last-In, First-Out)**. O **último** prato que você coloca no topo da pilha é o **primeiro** que você pega para lavar.
+  * **As Operações:**
+      * **`push`:** Colocar um prato no topo (**empilhar**).
+      * **`pop`:** Tirar o prato do topo (**desempilhar**).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dizer que a operação `pop` remove da base da pilha. **ERRADO\!** Na pilha, tudo acontece no **topo**.
+> >   * Se a questão descrever um problema que precisa processar itens na ordem inversa à que chegaram (ex: o botão "desfazer"), a resposta é **Pilha**.
+
+-----
+
+### \#\#\# Filas (Queues): A Fila do Caixa
+
+  * **A Analogia:** Uma **fila de pessoas no caixa** do supermercado.
+  * **O Princípio:** **FIFO (First-In, First-Out)**. A **primeira** pessoa que chega na fila é a **primeira** a ser atendida.
+  * **As Operações:**
+      * **`enqueue`:** Uma nova pessoa entra no **final** da fila.
+      * **`dequeue`:** A pessoa do **início** da fila é atendida e sai.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dizer que `enqueue` insere no início. **ERRADO\!** Inserção é no **final**, remoção é no **início**.
+> >   * Se a questão descrever um cenário que precisa processar itens na exata ordem em que chegaram (ex: fila de impressão), a resposta é **Fila**.
+
+-----
+
+### \#\#\# Árvores: A Árvore Genealógica
+
+  * **A Analogia:** Uma **árvore genealógica**, com pais, filhos e irmãos.
+  * **Árvore Binária de Busca (ABB):** É uma árvore genealógica organizada por idade. Para qualquer pessoa (nó), todos na sua **subárvore esquerda são mais novos**, e todos na sua **subárvore direita são mais velhos**.
+  * **Percursos:** Formas de ler a árvore.
+      * **Em-Ordem (Esquerda -\> Raiz -\> Direita):** Se você ler uma ABB em-ordem, você visita todos os membros em **ordem crescente de idade**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A complexidade de busca em uma ABB é **$O(\\log n)$ SE, e somente se, ela estiver balanceada**. Se ela estiver desbalanceada (parecendo uma "tripa"), o pior caso é $O(n)$, igual a uma lista.
+> >   * A banca vai te dar uma árvore e perguntar se é uma ABB. Verifique a regra **esquerda \< raiz \< direita** para TODOS os nós.
+
+-----
+
+### \#\#\# Ordenação, Pesquisa e Hashing: Encontrando Livros Rapidamente
+
+  * **Pesquisa Binária:** O jeito mais rápido de achar um livro em uma estante **ORDENADA**. Você abre no meio, vê se o livro está antes ou depois, e joga metade da estante fora. Repete até achar. Complexidade: $O(\\log n)$.
+  * **Algoritmos de Ordenação:**
+      * **$O(n^2)$ (Lentos):** `Bubble Sort`, `Selection Sort`. São como um bibliotecário novato e desorganizado.
+      * **$O(n \\log n)$ (Rápidos):** `Merge Sort`, `Quick Sort`. São os bibliotecários experientes e eficientes.
+  * **Tabela Hash:** Um **sistema de fichas mágico**. Você aplica uma "fórmula mágica" (**função hash**) no título do livro e ela te diz a prateleira e a posição exata dele. A busca é praticamente instantânea: **$O(1)$ em média**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dizer que você pode usar **pesquisa binária** em uma lista desordenada. **ERRADO\!** O pré-requisito é que a coleção esteja **ordenada**.
+> >   * A complexidade da **Tabela Hash** é $O(1)$ no **caso médio**. No pior caso (muitas colisões), ela pode ser $O(n)$.
+> >   * O pior caso do **Quick Sort** é $O(n^2)$ (acontece se o vetor já estiver ordenado), enquanto o **Merge Sort** garante $O(n \\log n)$ em todos os casos.
+
+-----
+
+### \#\#\# Estrutura de Arquivos: Organizando o Grande Acervo
+
+Como organizar os livros em um depósito gigantesco.
+
+  * **Sequencial:** Os livros são guardados um após o outro, em ordem. Para pegar o 500º livro, você tem que passar pelos 499 anteriores.
+  * **Indexada:** Você tem o depósito com os livros e um **catálogo de fichas (índice)** separado, que te diz o corredor e a prateleira exata de cada livro.
+  * **Direta (Hashing):** Usa uma função hash para calcular o endereço físico do livro a partir do seu título. É o acesso mais rápido possível.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A organização **indexada** é a que oferece o melhor dos dois mundos: permite tanto a leitura sequencial (ler todos os livros de um corredor) quanto o acesso rápido a um livro específico (usando o índice).
+
+### \#\#\# Mapa Mental: Comparativo de Desempenho (Listas)
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "📏 Lista Sequencial (Array)"
+        direction LR
+        A["Acesso Direto<br>(Posição i)"] -- "O(1)<br>Rápido" --> R1("✔️")
+        B["Inserção/Remoção<br>(Início ou Meio)"] -- "O(n)<br>Lento" --> R2("❌")
+    end
+
+    subgraph "🗺️ Lista Encadeada"
+        direction LR
+        C["Acesso Direto<br>(Posição i)"] -- "O(n)<br>Lento" --> R3("❌")
+        D["Inserção/Remoção<br>(Início ou Meio)"] -- "O(1)<br>Rápido" --> R4("✔️")
+    end
+    
+```
+
 ### **Classe:** B
 ### **Conteúdo:** Estruturas de Dados: Listas
 
