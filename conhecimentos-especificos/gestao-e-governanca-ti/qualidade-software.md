@@ -1,3 +1,97 @@
+### Olá, futuro(a) aprovado(a)\! Vamos graduar seu conhecimento em CMMI e MPS.BR para você conquistar a faixa preta na prova do Cebraspe.
+
+Pense nos modelos de qualidade de processo como um **sistema de graduação (faixas) em uma academia de artes marciais (um dojo)** 🥋. O objetivo não é avaliar um único lutador (o software), mas sim a **qualidade do treinamento do dojo (o processo)**. Um bom dojo, com processos maduros, tende a formar ótimos lutadores de forma consistente.
+
+-----
+
+### \#\#\# Qualidade de Software e o Modelo CMMI: A "Federação Internacional"
+
+O **CMMI** é como a "Federação Internacional de Karatê", o modelo mais famoso e reconhecido no mundo para avaliar a maturidade dos dojos de software.
+
+  * **Representações (Dois Caminhos para a Graduação):**
+
+    1.  **Por Estágios (*Staged*):** É o caminho tradicional das faixas. Para se tornar um "Dojo Faixa Azul", você precisa dominar TODAS as técnicas das faixas anteriores (branca, amarela, laranja...). A avaliação dá uma nota de maturidade **para o dojo como um todo**.
+    2.  **Contínua (*Continuous*):** É um caminho flexível. Seu dojo pode escolher focar e se tornar excelente apenas em "técnicas de chute", enquanto ainda é iniciante em "defesa". A avaliação dá notas de capacidade **para cada habilidade separadamente**.
+
+  * **Os 5 Níveis de Maturidade (A Trilha da Faixa Branca à Preta):**
+
+| Nível | Nome | Analogia do Dojo 🥋 |
+| :--- | :--- | :--- |
+| **Nível 1** | **Inicial** | **Briga de Rua:** Cada um luta como sabe. Não há método, é puro caos. O sucesso depende do heroísmo de um lutador talentoso. |
+| **Nível 2** | **Gerenciado** | **Faixa Amarela:** O básico da disciplina. Cada luta (projeto) é planejada. O técnico define uma estratégia para cada lutador. |
+| **Nível 3** | **Definido** | **Faixa Azul:** O dojo agora tem um **estilo padrão**. Existe um "manual do dojo" com as técnicas oficiais que todos os lutadores aprendem. |
+| **Nível 4** | **Gerenciado Quantitativamente** | **Faixa Marrom:** O dojo vira "científico". Usa **estatísticas** para tudo: mede o percentual de acerto dos golpes, o tempo de reação, etc. |
+| **Nível 5** | **Em Otimização** | **Faixa Preta:** O dojo é uma máquina de inovação. Ele analisa as estatísticas para criar novos golpes e melhorar continuamente seu estilo de luta. |
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **CMMI avalia PROCESSO, não PRODUTO:** A banca vai dizer que o CMMI certifica um software. **ERRADO\!** O CMMI certifica o **dojo (a organização)**, não o lutador (o produto).
+> >   * **Estágios vs. Contínua:** A banca vai confundir\! **Estágios** dá **Níveis de Maturidade** para a organização inteira. **Contínua** dá **Níveis de Capacidade** para processos específicos.
+> >   * **A diferença entre os níveis:** **Nível 2** = gerenciamento por projeto. **Nível 3** = padronização para a organização inteira. **Nível 4** = introdução da estatística.
+
+-----
+
+### \#\#\# MPS.BR: A "Confederação Brasileira" de Qualidade
+
+O **MPS.BR** é o nosso modelo nacional, a "Confederação Brasileira de Karatê". Ele foi criado para ser mais adaptado à realidade e ao bolso dos dojos brasileiros, especialmente os menores.
+
+  * **Fundamentação:** O MPS.BR não foi inventado do nada. Ele é baseado nas regras internacionais (**normas ISO**) e é **totalmente compatível com o CMMI**. Pense nele como uma versão brasileira, com a mesma qualidade, mas com um caminho mais suave.
+
+  * **Os 7 Níveis de Maturidade (Uma Escada com Mais Degraus):**
+    Para facilitar a evolução dos dojos menores, o MPS.BR criou mais "faixas intermediárias". São 7 níveis, de G até A.
+
+| Nível MPS.BR | Foco | Equivalência no CMMI |
+| :--- | :--- | :--- |
+| **G** e **F** | Gerência de Projeto | ≈ Nível 2 |
+| **E**, **D** e **C** | Processos Padrão da Organização | ≈ Nível 3 |
+| **B** | Gerência Quantitativa (Estatística) | ≈ Nível 4 |
+| **A** | Melhoria Contínua e Inovação | ≈ Nível 5 |
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **MPS.BR vs. CMMI:** A banca vai dizer que eles são rivais. **ERRADO\!** Eles são **compatíveis e harmonizados**. A principal vantagem do MPS.BR é sua escada de maturidade mais gradual, o que o torna mais acessível.
+> >   * **Mapeamento de Níveis:** A equivalência entre os níveis é um prato cheio para questões\! Grave as principais: **MPS-F ≈ CMMI-2**, **MPS-C ≈ CMMI-3**, **MPS-B ≈ CMMI-4** e **MPS-A ≈ CMMI-5**.
+> >   * **Normas Base:** Lembre-se que o MPS.BR se baseia nas normas internacionais **ISO/IEC 12207** e **ISO/IEC 15504 (agora 33000)**.
+
+### \#\#\# Mapa Mental: A Escada da Maturidade (CMMI vs. MPS.BR)
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "🥋 CMMI (5 Níveis de Maturidade)"
+        direction TB
+        C5["Nível 5<br>Em Otimização"] --> C4["Nível 4<br>Gerenciado Quantitativamente"];
+        C4 --> C3["Nível 3<br>Definido"];
+        C3 --> C2["Nível 2<br>Gerenciado"];
+        C2 --> C1["Nível 1<br>Inicial"];
+    end
+
+    subgraph "🇧🇷 MPS.BR (7 Níveis de Maturidade)"
+        direction TB
+        M_A["Nível A<br>Em Otimização"] --> M_B["Nível B<br>Gerenciado Quantitativamente"];
+        M_B --> M_C["Nível C<br>Definido"];
+        M_C --> M_D["Nível D<br>Largamente Definido"];
+        M_D --> M_E["Nível E<br>Parcialmente Definido"];
+        M_E --> M_F["Nível F<br>Gerenciado"];
+        M_F --> M_G["Nível G<br>Parcialmente Gerenciado"];
+    end
+    
+    C5 -.-> M_A;
+    C4 -.-> M_B;
+    C3 -.-> M_C;
+    C2 -.-> M_F;
+
+    style C5 fill:#313149,stroke:#bb9af7
+    style C4 fill:#313149,stroke:#bb9af7
+    style C3 fill:#313149,stroke:#bb9af7
+    style C2 fill:#313149,stroke:#bb9af7
+    style M_A fill:#313149,stroke:#7aa2f7
+    style M_B fill:#313149,stroke:#7aa2f7
+    style M_C fill:#313149,stroke:#7aa2f7
+    style M_F fill:#313149,stroke:#7aa2f7
+```
+
+
 ### **Classe:** C
 ### **Conteúdo:** Qualidade de Software: CMMI (Capability Maturity Model Integration)
 
