@@ -1,3 +1,73 @@
+### Olá, futuro(a) aprovado(a)! Vamos traçar a rota do Planejamento de TI para você não se perder nas curvas do Cebraspe.
+
+Pense no Planejamento de TI como **organizar a viagem dos sonhos de uma grande família por todo o país** 🚐. Não basta só entrar no carro e sair dirigindo. É preciso um plano estratégico (o sonho) e um plano tático (o roteiro detalhado).
+
+---
+
+### ### Planejamento de TI: O Sonho e o Roteiro da Viagem
+
+O objetivo de tudo é o **alinhamento estratégico**: a viagem de carro (a TI) tem que servir ao propósito maior da família (o negócio). Os dois principais documentos para isso são o PETI e o PDTI. A banca AMA trocar os dois de lugar.
+
+| Documento | Analogia da Viagem | Nível | Foco Principal | Duração |
+| :--- | :--- | :--- | :--- | :--- |
+| **PETI** (Plano Estratégico) | **O "Sonho" da Viagem** 🗺️ | Estratégico | Define **"O QUÊ?"** e **"POR QUÊ?"**. "Nossa missão é visitar 5 capitais em 4 anos para fortalecer nossos laços familiares." É o grande objetivo. | Longo Prazo (3-5 anos) |
+| **PDTI** (Plano Diretor) | **O "Roteiro" Detalhado** 📝 | Tático/Operacional | Define **"COMO?"**, **"QUANDO?"** e **"COM O QUÊ?"**. "No primeiro ano, vamos para o Sul, com este carro, com este orçamento, e o João será o motorista principal." É o plano de ação. | Curto Prazo (1-2 anos) |
+
+#### A Hierarquia da Viagem
+O planejamento segue uma cascata. Você não pode fazer o roteiro sem saber o sonho.
+**PEI (Plano da Família)** → **PETI (Sonho da Viagem)** → **PDTI (Roteiro Detalhado)**
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **PETI vs. PDTI:** A banca vai dizer que "o PDTI define a estratégia de longo prazo". **ERRADO!** PDTI é o plano de ação de curto prazo. PETI é a estratégia de longo prazo. Grave: **PETI = Estratégia (O Quê)**. **PDTI = Plano de Ação (Como)**.
+> > * **Alinhamento é Obrigatório:** A banca vai sugerir que o PETI é feito de forma independente. **ERRADO!** O PETI é uma tradução do plano estratégico da organização (PEI) para o mundo da TI. A viagem tem que estar alinhada com os objetivos da família.
+> > * **Contexto Federal (SISP):** Em provas federais, o **PDTI é um documento obrigatório** para os órgãos que fazem parte do SISP.
+
+---
+
+### ### Indicadores de Desempenho e BSC: O Painel de Controle da Viagem
+
+De nada adianta viajar se você não sabe se está no caminho certo. Para isso, usamos indicadores.
+
+* **Indicador de Desempenho:** É um "ponteiro" no painel do seu carro.
+* **KPI (Indicador-Chave de Desempenho):** É o ponteiro mais importante do painel, aquele que está diretamente ligado ao sucesso da sua viagem. Ex: "Km por Litro".
+
+* **Balanced Scorecard (BSC):**
+    É um **painel de controle completo e balanceado** para a viagem da família (a organização). Ele diz que não adianta olhar só para o ponteiro do combustível (o financeiro). Para ter sucesso, você precisa olhar 4 perspectivas ao mesmo tempo:
+
+    1.  **Financeira 💰:** "Estamos dentro do orçamento da viagem?" (Ex: Custo por km rodado).
+    2.  **Cliente 👨‍👩‍👧‍👦:** "A família está feliz e satisfeita com a viagem?" (Ex: Nota de satisfação com os hotéis).
+    3.  **Processos Internos ⚙️:** "Nossos processos de 'arrumar as malas' e 'abastecer o carro' estão sendo eficientes?" (Ex: Tempo médio de parada nos postos).
+    4.  **Aprendizado e Crescimento 🌱:** "O motorista (a equipe) está aprendendo a dirigir melhor em estradas de terra? Estamos com os mapas atualizados?" (Ex: Horas de treinamento em direção defensiva).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **As 4 Perspectivas do BSC:** A banca vai te dar um indicador e pedir para você classificá-lo. Ex: "O indicador 'número de defeitos no software' pertence à perspectiva do Cliente". **ERRADO!** Pertence à perspectiva de **Processos Internos**.
+> > * **Relação de Causa e Efeito:** As perspectivas se conectam. Motoristas mais **treinados** (Aprendizado) executam a manutenção do carro de forma mais **eficiente** (Processos), o que deixa a família mais **satisfeita** e segura (Cliente), resultando em uma viagem com menos custos inesperados (**Financeiro**).
+> > * **Indicador vs. Meta:** O **indicador** é o ponteiro (Km/L). A **meta** é o valor que você quer alcançar ("Fazer 12 Km/L").
+
+### ### Mapa Mental: A Cascata do Planejamento de TI
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["🏢 PEI<br>(Plano Estratégico<br>da Organização)"]
+    
+    subgraph "Planejamento de TI"
+        B["🗺️ PETI<br>(Estratégico / Longo Prazo)<br>'O Quê?'"]
+        C["📝 PDTI<br>(Tático-Operacional / Curto Prazo)<br>'Como?'"]
+    end
+
+    subgraph "Execução e Medição"
+        D["🚀 Execução<br>(Projetos e Serviços de TI)"]
+        E["📊 Medição<br>(Indicadores e BSC)"]
+    end
+
+    A -- Alimenta --> B;
+    B -- Desdobra-se em --> C;
+    C -- Guia a --> D;
+    D -- Gera Resultados para --> E;
+    E -- Fornece Feedback para --> A & B & C;
+````
+
 ### **Classe:** B
 ### **Conteúdo:** Planejamento de TI: PETI e PDTI
 
