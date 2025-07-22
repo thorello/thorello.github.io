@@ -1,3 +1,107 @@
+### Olá, futuro(a) aprovado(a)\! Vamos planejar sua aprovação desvendando o Sistema Orçamentário Federal para o Cebraspe.
+
+Pense no planejamento do orçamento do governo como o **planejamento de uma grande viagem de férias em família** ✈️. Para a viagem dar certo, a família não decide tudo de última hora. Ela usa três documentos principais, em uma hierarquia clara.
+
+-----
+
+### \#\#\# O Sistema de Planejamento e Orçamento: O Sonho, o Plano e o Dinheiro
+
+O art. 165 da Constituição estabelece o trio de ouro do planejamento brasileiro.
+
+  * **PPA (Plano Plurianual - O Sonho de Viagem de 4 Anos 🗺️):**
+
+      * **O que é?** É o plano **estratégico** de médio prazo. É a família sonhando alto: "Nos próximos 4 anos, nosso grande objetivo é conhecer a Europa".
+      * **Conteúdo:** Estabelece as **Diretrizes, Objetivos e Metas (DOM)** gerais. Não entra em detalhes de qual hotel ficar.
+      * **Vigência:** Dura **4 anos**, mas com um detalhe especial: começa no 2º ano de um governo e termina no 1º ano do governo seguinte, para garantir a continuidade dos planos.
+
+  * **LDO (Lei de Diretrizes Orçamentárias - O Plano da Viagem do Ano 📝):**
+
+      * **O que é?** É o instrumento **tático** que faz a **ponte** entre o sonho e a realidade do ano.
+      * **Conteúdo:** "Ok, do nosso sonho de conhecer a Europa (PPA), a **meta e prioridade** para **este ano** será conhecer a Itália". A LDO orienta como o orçamento do ano (LOA) deve ser montado e define as regras do jogo fiscal para aquele ano.
+      * **Anexos da LRF:** A LDO traz dois anexos super importantes: o de **Metas Fiscais** (quanto a família pode se endividar) e o de **Riscos Fiscais** (o que pode dar errado e estragar as contas).
+
+  * **LOA (Lei Orçamentária Anual - O Orçamento da Viagem 💵):**
+
+      * **O que é?** É o instrumento **operacional**, o orçamento do dia a dia.
+      * **Conteúdo:** "Para a viagem à Itália este ano, vamos receber R$ X (previsão da **receita**) e podemos gastar R$ Y com hotéis e R$ Z com passagens (fixação da **despesa**)". É o orçamento propriamente dito.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **A Hierarquia:** A LOA obedece à LDO, que obedece ao PPA. A banca vai dizer que são independentes. **ERRADO\!** A LDO é a cola que une o planejamento de médio prazo (PPA) com o de curto prazo (LOA).
+> >   * **Vigência do PPA:** A banca ama cobrar a vigência "quebrada" do PPA, que atravessa mandatos para garantir a continuidade.
+> >   * **Anexos da LRF:** Decore\! Os anexos de **Metas Fiscais** e **Riscos Fiscais** são parte da **LDO**, não da LOA nem do PPA.
+
+-----
+
+### \#\#\# Estrutura do Orçamento: Detalhando os Gastos da Viagem
+
+A LOA organiza os gastos da viagem em várias "etiquetas" para saber exatamente para onde o dinheiro está indo.
+
+  * **Classificações da Despesa:**
+      * **Institucional ("Quem gasta?"):** "Orçamento do Pai", "Orçamento da Mãe".
+      * **Funcional ("Em que área?"):** "Gastos com Transporte", "Gastos com Hospedagem", "Gastos com Cultura".
+      * **Programática ("Para quê?"):** O programa é "Viagem para a Itália". As ações dentro do programa são:
+          * **Projeto:** "Comprar a casa de férias na Toscana". Tem começo, meio e fim, e cria/expande um bem.
+          * **Atividade:** "Pagar a manutenção do carro da família usado na viagem". É um gasto contínuo para manter as coisas funcionando.
+      * **Por Natureza ("Com o que, exatamente?"):**
+          * **Despesa Corrente:** Gastos do dia a dia (passagens, hotel, comida).
+          * **Despesa de Capital:** Comprar a casa de férias (investimento).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Projeto vs. Atividade:** A distinção clássica\! **Projeto = cria/expande algo, tem fim**. **Atividade = mantém algo, é contínuo**. "Construção de uma ponte" é projeto. "Manutenção da ponte" é atividade.
+> >   * **Corrente vs. Capital:** A banca vai dar exemplos. "Pagamento de salários" = **Corrente**. "Compra de um novo computador" = **Capital**.
+
+-----
+
+### \#\#\# Créditos Orçamentários: A Verba da Viagem e os Gastos Extras
+
+  * **Créditos Ordinários:** É a verba que já estava no orçamento inicial da viagem (na LOA).
+  * **Créditos Adicionais (A "Verba Extra"):**
+    Às vezes, o dinheiro planejado não é suficiente. Para isso, existem 3 tipos de créditos adicionais.
+
+| Tipo de Crédito | Situação na Viagem | Precisa de Lei Nova? |
+| :--- | :--- | :--- |
+| **Suplementar** | A verba para "restaurantes" acabou. Precisa de um **REFORÇO** em uma categoria que já existia. | Não necessariamente (pode ser autorizado na própria LOA). |
+| **Especial** | No meio da viagem, a família decide fazer um passeio de balão, um gasto **NOVO** que não estava no plano. | Sim, exige autorização por lei específica. |
+| **Extraordinário** | O voo de volta é cancelado por uma nevasca. A família precisa de dinheiro **URGENTE e IMPREVISÍVEL** para um novo hotel e passagens. | Não (aberto por MP ou decreto, devido à emergência). |
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dar o cenário e pedir o tipo de crédito. Decore a finalidade:
+> >       * **Reforçar = Suplementar.**
+> >       * **Gasto Novo = Especial.**
+> >       * **Urgência/Calamidade = Extraordinário.**
+> >   * Os créditos **extraordinários** são a grande exceção: por serem emergenciais, **dispensam autorização legislativa prévia**.
+> >   * **"Regra dos 4 meses":** Créditos especiais e extraordinários abertos nos últimos 4 meses do ano podem ser "reabertos" no ano seguinte, uma exceção ao princípio da anualidade.
+
+### \#\#\# Mapa Mental: A Hierarquia do Planejamento e Orçamento
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["<b>Plano Plurianual (PPA)</b><br>🗺️ Estratéggico (4 anos)<br>O Sonho da Viagem"]
+    
+    B["<b>Lei de Diretrizes Orçamentárias (LDO)</b><br>📝 Tático (Anual)<br>O Plano da Viagem do Ano"]
+    
+    C["<b>Lei Orçamentária Anual (LOA)</b><br>💵 Operacional (Anual)<br>O Orçamento Detalhado da Viagem"]
+
+    subgraph " "
+        direction LR
+        D["Anexo de<br>Metas Fiscais"]
+        E["Anexo de<br>Riscos Fiscais"]
+    end
+
+    A -- "Orienta" --> B
+    B -- "Estabelece as Regras para" --> C
+    B -- "Contém" --> D & E
+
+    style A fill:#313149,stroke:#bb9af7
+    style B fill:#313149,stroke:#7aa2f7
+    style C fill:#313149,stroke:#7dcfff
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Orçamento Público: Sistema de Planejamento e Orçamento Federal
 
