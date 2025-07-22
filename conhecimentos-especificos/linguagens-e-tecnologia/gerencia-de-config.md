@@ -1,3 +1,108 @@
+### Olá, futuro(a) aprovado(a)\! Vamos controlar as versões do seu estudo e configurar sua mente para gabaritar o Cebraspe.
+
+Pense em Gerência de Configuração e Git como o processo de **escrever um livro em equipe** ✍️. Você precisa de um sistema para que vários autores possam trabalhar juntos sem que um apague o trabalho do outro e para manter um histórico de todas as versões do manuscrito.
+
+-----
+
+### \#\#\# Gerência de Configuração e Git: A Mágica de Escrever em Equipe
+
+  * **O que é um VCS (Sistema de Controle de Versão)?** É o sistema que a equipe de autores usa.
+
+      * **Centralizado (O Jeito Antigo):** Há apenas **um manuscrito mestre** guardado na editora. Para escrever, o autor precisa pegar o manuscrito, levar para casa, e depois devolver. Se a editora pegar fogo, todo o trabalho é perdido.
+      * **Distribuído (O Jeito Git):** Cada autor tem uma **cópia completa e mágica do livro inteiro**, com todo o seu histórico, em seu próprio notebook. Ele pode escrever capítulos inteiros (`commit`) offline no avião. A editora é apenas um lugar para sincronizar as cópias.
+
+  * **As 3 Áreas de Trabalho do Git:** É o fluxo de trabalho de um autor.
+
+    1.  **Diretório de Trabalho (A Sua Mesa):** Onde você está escrevendo e rabiscando o capítulo. O texto está **Modificado**.
+    2.  **Área de Preparação (*Staging Area*):** A sua **"pasta de revisão"**. Você gostou de um parágrafo. Você o move para essa pasta para incluí-lo na próxima versão oficial. O texto está **Preparado (*Staged*)**. O comando para isso é `git add`.
+    3.  **Repositório (Seu Histórico Local):** No final do dia, você pega tudo o que está na "pasta de revisão" e salva permanentemente como uma nova versão no seu caderno de histórico. O texto está **Consolidado (*Committed*)**. O comando para isso é `git commit`.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Distribuído vs. Centralizado:** A banca vai dizer que o Git precisa de conexão com o servidor para fazer `commit`. **ERRADO\!** O `commit` é uma operação **local**. Você só precisa de conexão para sincronizar (`push`/`pull`).
+> >   * **A *Staging Area* é a Chave:** A banca vai dizer que `git add` salva a mudança no repositório. **ERRADO\!** `git add` move da sua mesa para a **pasta de revisão (*Staging Area*)**. É o `git commit` que salva o que está na pasta de revisão para o seu histórico.
+
+-----
+
+### \#\#\# Branches e Gitflow: Escrevendo Universos Paralelos
+
+  * **Branch (Ramificação):** É como criar um **universo paralelo** para o livro. Enquanto um autor escreve a história principal, outro pode criar um `branch` para escrever um capítulo experimental com um novo personagem, sem bagunçar a trama principal.
+
+  * **Gitflow (O Método de Escrita da Editora):** É uma estratégia famosa para organizar os `branches`.
+
+      * **`master` (ou `main`):** A prateleira da livraria com os **livros já publicados**. É o código em produção.
+      * **`develop`:** A **mesa de edição principal**, onde os capítulos finalizados são juntados para a próxima edição do livro.
+      * **`feature/*` (Capítulo Novo):** Rascunho para uma nova funcionalidade. **Sai de `develop` e volta para `develop`**.
+      * **`release/*` (Revisão Final):** O livro indo para a gráfica. **Sai de `develop` e volta para `master` E `develop`**.
+      * **`hotfix/*` (Correção Urgente):** Corrigir um erro grave no livro já publicado. **Sai de `master` e volta para `master` E `develop`**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * O fluxo dos branches no Gitflow é o alvo principal. A banca vai dizer que uma `feature` sai da `master`. **ERRADO\!** Sai da `develop`.
+> >   * Vão dizer que um `hotfix` volta só para a `master`. **ERRADO\!** Ele precisa voltar para a `develop` também, para que a correção não se perca na próxima edição.
+
+-----
+
+### \#\#\# Merge e Colaboração: Juntando as Histórias
+
+  * **`git merge`:** É o ato do editor-chefe de **juntar** o capítulo experimental de um autor (`branch`) com o manuscrito principal.
+  * **Conflito de Merge:** Acontece quando dois autores, em seus universos paralelos, reescreveram o **mesmo parágrafo** de formas diferentes. O sistema não consegue decidir qual é o certo e pede uma intervenção manual do editor.
+  * **`git rebase`:** Uma alternativa ao `merge` que **reescreve a história**, criando uma linha do tempo mais limpa, como se um autor tivesse escrito seu capítulo depois do outro, sequencialmente. É uma ferramenta poderosa, mas perigosa se usada em capítulos que já foram compartilhados.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **`merge` vs. `rebase`:** **`merge`** preserva o histórico real (com "nós" e ramificações) e é seguro. **`rebase`** cria um histórico linear e bonito, mas **altera o passado**, o que pode ser problemático em ramos públicos.
+> >   * **`git pull`** é um atalho para `git fetch` (baixar as novidades) + `git merge` (juntar com o seu trabalho).
+
+-----
+
+### \#\#\# CI/CD e GitLab: A Gráfica Automatizada
+
+  * **Integração Contínua (CI):** Toda vez que um autor envia um novo parágrafo, um **robô revisor** automaticamente verifica a gramática e se o texto se encaixa com o resto do livro.
+
+  * **Entrega Contínua (*Continuous Delivery*):** Se o robô revisor aprova o texto, ele automaticamente gera um **e-book** e o deixa pronto, apenas esperando o "OK" do editor-chefe para publicar.
+
+  * **Implantação Contínua (*Continuous Deployment*):** O mesmo que o anterior, mas o "OK" é automático. O e-book é publicado na Amazon no mesmo instante em que o robô o aprova.
+
+  * **GitLab:** É a **editora moderna e completa**. Ela oferece o depósito de manuscritos (Git), o controle de tarefas e a gráfica automatizada (**GitLab CI/CD**) em um só lugar. A "receita" da automação da gráfica é escrita em um arquivo chamado **`.gitlab-ci.yml`**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A diferença entre os dois "CDs": Na **Entrega** (*Delivery*), a publicação final é **manual**. Na **Implantação** (*Deployment*), a publicação final é **automática**.
+> >   * O coração da automação no GitLab é o arquivo **`.gitlab-ci.yml`**, que define a *pipeline* como código.
+
+### \#\#\# Mapa Mental: O Fluxo de Trabalho do Gitflow
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "Produção (Livros Publicados)"
+        M["📘 master/main"]
+    end
+    
+    subgraph "Desenvolvimento (Próxima Edição)"
+        D["📙 develop"]
+    end
+
+    subgraph "Rascunhos (Trabalho em Andamento)"
+        F["⭐ feature/nova-ideia"]
+        R["🔖 release/v1.2"]
+        H["🔥 hotfix/bug-critico"]
+    end
+    
+    D -- "Cria um rascunho<br>para uma nova funcionalidade" --> F
+    F -- "Finaliza e integra<br>na próxima edição" --> D
+
+    D -- "Prepara para<br>lançamento" --> R
+    R -- "Lança na livraria" --> M
+    R -- "Incorpora ajustes<br>de volta" --> D
+
+    M -- "Encontra um erro<br>grave no livro" --> H
+    H -- "Lança a correção<br>na livraria" --> M
+    H -- "Incorpora a correção<br>na próxima edição" --> D
+```
+
+
 ### **Classe:** B
 ### **Conteúdo:** Gerência de Configuração e Versionamento com Git
 
