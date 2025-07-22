@@ -1,3 +1,106 @@
+### Olá, futuro(a) aprovado(a)! Vamos abrir as portas do conhecimento sobre Autenticação para você garantir seu acesso à aprovação no Cebraspe.
+
+Pense em autenticação e autorização como o processo de **entrar em um clube de luxo super exclusivo** 💎 e usar seus serviços. Cada conceito é uma camada de segurança ou uma permissão especial.
+
+---
+
+### ### Autenticação Multifator (MFA): Provando Quem Você É na Portaria
+
+**Autenticação** é o ato de provar para o segurança da portaria que você é realmente um membro do clube.
+
+* **Os Fatores de Autenticação (As Provas de Identidade):**
+    Existem 3 tipos de "provas" que você pode apresentar:
+    1.  **Algo que você SABE (Conhecimento):** A **senha secreta** que só os membros conhecem.
+    2.  **Algo que você TEM (Posse):** O **cartão de membro** físico e intransferível no seu bolso.
+    3.  **Algo que você É (Inerência):** Sua **impressão digital** no leitor da catraca.
+
+* **O que é MFA?**
+    É a regra do clube que diz que uma única prova não é suficiente. Para entrar, você precisa apresentar **pelo menos duas provas de TIPOS DIFERENTES**. Por exemplo, a senha secreta **(sabe)** + o cartão de membro **(tem)**. Isso é a Autenticação de Dois Fatores (2FA), o tipo mais comum de MFA.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * A pegadinha mais clássica! A banca vai dizer que usar "uma senha e um PIN" é MFA. **ERRADO!** Senha e PIN são ambos da categoria **conhecimento**. Para ser MFA, os fatores precisam ser de **categorias diferentes**.
+> > * A MFA é a defesa mais forte contra a maioria dos ataques de roubo de senha. Mesmo que o ladrão descubra sua senha, ele ainda não consegue entrar no clube porque não tem o seu cartão de membro.
+
+---
+
+### ### OAuth 2.0: Autorizando seu Personal Shopper
+
+Você está no clube e quer que um serviço de *personal shopper* (um aplicativo terceiro) organize seu armário de vinhos privado (seus dados no Google Fotos). Você não vai dar a chave do clube e a senha do seu armário para ele!
+
+* **O que é OAuth 2.0?**
+    É o **framework de AUTORIZAÇÃO DELEGADA**. É o procedimento que o clube usa para que você possa autorizar o *personal shopper* a acessar seu armário, sem entregar suas senhas.
+
+* **O Fluxo:**
+    1.  O *personal shopper* (aplicação cliente) te pede permissão.
+    2.  Você vai até a **gerência do clube** (é redirecionado para a página de login do Google).
+    3.  Você prova para o gerente que é você e autoriza: "Pode deixar o *personal shopper* entrar, mas SÓ no meu armário de vinhos".
+    4.  O gerente entrega uma **chave de acesso temporária e restrita (Access Token)** para o *personal shopper*.
+    5.  O *personal shopper* usa essa chave para acessar apenas o seu armário de vinhos (o Resource Server).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **AUTORIZAÇÃO, NÃO AUTENTICAÇÃO!** A banca VAI dizer que OAuth 2.0 serve para fazer login. **ERRADO!** OAuth 2.0 serve para **autorizar** um app a acessar seus dados. Ele delega permissões. Quem faz a autenticação (o login) é o protocolo a seguir...
+
+---
+
+### ### OpenID Connect (OIDC): O "Login com o Clube"
+
+Agora, uma charutaria da esquina (outro site) quer te dar um desconto por você ser membro do clube. A charutaria não quer acessar seus dados, ela só precisa **saber que você é realmente um membro verificado**.
+
+* **O que é OIDC?**
+    É uma camada de **AUTENTICAÇÃO** construída **em cima do OAuth 2.0**. É o que permite o famoso "Entrar com o Google".
+
+* **A Mágica do OIDC:**
+    O fluxo é o mesmo do OAuth, mas com um item extra. Além da chave de acesso (Access Token), a gerência do clube também entrega para a charutaria um **crachá de identidade autenticado (ID Token)**.
+
+* **ID Token vs. Access Token:**
+    * **Access Token (A Chave do Armário):** É para o **servidor de recursos** (o guarda do armário). É uma chave de permissão.
+    * **ID Token (O Crachá de Identidade):** É para a **aplicação cliente** (a charutaria). É um comprovante que diz: "Eu, o Clube, garanto que este é o João, e ele se autenticou com sucesso".
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * OIDC e OAuth 2.0 não são rivais. O **OIDC estende o OAuth 2.0**, adicionando a peça que faltava: a autenticação.
+> > * Se a questão fala em **login** ou **verificação de identidade**, a resposta é **OIDC**. Se fala em **dar permissão** para um app acessar seus dados, a resposta é **OAuth 2.0**.
+
+---
+
+### ### JSON Web Token (JWT): O Design do Crachá Digital
+
+* **O que é JWT?**
+    É o padrão de como o **crachá de identidade digital (o ID Token)** é desenhado.
+
+* **A Estrutura (header.payload.signature):**
+    O crachá tem 3 partes, separadas por pontos.
+    1.  **Header (Cabeçalho):** Diz o tipo de crachá e como ele foi assinado.
+    2.  **Payload (Carga Útil):** As informações do membro (nome, ID, validade do crachá).
+    3.  **Signature (Assinatura):** A **assinatura digital do gerente do clube**. É o que garante que o crachá é autêntico e não foi falsificado.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **JWT NÃO É CRIPTOGRAFADO (por padrão)!** A pegadinha mais comum. As informações no crachá (Payload) são apenas codificadas em Base64, qualquer um pode ler. A segurança do JWT vem da **ASSINATURA**, que garante **autenticidade e integridade** (prova que foi o gerente que emitiu e que não foi alterado), mas **NÃO garante confidencialidade**.
+> > * **Stateless:** Como o crachá já contém as informações do usuário, o segurança não precisa consultar a lista de membros a cada vez que o vê. Isso permite que os sistemas sejam *stateless* (sem estado), o que é ótimo para a escalabilidade.
+
+### ### Mapa Mental: OAuth 2.0 (Autorização) vs. OpenID Connect (Autenticação)
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["<b>OAuth 2.0</b><br>Framework de <b>AUTORIZAÇÃO</b>"]
+    
+    subgraph "Gera como resultado"
+        direction LR
+        AT["🔑<br>Access Token<br>(Para a API)"]
+    end
+
+    B["<b>OpenID Connect (OIDC)</b><br>Camada de <b>AUTENTICAÇÃO</b>"]
+
+    subgraph "Adiciona ao fluxo o"
+        direction LR
+        IT["🪪<br>ID Token (JWT)<br>(Para o Cliente)"]
+    end
+
+    B -- "É construído sobre o" --> A
+    A --> AT
+    B --> IT
+````
+
 ### **Classe:** A
 ### **Conteúdo:** Autenticação: Autenticação Multifator (MFA)
 
