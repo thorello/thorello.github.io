@@ -1,3 +1,108 @@
+### Olá, futuro(a) aprovado(a)\! Vamos decifrar os segredos da Criptografia para você garantir a confidencialidade da sua vaga no Cebraspe.
+
+Pense em criptografia como a arte de **enviar mensagens secretas durante uma guerra** 🕵️‍♂️. Você precisa garantir que, mesmo que o inimigo intercepte seu mensageiro, ele não consiga ler a sua mensagem.
+
+-----
+
+### \#\#\# Fundamentos: A Arte dos Códigos Secretos
+
+  * **Os Elementos da Mensagem:**
+      * **Texto Claro:** A mensagem original, legível. "Atacar ao amanhecer".
+      * **Texto Cifrado:** A mensagem codificada, ilegível. "XyZ7@\#$&\*".
+      * **Cifragem:** O ato de transformar o texto claro em cifrado.
+      * **Chave Criptográfica 🔑:** O **segredo** que você usa para cifrar e decifrar a mensagem. Pode ser uma "palavra-chave" ou um "livro de códigos".
+  * **Princípio de Kerckhoffs:** A segurança do seu sistema de mensagens não deve depender do segredo da "máquina de codificar" (o algoritmo), pois o inimigo pode capturá-la. A segurança deve residir **apenas na chave**, que é pequena e fácil de proteger ou trocar.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A criptografia, por si só, garante principalmente a **confidencialidade**. Ela é uma ferramenta essencial para os outros pilares (como integridade e autenticidade), mas não os garante sozinha. E ela não tem a ver com **disponibilidade**.
+> >   * A banca vai dizer que a segurança está no algoritmo secreto. **ERRADO\!** Pelo Princípio de Kerckhoffs, a segurança está na **chave secreta**.
+
+-----
+
+### \#\#\# Criptografia Simétrica: O Cofre com Chave Única
+
+  * **A Analogia:** Você e seu general usam um **cofre idêntico com uma chave secreta única**. Você escreve a mensagem, tranca no cofre e envia. O general, que tem uma cópia exata da mesma chave, usa-a para abrir o cofre e ler a mensagem.
+  * **Características:**
+      * **Velocidade:** É um método **extremamente rápido**. Ótimo para trancar grandes volumes de documentos (dados).
+      * **O Grande Problema:** **Como você fez para entregar a cópia da chave para o general em segurança?** Se o inimigo interceptar a chave, todas as suas mensagens futuras estarão comprometidas. É o **problema da distribuição de chaves**.
+  * **Padrão Atual:** O cofre mais moderno e seguro hoje é o **AES**. O antigo, **DES**, é como um cofre de madeira, facilmente arrombável.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A principal **vantagem** da criptografia simétrica é a **velocidade**.
+> >   * A principal **desvantagem** é o **gerenciamento e a distribuição segura das chaves**.
+
+-----
+
+### \#\#\# Criptografia Assimétrica: O Cofre com Cadeado e Chave
+
+Este método é mais engenhoso e resolve o problema da distribuição de chaves.
+
+  * **A Analogia:** Agora, cada pessoa tem um par mágico:
+
+      * Uma **Chave Pública (um cadeado aberto 🔓):** Você distribui cópias do seu cadeado aberto para todo mundo que quiser.
+      * Uma **Chave Privada (a única chave que abre o seu cadeado 🔑):** Você a guarda em segredo absoluto.
+
+  * **As Duas Grandes Utilidades:**
+
+    1.  **Para Garantir CONFIDENCIALIDADE (Enviar uma mensagem secreta PARA o general):**
+        Você pega um dos **cadeados abertos do general (a chave pública dele)**. Você coloca sua mensagem em uma caixa e a tranca com o cadeado dele. Agora, a caixa está segura. **Apenas o general, com sua chave privada única**, pode abrir o cadeado e ler a mensagem.
+
+    2.  **Para Garantir AUTENTICIDADE (PROVAR que uma mensagem veio DE você - Assinatura Digital):**
+        Você escreve uma mensagem. Para provar que foi você, você usa sua **chave privada secreta** para "carimbar" a mensagem com um selo mágico. Qualquer pessoa no mundo pode pegar um dos seus **cadeados abertos (sua chave pública)** e testá-lo no selo. Se o cadeado "reconhecer" o selo, é a prova matemática de que só poderia ter sido você que o criou.
+
+  * **Característica:** É um processo **muito mais lento** que o da chave simétrica.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai inverter tudo\! Decore esta regra:
+> >       * Para **CONFIDENCIALIDADE**, você cifra com a **PÚBLICA** de quem vai receber.
+> >       * Para **ASSINATURA DIGITAL**, você assina com a sua **PRIVADA**.
+> >   * A criptografia assimétrica é **lenta**. A banca vai dizer que é mais rápida. **ERRADO\!**
+> >   * Uma assinatura digital, por si só, **não deixa a mensagem secreta**. Ela só prova a autoria e a integridade.
+
+-----
+
+### \#\#\# Aplicações Práticas: O Melhor dos Dois Mundos
+
+No mundo real, como na comunicação segura pela internet (HTTPS), usamos uma **abordagem híbrida**.
+
+  * **Protegendo Dados em Trânsito (A Conversa Segura):**
+    Seria muito lento usar o método do cadeado (assimétrica) para cada frase da conversa. Então, fazemos o seguinte:
+
+    1.  No início da conversa, usamos o método lento do **cadeado (assimétrica)** para um único propósito: trocar em segurança a **chave secreta do cofre (simétrica)** que usaremos hoje.
+    2.  Uma vez que ambos têm a chave do cofre, toda a conversa restante é feita usando o método rápido do **cofre (simétrica)**.
+
+  * **Protegendo Dados em Repouso (O Arquivo Secreto):**
+    Para proteger os documentos guardados no seu computador, usamos o método rápido do **cofre (simétrica, com o algoritmo AES)**, pois ele é ideal para grandes volumes de dados. O grande desafio aqui é: onde guardar a chave do cofre em segurança?
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A comunicação segura na web (TLS/HTTPS) usa uma **abordagem híbrida**. Criptografia assimétrica para trocar a chave, e simétrica para trocar os dados.
+> >   * Lembre-se da regra de ouro: **Simétrica para DADOS, Assimétrica para CHAVES e ASSINATURAS.**
+
+### \#\#\# Mapa Mental: Criptografia Simétrica vs. Assimétrica (para Confidencialidade)
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "Simétrica (Cofre com Chave Única)"
+        A["Mensagem"] -- "Cifra com<br>🔑 Chave Secreta" --> B["Mensagem<br>Cifrada"];
+        B -- "Canal Inseguro" --> C["Mensagem<br>Cifrada"];
+        C -- "Decifra com<br>🔑 Mesma Chave Secreta" --> D["Mensagem"];
+        K1["(Chave precisa ser<br>compartilhada antes<br>por um canal seguro!)"]
+    end
+
+    subgraph "Assimétrica (Cofre com Cadeado e Chave)"
+        E["Mensagem"] -- "Cifra com<br>🔓 Chave Pública do Destinatário" --> F["Mensagem<br>Cifrada"];
+        F -- "Canal Inseguro" --> G["Mensagem<br>Cifrada"];
+        G -- "Decifra com<br>🔑 Chave Privada do Destinatário" --> H["Mensagem"];
+        K2["(Chave Pública pode ser<br>distribuída livremente)"]
+    end
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Criptografia: Fundamentos
 
