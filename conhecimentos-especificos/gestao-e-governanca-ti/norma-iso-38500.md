@@ -1,3 +1,87 @@
+
+### Olá, futuro(a) aprovado(a)\! Vamos pilotar pelos conceitos da ISO/IEC 38500 para você cruzar a linha de chegada na prova do Cebraspe.
+
+Pense na Governança de TI como o trabalho do **dono de uma equipe de Fórmula 1** 🏎️. A ISO/IEC 38500 é o **manual de alto nível para o dono da equipe**, não para os mecânicos ou para o piloto. Ela ensina *o que* o dono deve cobrar de sua equipe para que ela seja vitoriosa, não *como* trocar um pneu.
+
+-----
+
+### \#\#\# ISO/IEC 38500: Visão Geral e os 6 Princípios do Dono da Equipe
+
+  * **O Propósito da Norma:** Esta norma é um guia para a **alta direção** (o dono da equipe, os diretores). Ela foca em **governança**, que é a arte de definir a direção e monitorar os resultados. Ela não entra em detalhes de gerenciamento (o trabalho do dia a dia da oficina).
+
+  * **Os Seis Princípios (As Regras de Ouro do Dono da Equipe):**
+
+    1.  **Responsabilidade:** Todos na equipe, do piloto ao mecânico, sabem exatamente qual é a sua função e são responsáveis por ela. Não há dúvidas sobre quem aperta qual parafuso.
+    2.  **Estratégia:** A estratégia da equipe ("vamos focar em corridas de longa duração") deve guiar a escolha dos carros e motores (a estratégia de TI). E os carros disponíveis (as capacidades da TI) devem influenciar a estratégia da equipe. As duas andam juntas.
+    3.  **Aquisição:** Comprar um novo motor de F1 custa milhões. O dono só aprova essa compra (**aquisição**) se houver uma análise clara de que esse investimento trará vitórias (benefícios) que justifiquem o custo e o risco.
+    4.  **Desempenho:** O carro precisa ter um bom **desempenho** na pista. Ele deve ser rápido e confiável para atender às necessidades da equipe, que é vencer corridas.
+    5.  **Conformidade:** O carro deve estar em **conformidade** com todas as regras da federação de automobilismo. Nenhuma peça pode ser ilegal.
+    6.  **Comportamento Humano:** As decisões devem respeitar os pilotos e os mecânicos. Não adianta ter o carro mais rápido se o piloto está exausto e propenso a cometer erros fatais.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Governança vs. Gerenciamento:** A principal pegadinha. A banca vai dizer que a ISO 38500 detalha como configurar um servidor. **ERRADO\!** A norma é de **governança**, para a **alta direção**. Ela define o "o quê", não o "como". O "como" é papel de frameworks como ITIL e COBIT.
+> >   * **Associação dos Princípios:** A banca vai dar um cenário e perguntar qual princípio se aplica. Ex: "A necessidade de justificar um investimento em um novo sistema com um caso de negócio" se refere ao princípio da **Aquisição**.
+> >   * **Comportamento Humano:** Este princípio é muitas vezes esquecido. Ele mostra que a Governança de TI não é só sobre máquinas e processos, mas também sobre o impacto nas pessoas.
+
+-----
+
+### \#\#\# O Modelo de Governança: O Ciclo de Comando do Dono da Equipe
+
+A ISO 38500 define um ciclo simples com 3 tarefas que o dono da equipe deve executar continuamente. Este modelo é a base do domínio de governança do COBIT (o famoso **EDM**).
+
+1.  **Avaliar (*Evaluate*):**
+
+      * **O que é?** O dono da equipe senta na sua sala e **avalia** o desempenho do carro nas últimas corridas, as novas tecnologias dos concorrentes e as condições da próxima pista.
+      * **Foco:** Entender a situação atual e as opções para o futuro.
+
+2.  **Dirigir (*Direct*):**
+
+      * **O que é?** Com base na avaliação, o dono **dá a direção** e as ordens para a equipe. "Quero que vocês preparem o carro nº 5 com a configuração para chuva" ou "Autorizo a compra do novo motor da Mercedes para a próxima temporada".
+      * **Foco:** Definir a estratégia e autorizar os planos.
+
+3.  **Monitorar (*Monitor*):**
+
+      * **O que é?** Durante a corrida, o dono fica no rádio **monitorando** o desempenho do carro, o consumo de combustível, a posição na pista e o tempo das voltas.
+      * **Foco:** Garantir que o plano está sendo seguido e que os objetivos estão sendo alcançados.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Ciclo Contínuo:** A banca pode dizer que Avaliar, Dirigir e Monitorar são fases que acontecem uma única vez. **ERRADO\!** É um **ciclo contínuo e interativo**. O dono da equipe está fazendo as três coisas o tempo todo.
+> >   * **Verbos de Ação:** Associe os verbos\! **Avaliar** = examinar, julgar. **Dirigir** = orientar, autorizar. **Monitorar** = acompanhar, supervisionar.
+> >   * **ISO 38500 vs. COBIT:** Eles são parceiros, não rivais. A **ISO 38500** é o manual de alto nível com os princípios ("o quê"). O **COBIT** é o manual detalhado com os processos que ensinam *como* colocar os princípios em prática ("o como").
+
+### \#\#\# Mapa Mental: O Ciclo de Governança da ISO/IEC 38500
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "Ciclo de Governança (ADM)"
+        direction LR
+        A["🧐<br>Avaliar"] --> B["🧭<br>Dirigir"];
+        B --> C["📈<br>Monitorar"];
+        C --> A;
+    end
+    
+    subgraph "Guiado pelos 6 Princípios"
+        P1["Responsabilidade"]
+        P2["Estratégia"]
+        P3["Aquisição"]
+        P4["Desempenho"]
+        P5["Conformidade"]
+        P6["Comportamento Humano"]
+    end
+    
+    style A fill:#313149,stroke:#bb9af7
+    style B fill:#313149,stroke:#bb9af7
+    style C fill:#313149,stroke:#bb9af7
+
+    P1 & P2 & P3 & P4 & P5 & P6 -.-> A;
+    P1 & P2 & P3 & P4 & P5 & P6 -.-> B;
+    P1 & P2 & P3 & P4 & P5 & P6 -.-> C;
+
+```
+
 ### **Classe:** C
 ### **Conteúdo:** Norma ISO/IEC 38500
 
