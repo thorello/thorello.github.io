@@ -1,3 +1,79 @@
+### Olá, futuro(a) aprovado(a)\! Vamos auditar a Lei Orgânica do TCE-RS para garantir que seu conhecimento esteja em conformidade para o Cebraspe.
+
+Pense na fiscalização do Estado como a **gestão de um grande condomínio residencial** 🏢. O Governador é o "síndico-chefe", a Assembleia Legislativa é a "assembleia de moradores", e o **Tribunal de Contas do Estado (TCE-RS)** é a **"empresa de auditoria independente e tribunal de contas do condomínio"**, contratada para garantir que o síndico e sua equipe usem o dinheiro de todos corretamente. A Lei Orgânica é o estatuto dessa empresa de auditoria.
+
+-----
+
+### \#\#\# Natureza, Jurisdição e Competências: O Estatuto do Auditor
+
+  * **Natureza e Jurisdição (Art. 1º e 2º):** A empresa de auditoria (TCE-RS) tem sua sede na Capital, mas sua **jurisdição alcança todo o condomínio (o Estado)** e também os "condomínios filiais" (os Municípios). Ela pode fiscalizar qualquer um que use o dinheiro do condomínio, seja um funcionário, uma empresa terceirizada ou até um morador que recebeu verba para organizar a festa junina.
+
+  * **Competências Principais (Art. 11):**
+    A principal função do auditor é verificar as contas, mas de formas diferentes para pessoas diferentes.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Apreciar vs. Julgar (A PEGADINHA DE OURO\!):** A banca vai explorar isso à exaustão.
+> >       * O TCE-RS **NÃO JULGA** as contas do **síndico-chefe (Governador e Prefeitos)**. Ele as **APRECIA** e emite um **parecer prévio** (um relatório técnico). Quem bate o martelo e faz o **julgamento político** final é a **assembleia de moradores (Assembleia Legislativa ou Câmara Municipal)**.
+> >       * Em contrapartida, o TCE-RS **JULGA** as contas dos **demais administradores** (secretários, diretores de autarquias, etc.). Neste caso, a decisão do TCE é definitiva.
+> >   * **Exceção do Cargo em Comissão:** O TCE-RS fiscaliza a legalidade da contratação de todos os "funcionários" do condomínio, **EXCETO** a nomeação para **cargos de confiança** do síndico.
+
+-----
+
+### \#\#\# O Processo no TCE-RS: As Decisões e os Recursos
+
+Quando o auditor encontra um problema, abre-se um processo.
+
+  * **A Decisão do Auditor:**
+    A decisão final do auditor sobre um processo é chamada de **Acórdão**. Se esse acórdão diz que um gestor deve devolver dinheiro ao condomínio, essa decisão tem força de **título executivo extrajudicial** (é como um cheque especial protestado, já pode ir para a cobrança).
+
+  * **Os Recursos (As Chances de Apelar):**
+    Se você não concorda com a decisão do auditor, existem "apelações" específicas:
+
+| Recurso | Prazo | Para que serve? | Efeito Suspensivo? |
+| :--- | :-: | :--- | :--- |
+| **Embargos de Declaração** | 5 dias | "Seu relatório está obscuro/omisso, favor esclarecer". (Corrige defeitos formais). | Não |
+| **Agravo** | 5 dias | "Não concordo com essa decisão intermediária de um único auditor, quero que o grupo todo decida". | Não |
+| **Reconsideração** | 15 dias | "Não concordo com a decisão final, quero que reconsiderem o caso com as provas que já existem". | **Sim** |
+| **Recurso de Revisão** | 5 anos | "Achei uma prova nova e bombástica que muda tudo\!". (Para reabrir um caso já encerrado). | Não |
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai trocar os recursos\! "Para corrigir uma omissão, cabe Recurso de Reconsideração". **ERRADO\!** Para omissão, cabem **Embargos de Declaração**.
+> >   * O único recurso com **efeito suspensivo** previsto na lei é o de **Reconsideração**. Isso significa que, enquanto ele está sendo julgado, a punição fica suspensa.
+> >   * A decisão do TCE que imputa débito é um **título executivo extrajudicial**. Decore isso\!
+
+-----
+
+### \#\#\# O Ministério Público de Contas (MPC): O "Promotor do Condomínio"
+
+  * **O que é?** É um **"promotor de justiça especializado"** que atua **junto ao Tribunal de Contas**. Ele não é do Ministério Público do Estado (MP-RS), é um órgão independente com a função específica de ser o fiscal da lei e defender o dinheiro do condomínio dentro dos processos do TCE-RS.
+  * **Ingresso:** Para ser "promotor do condomínio", é preciso passar em um **concurso público** específico.
+  * **Função Principal:** Ele atua em todos os processos, dando pareceres, e pode, por conta própria, representar contra irregularidades e recorrer de decisões, sempre na defesa da ordem jurídica e do erário.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **MPC vs. MP-RS:** A banca vai tratar os dois como se fossem a mesma coisa. **ERRADO\!** São órgãos distintos, com carreiras e atribuições diferentes. O MPC atua **perante o TCE-RS**.
+> >   * **Independência Funcional:** O MPC não é subordinado aos Conselheiros do TCE. Ele atua com independência.
+> >   * O parecer do MPC é **obrigatório** nos processos de contas.
+
+### \#\#\# Mapa Mental: A Diferença Crucial (Apreciar vs. Julgar)
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["Contas do<br><b>Governador / Prefeitos</b><br>(Síndicos-Chefes)"] --> B["<b>TCE-RS</b><br>(Auditor Independente)"];
+    B -- "Emite<br><b>PARECER PRÉVIO</b><br>(Apreciação Técnica)" --> C["<b>Poder Legislativo</b><br>(Assembleia de Moradores)"];
+    C --> D["⚖️<br><b>JULGAMENTO POLÍTICO</b><br>(Decisão Final)"];
+
+    E["Contas dos<br><b>Demais Administradores</b><br>(Secretários, Diretores...)"] --> F["<b>TCE-RS</b><br>(Auditor Independente)"];
+    F --> G["⚖️<br><b>JULGAMENTO TÉCNICO</b><br>(Decisão Terminativa)"];
+
+    style D fill:#313149,stroke:#bb9af7
+    style G fill:#313149,stroke:#7aa2f7
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Lei Orgânica do TCE/RS: Natureza, Jurisdição e Competências
 
