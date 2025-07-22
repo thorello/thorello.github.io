@@ -1,3 +1,119 @@
+### Olá, futuro(a) aprovado(a)\! Vamos fiscalizar os conceitos de Controle da Administração Pública para garantir que sua aprovação esteja em conformidade.
+
+Pense no Controle da Administração Pública como o **sistema de fiscalização de um grande condomínio residencial** 🏢. A "Administração" é o síndico e sua equipe. As "regras" são a convenção do condomínio e as leis. O "controle" é garantir que o síndico esteja trabalhando direito.
+
+-----
+
+### \#\#\# Conceito e Tipos de Controle: Quem Fiscaliza o Síndico?
+
+  * **Classificação do Controle:**
+      * **Quanto à Origem (Quem fiscaliza?):**
+
+          * **Controle Interno:** O **próprio síndico** revisando suas contas e decisões para ver se cometeu algum erro.
+          * **Controle Externo:** A **assembleia de moradores** (outro Poder) se reunindo para fiscalizar o síndico.
+          * **Controle Social:** **Você, morador**, indo diretamente à administração para reclamar de um vazamento ou pedir uma cópia de um contrato.
+
+      * **Quanto ao Momento (Quando fiscaliza?):**
+
+          * **Prévio (*a priori*):** A assembleia precisa aprovar o orçamento da obra da piscina **antes** de ela começar.
+          * **Concomitante:** Um morador fiscaliza a obra **enquanto** ela está acontecendo.
+          * **Subsequente (*a posteriori*):** A assembleia analisa as notas fiscais da obra **depois** de ela ter terminado.
+
+      * **Quanto ao Aspecto (O que fiscaliza?):**
+
+          * **Controle de Legalidade:** Verifica se a decisão do síndico seguiu as regras da convenção e da lei. Se foi ilegal, o ato deve ser **anulado**.
+          * **Controle de Mérito:** O síndico decidiu pintar o prédio de verde-limão. Não é ilegal, mas a assembleia pode achar a cor feia (inconveniente/inoportuna) e decidir pintar de branco. O ato é **revogado**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A pegadinha clássica\! A **assembleia (Controle Externo) e o juiz (Poder Judiciário)**, como regra, só podem fazer o **controle de legalidade**. Eles não podem se meter no **mérito** da decisão do síndico e dizer que a cor verde é feia. Quem faz o controle de mérito (e revoga o ato) é, primariamente, a própria administração (o síndico, percebendo o erro).
+
+-----
+
+### \#\#\# Controle Interno: O Síndico Fiscalizando a Si Mesmo
+
+Este controle é baseado no **princípio da autotutela**: o poder-dever que o síndico tem de corrigir seus próprios erros.
+
+  * **Anulação vs. Revogação (A Diferença que Mais Cai em Prova\!):**
+
+| Ação | Motivo | Efeito | Analogia |
+| :--- | :--- | :--- | :--- |
+| **Anulação** | **Ilegalidade** (feriu uma regra) | **Ex Tunc** (retroage, "desde então") | O síndico fez uma obra ilegal. O ato é anulado e é como se a obra nunca tivesse sido aprovada. |
+| **Revogação** | **Mérito** (não foi uma boa ideia) | **Ex Nunc** (não retroage, "daqui para frente") | O síndico instalou um chafariz barulhento. O ato não foi ilegal, mas foi inoportuno. Ele revoga a decisão, e o chafariz é desligado dali para a frente. |
+
+  * **O Controle Interno também tem a função de apoiar o Controle Externo.** A controladoria do condomínio deve avisar a assembleia e o auditor (TCU) sobre qualquer irregularidade grave que encontrar.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dizer que um ato ilegal é revogado. **ERRADO\!** Ato **ilegal se anula**. Ato **legal, mas inoportuno, se revoga**.
+> >   * A banca vai dizer que a anulação tem efeito *ex nunc*. **ERRADO\!** **Anulação = Ex Tunc (T de Testão na prova)**. **Revogação = Ex Nunc (N de Novo)**.
+
+-----
+
+### \#\#\# Controle Externo: A Assembleia e o Auditor Independente
+
+É o controle de um Poder sobre o outro.
+
+  * **Controle Parlamentar:** É a **assembleia de moradores** (Congresso Nacional) exercendo seu poder: aprovando o orçamento do condomínio, convocando o síndico para dar explicações, abrindo uma CPI para investigar uma grande obra, e, principalmente, **julgando as contas anuais do síndico** (Presidente da República).
+
+  * **Tribunais de Contas (TCU):** É o **auditor independente e super técnico** contratado para **auxiliar** a assembleia. Ele não é subordinado à assembleia, mas tem autonomia.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Apreciar vs. Julgar:** A pegadinha de ouro\!
+> >       * O TCU **NÃO julga** as contas do **síndico (Presidente)**. Ele as analisa e emite um **parecer prévio** (uma recomendação técnica). Quem bate o martelo e faz o **julgamento político** final é a **assembleia (Congresso)**.
+> >       * Por outro lado, o TCU **JULGA** as contas dos **demais funcionários** da administração (ministros, diretores, etc.). A decisão do TCU, nesse caso, tem força de título executivo.
+> >   * **Auxílio, não Subordinação:** A banca vai dizer que o TCU é subordinado ao Legislativo. **ERRADO\!** Ele presta auxílio técnico, mas tem autonomia e competências próprias.
+
+-----
+
+### \#\#\# Controle Social: O Morador de Olho
+
+É o controle exercido por **você, morador**, diretamente sobre a gestão do condomínio.
+
+  * **Instrumentos:**
+
+      * **Direito de Petição / Abaixo-assinado**.
+      * **Ação Popular:** Entrar na justiça para anular um ato do síndico que prejudique o patrimônio do condomínio.
+      * **Lei de Acesso à Informação (LAI):** A sua ferramenta mais poderosa\! Com ela, você pode pedir cópia de qualquer contrato ou nota fiscal da administração do condomínio.
+
+  * **Relação com os Tribunais de Contas:**
+    Qualquer **morador (cidadão), partido político, associação de moradores ou sindicato** pode fazer uma **denúncia formal** diretamente ao auditor (Tribunal de Contas) sobre uma irregularidade no condomínio. O TCU é obrigado a investigar.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai testar quem pode denunciar ao TCU. Lembre-se da lista: **cidadão, partido político, associação ou sindicato**.
+> >   * A **LAI** é o que viabiliza o controle social eficaz. Sem acesso à informação, o morador não tem como fiscalizar.
+
+### \#\#\# Mapa Mental: Os Tipos de Controle da Administração Pública
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["<b>Administração Pública</b><br>(O Síndico)"]
+    
+    subgraph "Controle Interno (Autotutela)"
+        direction LR
+        B["O próprio Síndico<br>fiscaliza a si mesmo"] -- Revisa --> A
+    end
+
+    subgraph "Controle Externo"
+        C["<b>Poder Legislativo</b><br>(Assembleia de Moradores)"]
+        D["<b>Tribunal de Contas</b><br>(Auditor Independente)"]
+        C -- Exerce Controle<br>Político sobre --> A
+        C -- É auxiliado por --> D
+        D -- Exerce Controle<br>Técnico sobre --> A
+    end
+
+    subgraph "Controle Social"
+        E["<b>Sociedade</b><br>(Cidadãos, Associações)"]
+        E -- Fiscaliza e<br>Denuncia para --> A & D
+    end
+
+    A -- Sofre os controles --> B & C & E
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Controle da Administração Pública: Conceito, Tipos e Formas
 
