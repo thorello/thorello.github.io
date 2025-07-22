@@ -1,3 +1,124 @@
+### Olá, futuro(a) aprovado(a)! Vamos construir seu conhecimento sobre o ecossistema Java EE para você não travar na prova do Cebraspe.
+
+Pense no desenvolvimento de uma aplicação web corporativa como a **construção e operação de um shopping center gigante** 🛍️. A plataforma Java EE (agora Jakarta EE) é a planta, as normas técnicas e os serviços que o shopping oferece para que as lojas possam funcionar.
+
+---
+
+### ### JEE e Servidores de Aplicação: A Estrutura do Shopping
+
+* **Java SE vs. Java EE:**
+    * **Java SE (Standard Edition):** É o **kit básico de construção**, com tijolos, cimento e ferramentas (a linguagem Java, suas bibliotecas principais).
+    * **Java EE (Enterprise Edition):** É a **planta completa do shopping**, com todas as especificações para construir lojas, praça de alimentação, cinema, e com serviços centralizados como segurança e ar-condicionado. É um **superconjunto** que usa o Java SE como base.
+
+* **Servidor de Aplicação vs. Servlet Container:** Essa é a pegadinha clássica!
+    * **Servlet Container (A Galeria de Lojas 🏬):** É um "mini-shopping" que só tem o básico para as lojas da fachada funcionarem (sites). Ele sabe como receber clientes (requisições HTTP) e mostrar as vitrines (JSPs). Ex: **Apache Tomcat**.
+    * **Servidor de Aplicação (O Shopping Completo 🛍️):** É o shopping center completo. Além das lojas da fachada, ele tem o "back-office" com o setor financeiro (transações), a logística (mensageria) e as regras de negócio complexas (EJBs). Ex: **WildFly (JBoss)**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * A banca vai afirmar que o **Apache Tomcat** é um servidor de aplicação JEE completo. **ERRADO!** O Tomcat é um **Servlet Container** (uma galeria), ele não tem suporte a EJBs (o back-office complexo).
+> > * **JEE é um superconjunto do Java SE**, ele não o substitui.
+
+---
+
+### ### Servlets e JSP: A Loja e a Vitrine
+
+São as tecnologias para construir a "frente de loja" no mundo Java.
+
+* **Servlet (O Vendedor / Gerente da Loja 👨‍💼):**
+    É a **lógica** por trás do balcão. Ele recebe o pedido do cliente (requisição HTTP), processa, busca o produto no estoque e prepara a resposta. É puro código Java.
+    * **Ciclo de Vida:** O gerente (`init`) é contratado uma vez. A cada cliente que chega (`service`), ele atende. No fim do dia, ele fecha a loja (`destroy`).
+
+* **JSP (A Vitrine Decorada ✨):**
+    É a **vitrine** da loja. É um arquivo HTML com "espaços mágicos" onde o vendedor pode colocar os produtos dinamicamente.
+    * **Como funciona?** Na primeira vez que um cliente olha para a vitrine, o JSP é **compilado** e transformado em um Servlet (vendedor) super rápido nos bastidores. Ele não é interpretado a cada visita.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **JSP não é interpretado.** A banca vai dizer que ele é lento porque é interpretado a cada requisição. **ERRADO!** Ele é **compilado** em um Servlet.
+> > * **Separação de Papéis:** **Servlet = Lógica (Controller)**. **JSP = Apresentação (View)**. Misturar muita lógica de negócio na vitrine (JSP) é uma péssima prática.
+
+---
+
+### ### Framework Spring: A Franquia de Lojas de Sucesso
+
+O Spring é como um **modelo de franquia de sucesso (tipo McDonald's)** que te ajuda a montar sua loja de forma muito mais rápida e eficiente.
+
+* **Injeção de Dependência (DI):** **O conceito mais importante!** É a "mágica" da franquia. Em vez de você, dono da loja, ter que construir seu próprio forno, a franqueadora (o Contêiner Spring) **injeta** um forno padrão e já configurado na sua cozinha. Isso gera um **baixo acoplamento** (sua cozinha não depende de uma marca específica de forno).
+
+* **Spring MVC:** O modelo de franquia para as lojas da fachada, com um gerente geral na porta (`DispatcherServlet`) que direciona os clientes para os vendedores certos.
+* **Spring Boot:** É a **franquia "loja em uma caixa"**. Ele te entrega a loja quase pronta, com tudo pré-configurado. Você só precisa se preocupar em fazer o seu sanduíche (a sua regra de negócio). Favorece **convenção sobre configuração**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * A principal vantagem da **Injeção de Dependência** é o **baixo acoplamento**, o que torna o sistema mais fácil de testar e manter.
+> > * **Spring não é parte da especificação JEE.** Ele é um framework concorrente/alternativo que se tornou o padrão de mercado.
+
+---
+
+### ### Web Services (SOAP e REST): O Delivery do Shopping
+
+São as duas formas de o "restaurante" (um serviço) conversar com o "aplicativo de delivery" (outro serviço).
+
+| Característica | SOAP (O Pedido Formal 📜) | REST (O Pedido Informal 📱) |
+| :--- | :--- | :--- |
+| **Tipo** | **Protocolo** (regras rígidas) | **Estilo Arquitetural** (um guia de boas práticas) |
+| **Formato** | Apenas **XML** (um documento formal) | Flexível (geralmente **JSON**, um bilhete rápido) |
+| **Estado** | Pode ser complexo | **Stateless** (cada pedido é independente) |
+| **Manual** | **WSDL** (um manual de instruções detalhado) | OpenAPI (Swagger) (opcional, um cardápio) |
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * A banca vai trocar tudo! **SOAP = Protocolo, XML, WSDL**. **REST = Estilo, JSON, Stateless**.
+> > * **Stateless** é a chave do REST: o restaurante não precisa se lembrar do seu pedido anterior para entender o seu pedido atual.
+
+---
+
+### ### Acesso a Dados: O Estoque do Shopping
+
+Como as lojas acessam o grande estoque central (o banco de dados).
+
+* **JDBC (O Carregador de Caixas 📦):** É a ferramenta de baixo nível. Você precisa dar ordens detalhadas: "Vá ao corredor 5, prateleira 3, pegue a caixa azul...".
+    * **`Statement` vs. `PreparedStatement`:** `Statement` é como gritar a ordem no meio do estoque, vulnerável a "injeção de SQL" (alguém mal-intencionado gritar uma ordem falsa junto). `PreparedStatement` é como entregar um formulário pré-formatado, muito mais seguro.
+
+* **JPA e Hibernate (O Gerente de Estoque Inteligente 🧠):**
+    * **JPA:** A **especificação**, as regras para ser um bom gerente de estoque.
+    * **Hibernate:** A **implementação**, o gerente de estoque mais famoso que segue as regras da JPA.
+    * Em vez de pedir "a caixa azul", você pede ao gerente: "Me traga o objeto 'Tênis Nike nº 42'". O gerente (Hibernate/ORM) se vira para encontrar a caixa certa no estoque.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * Use sempre **`PreparedStatement`** para evitar **SQL Injection**. A banca vai dizer que `Statement` é seguro. **ERRADO!**
+> > * **JPA é a regra, Hibernate é o jogador.** Hibernate implementa a especificação JPA.
+
+---
+
+### ### Build e Ferramentas: A Construção do Shopping
+
+* **Maven (O Mestre de Obras Moderno):** Uma ferramenta que gerencia a construção do shopping. Ele segue a filosofia de **convenção sobre configuração** (já sabe onde ficam a fundação, as paredes, etc.) e o mais importante: ele gerencia a **lista de materiais (`pom.xml`)** e vai buscar os tijolos e o cimento (as dependências) automaticamente no fornecedor.
+* **Ant (O Mestre de Obras Antigo):** Você precisa escrever um roteiro (`build.xml`) detalhando cada passo da construção, e você mesmo tem que ir comprar os materiais.
+* **JUnit:** O **inspetor de qualidade** que executa testes automatizados para garantir que cada tijolo está perfeito.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+> > * **Maven vs. Ant:** A grande diferença é o **gerenciamento automático de dependências** do Maven.
+
+### ### Mapa Mental: A Arquitetura Clássica de uma Aplicação Web Java
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["🌐<br>Navegador do Cliente"]
+    
+    subgraph "Servidor de Aplicação / Servlet Container"
+        B["<b>Camada Web</b><br>🛍️ JSP (Vitrine)<br>👨‍💼 Servlet (Vendedor)<br>🛂 Spring MVC (Gerente)"]
+        C["<b>Camada de Negócio</b><br>🧠 Lógica de Negócio<br>(Spring Beans, EJBs)"]
+        D["<b>Camada de Dados (Persistência)</b><br>📦 DAO (Padrão)<br>🧠 Hibernate (Gerente de Estoque)<br>🚚 JDBC (Carregador)"]
+    end
+    
+    E["🗃️<br>Banco de Dados"]
+
+    A -- Requisição HTTP --> B
+    B -- Chama a Lógica --> C
+    C -- Pede os Dados --> D
+    D -- Acessa o Estoque --> E
+````
+
+
 ### **Classe:** B
 ### **Conteúdo:** Programação JEE e Servidores de Aplicação
 
