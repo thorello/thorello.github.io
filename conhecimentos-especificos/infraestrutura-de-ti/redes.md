@@ -1,3 +1,118 @@
+### Olá, futuro(a) aprovado(a)\! Vamos desvendar o emaranhado das Redes de Computadores para você navegar com tranquilidade na prova do Cebraspe.
+
+Pense em redes e na internet como um gigantesco e complexo **serviço de entregas dos Correios** 🚚. Cada conceito que vamos ver é uma parte desse sistema, desde o endereço no envelope até o tipo de frete escolhido.
+
+-----
+
+### \#\#\# Arquitetura TCP/IP e Endereçamento: A Estrutura dos Correios
+
+A arquitetura TCP/IP é o "organograma" dos Correios, dividido em 4 departamentos (camadas).
+
+1.  **Aplicação:** É o **cliente**, a pessoa que escreve a carta (os dados) e a coloca no envelope (ex: usando o navegador, um cliente de e-mail). Protocolos: HTTP, SMTP, DNS.
+2.  **Transporte:** É o **setor de triagem** da agência. Ele olha a sua carta e decide se ela vai por **SEDEX com rastreamento (TCP)** ou por **carta simples (UDP)**.
+3.  **Internet (Rede):** São os **carteiros, os caminhões e os aviões**. Eles leem o **endereço IP** (o CEP e a cidade) e decidem a melhor rota para o pacote chegar à cidade de destino.
+4.  **Acesso à Rede (Enlace):** É a **rua e o número da agência** dos Correios (o endereço físico, MAC) e o meio físico (o asfalto, os cabos) por onde o caminhão vai passar.
+
+<!-- end list -->
+
+  * **NAT (Network Address Translation):** É a **portaria de um condomínio**. O carteiro entrega todas as encomendas na portaria (que tem um único endereço público). O porteiro, então, olha o número do apartamento (endereço privado) e entrega a encomenda para o morador certo.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Cálculo de Sub-redes:** A banca vai te dar um endereço IP com uma máscara (ex: `192.168.10.100 /26`) e pedir o endereço da rede, de broadcast ou o número de hosts. É fundamental saber fazer esse cálculo.
+> >   * **Endereços Privados:** Decore os "CEPs" internos que não podem ser usados na internet: **`10.x.x.x`**, **`172.16.x.x` a `172.31.x.x`**, e **`192.168.x.x`**.
+> >   * **Propósito do NAT:** O objetivo principal do NAT é **economizar endereços IPv4**, não a segurança. A segurança de esconder sua rede interna é um efeito colateral positivo, não o objetivo primário.
+
+-----
+
+### \#\#\# TCP e UDP: SEDEX com Rastreamento vs. Carta Simples
+
+Na camada de Transporte, você escolhe o tipo de "frete".
+
+| Característica | TCP (SEDEX com AR) | UDP (Carta Simples) |
+| :--- | :--- | :--- |
+| **Conexão** | **Orientado à Conexão:** Você liga antes para avisar que a encomenda vai chegar (*three-way handshake*). | **Não Orientado à Conexão:** Você só joga a carta na caixa de correio. |
+| **Confiabilidade** | **Confiável:** Tem código de rastreamento (números de sequência), aviso de recebimento (ACKs) e reenvio se a encomenda se perder. | **Não Confiável:** Sem garantias. A carta pode se perder, chegar fora de ordem ou duplicada. |
+| **Velocidade** | Mais lento (devido a todos os controles). | Muito rápido e leve (pouca burocracia). |
+| **Caso de Uso** | E-mail, download de arquivos, páginas web. (Onde cada pedacinho da informação é crucial). | Streaming de vídeo, VoIP, jogos online. (Onde a velocidade é mais importante que a perda de um ou outro pacote). |
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A principal diferença é a **confiabilidade**. A banca vai dar um exemplo de aplicação (ex: "transmissão de um jogo de futebol ao vivo") e perguntar o protocolo ideal (neste caso, **UDP**).
+
+-----
+
+### \#\#\# Equipamentos de Rede: A Infraestrutura dos Correios
+
+  * **Hub (O Estagiário 🤪):** Um funcionário novato e "burro" (Camada 1). Quando recebe uma carta, ele não lê o destinatário. Ele tira cópia e grita para todo mundo na sala. Causa a maior confusão (domínio de colisão).
+  * **Switch (O Funcionário Eficiente 🤓):** Um funcionário esperto (Camada 2). Ele tem uma lista com o nome de cada pessoa e sua respectiva mesa (tabela MAC). Ele entrega a carta **apenas** na mesa do destinatário correto.
+  * **Roteador (O Gerente da Agência 👨‍💼):** O chefe da agência (Camada 3). Ele não se importa com o nome da pessoa (MAC), só com o **CEP e a cidade (IP)**. Sua função é conectar redes diferentes, ou seja, enviar o malote de cartas para a agência da cidade correta.
+  * **VLAN:** É criar "departamentos virtuais" dentro de uma mesma agência. As cartas do "Financeiro" só circulam entre as mesas do "Financeiro". Para uma carta ir do "Financeiro" para o "RH", ela precisa passar pela mesa do gerente (roteador).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Hub vs. Switch:** **Hub** é burro (repete tudo), **Switch** é inteligente (usa endereço MAC).
+> >   * **Switch vs. Roteador:** **Switch** trabalha dentro da mesma rede (com MAC). **Roteador** conecta redes diferentes (com IP).
+> >   * **Domínio de Colisão vs. Broadcast:** **Switches** quebram domínios de colisão. **Roteadores** (e VLANs) quebram domínios de broadcast.
+
+-----
+
+### \#\#\# Protocolos da Camada de Aplicação: Os Tipos de Carta
+
+  * **DNS:** A **lista telefônica** da internet. Traduz um nome (www.cebraspe.org.br) para um número de telefone (endereço IP).
+  * **HTTP/HTTPS:** O protocolo para pedir e receber o conteúdo de uma revista (página web). **HTTPS** é o mesmo, mas o envelope vem lacrado e criptografado.
+  * **SMTP:** O protocolo para **enviar** um e-mail. É o ato de colocar a carta na caixa de correio.
+  * **FTP:** O protocolo para **transferir arquivos**, como enviar uma caixa grande.
+  * **SSH:** Uma linha de telefone **segura e criptografada** para dar comandos a um computador remoto.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai trocar as funções\! "SMTP é usado para ler e-mails". **ERRADO\!** SMTP é para **enviar**. Para ler/receber, usamos POP3 ou IMAP.
+> >   * Decore as portas padrão: DNS(53), HTTP(80), HTTPS(443), SMTP(25), FTP(20, 21), SSH(22).
+
+-----
+
+### \#\#\# Outras Tecnologias: Serviços e Ferramentas Especiais
+
+  * **VPN:** Um **túnel blindado e secreto** para o caminhão dos Correios passar por uma área perigosa (a internet pública) e chegar em segurança na outra agência.
+  * **Wi-Fi:** O carteiro que entrega as cartas pelo ar, sem usar fios. **WEP** é um protocolo de segurança antigo e fraco. **WPA3** é o mais moderno e seguro.
+  * **Utilitários de Diagnóstico:**
+      * **`ping`:** Ligar para o destinatário e perguntar "Alô, está me ouvindo?". Testa a conectividade.
+      * **`tracert`:** O serviço de rastreamento que mostra todas as cidades por onde sua encomenda passou.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Segurança Wi-Fi:** WEP é obsoleto e inseguro. WPA2 é o mínimo aceitável hoje, e WPA3 é o mais forte.
+> >   * Para diagnosticar um problema de conectividade, a primeira ferramenta a usar é o **`ping`**. Para descobrir onde a conexão está parando no meio do caminho, usa-se o **`tracert`**.
+
+### \#\#\# Mapa Mental: O Encapsulamento da Carta
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["<b>Camada de Aplicação</b><br>📝 O conteúdo da sua carta<br>(Dados)"]
+    
+    subgraph "Camada de Transporte"
+        B["✉️ Envelope TCP/UDP<br>com porta de origem/destino"]
+    end
+
+    subgraph "Camada de Internet"
+        C["📦 Pacote IP<br>com endereço IP de origem/destino"]
+    end
+
+    subgraph "Camada de Acesso à Rede"
+        D["🚚 Caixa do Caminhão (Quadro Ethernet)<br>com endereço MAC de origem/destino"]
+    end
+
+    E["🔌 Meio Físico<br>(Cabos, Fibra, Ondas de Rádio)"]
+
+    A -- Encapsula em --> B
+    B -- Encapsula em --> C
+    C -- Encapsula em --> D
+    D -- Viaja pelo --> E
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Redes: Arquitetura TCP/IP e Endereçamento
 
