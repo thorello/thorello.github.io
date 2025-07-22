@@ -1,3 +1,126 @@
+### Olá, futuro(a) aprovado(a)! Vamos selar seu conhecimento sobre os Pilares da Segurança da Informação para você blindar sua vaga no concurso.
+
+Pense nos cinco pilares da segurança como as **regras de segurança para enviar uma carta secreta e importante** 💌. Cada pilar protege a carta de uma maneira diferente.
+
+---
+
+### ### Confidencialidade: A Garantia do Segredo
+
+* **A Analogia:** É a garantia de que **só a pessoa certa vai ler o conteúdo da carta**. É o segredo.
+* **O Objetivo:** Proteger a informação contra a "bisbilhotice" não autorizada.
+* **Como Fazemos Isso? (Mecanismos):**
+    * **Criptografia (Escrever em Código Secreto):** É o principal mecanismo. Você escreve a carta em um código que só o destinatário, com a "chave" certa, consegue decifrar. Mesmo que alguém intercepte a carta, não vai entender nada.
+    * **Controle de Acesso (Caixa de Correio com Senha):** Garantir que só o destinatário autorizado tenha a senha para abrir a caixa de correio e pegar a carta.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> > * **Confidencialidade vs. Privacidade:** A **privacidade** é um direito amplo sobre seus dados pessoais. A **confidencialidade** é o mecanismo técnico (como a criptografia) que ajuda a proteger esse direito.
+> > * **Confidencialidade não garante Integridade:** Um interceptador pode não conseguir ler sua carta criptografada (confidencialidade mantida), mas ele pode rasurá-la toda, tornando-a inútil (integridade perdida).
+
+---
+
+### ### Integridade: A Garantia de que a Carta não foi Alterada
+
+* **A Analogia:** É a certeza de que a carta que chegou ao destino **é exatamente a mesma que foi enviada**, sem nenhuma palavra adicionada, removida ou alterada no caminho.
+* **O Objetivo:** Proteger a informação contra modificações não autorizadas.
+* **Como Fazemos Isso? (Mecanismos):**
+    * **Funções de Hash (O "Selo de Resumo"):** Antes de enviar a carta, você a passa em uma máquina que gera um "código de resumo" único (um *hash*), baseado no conteúdo exato. Você envia a carta e o código. O destinatário, ao receber, passa a carta na mesma máquina. Se o código gerado for idêntico, a carta está íntegra.
+    * **Assinaturas Digitais:** Um selo ainda mais poderoso que também garante quem enviou.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> > * **Confidencialidade vs. Integridade:** A troca clássica! Se alguém **leu** o que não devia, feriu a **confidencialidade**. Se alguém **alterou** o que não devia, feriu a **integridade**.
+> > * **Hash não é Criptografia:** Uma função de hash (ex: SHA-256) serve para **verificar a integridade**, não para esconder o conteúdo. Ela é uma via de mão única. A banca vai dizer que um hash torna a mensagem confidencial. **ERRADO!**
+
+---
+
+### ### Disponibilidade: A Garantia de que a Carta Chega
+
+* **A Analogia:** É a garantia de que o **serviço dos Correios estará funcionando** para que a sua carta possa ser entregue e lida sempre que o destinatário precisar.
+* **O Objetivo:** Assegurar que os sistemas e os dados estejam acessíveis.
+* **Como Fazemos Isso? (Mecanismos):**
+    * **Redundância (Dois Carteiros):** Ter componentes duplicados. Se um servidor falha, o outro assume.
+    * **Backup (Fotocópia da Carta):** Ter cópias de segurança para poder restaurar a informação em caso de perda.
+* **Ataques:** Um ataque de **DDoS** é como uma multidão entupindo a agência dos Correios com milhões de cartas de spam, impedindo que as cartas de verdade sejam entregues.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> > * As ameaças à disponibilidade não são só ataques hackers. Falhas de hardware, falta de energia e desastres naturais também são ameaças.
+> > * A maioria das soluções para garantir a disponibilidade se baseia no princípio da **redundância**.
+
+---
+
+### ### Autenticidade: A Garantia de que o Remetente é Real
+
+* **A Analogia:** É ter certeza de que a carta que diz ser do "Rei" **foi realmente enviada pelo Rei**, e não por um impostor se passando por ele.
+* **O Objetivo:** Provar a identidade de quem envia ou acessa a informação.
+* **Como Fazemos Isso? (Mecanismos):**
+    * **Fatores de Autenticação:** As provas de identidade.
+        1.  **Algo que você sabe:** A senha do Rei.
+        2.  **Algo que você tem:** O anel com o selo real.
+        3.  **Algo que você é:** A impressão digital do Rei.
+    * **Autenticação Multifator (MFA):** Exigir a senha **E** o anel, por exemplo.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> > * **Autenticação vs. Autorização:** A pegadinha fatal! **Autenticação** é o guarda verificando: "Você é o Rei?". **Autorização** é o guarda, após confirmar a identidade, dizendo: "Ok, Rei, você tem permissão para entrar na sala do trono". A autenticação vem **antes** da autorização.
+> > * Usar duas senhas **não é MFA**, pois são dois fatores do mesmo tipo (conhecimento).
+
+---
+
+### ### Não Repúdio (Irretratabilidade): A Prova Inegável
+
+* **A Analogia:** É ter uma **prova tão forte que o Rei não pode negar que enviou a carta**. Ele não pode dizer "não fui eu!".
+* **O Objetivo:** Impedir que o autor de uma ação possa negar sua autoria no futuro.
+* **Como Fazemos Isso? (Mecanismo Principal):**
+    * **Assinatura Digital:** É o mecanismo supremo. O Rei usa sua **caneta mágica secreta (chave privada)** para assinar a carta. A assinatura é única. Qualquer pessoa com os "óculos mágicos" corretos (a **chave pública** do Rei) pode verificar que a assinatura é autêntica.
+    * Uma assinatura digital válida garante 3 coisas ao mesmo tempo: **Autenticidade, Integridade e Não Repúdio**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> > * A banca vai dizer que a assinatura digital é feita com a chave pública. **ERRADO!** A assinatura é **CRIADA** com a **chave PRIVADA** e **VERIFICADA** com a **chave PÚBLICA**.
+> > * A assinatura digital, por si só, **não torna a carta secreta (confidencial)**. Para isso, a carta precisaria ser adicionalmente criptografada.
+
+### ### Mapa Mental: Os 5 Pilares da Segurança da Informação
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    subgraph "Confidencialidade"
+        Q1["<b>Quem pode ler?</b><br>Só os autorizados"]
+        T1["Ameaça: Espionagem"]
+        M1["Mecanismo: Criptografia 🔒"]
+    end
+    
+    subgraph "Integridade"
+        Q2["<b>Foi alterado?</b><br>Não"]
+        T2["Ameaça: Adulteração"]
+        M2["Mecanismo: Hash, Assinatura ✍️"]
+    end
+
+    subgraph "Disponibilidade"
+        Q3["<b>Está acessível?</b><br>Sim"]
+        T3["Ameaça: Interrupção"]
+        M3["Mecanismo: Redundância, Backup 🔄"]
+    end
+    
+    subgraph "Autenticidade"
+        Q4["<b>É você mesmo?</b><br>Sim"]
+        T4["Ameaça: Falsificação"]
+        M4["Mecanismo: Senhas, MFA 🆔"]
+    end
+
+    subgraph "Não Repúdio"
+        Q5["<b>Pode negar que fez?</b><br>Não"]
+        T5["Ameaça: Negação de autoria"]
+        M5["Mecanismo: Assinatura Digital ✒️"]
+    end
+````
+
+
+
+
+
 ### **Classe:** A
 ### **Conteúdo:** Conceitos: Confidencialidade
 
