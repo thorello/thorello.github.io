@@ -1,3 +1,101 @@
+### Olá, futuro(a) aprovado(a)\! Vamos montar uma defesa robusta contra as questões de Ataques a Redes para você garantir a segurança da sua aprovação no Cebraspe.
+
+Pense em um servidor ou rede como uma **grande loja de departamentos** 🏬. Os usuários legítimos são os clientes, e os hackers são os criminosos tentando causar problemas na sua loja.
+
+-----
+
+### \#\#\# Negação de Serviço (DoS/DDoS): O Tumulto na Porta da Loja
+
+O objetivo deste ataque não é roubar nada, mas sim **impedir que os clientes de verdade consigam entrar e usar a loja**. O princípio da **Disponibilidade** é violado.
+
+  * **DoS (Ataque de um Vândalo Só):** Um único vândalo fica na porta da loja, bloqueando a passagem de todo mundo.
+
+  * **DDoS (Ataque de uma Multidão Contratada):** O vândalo é mais esperto. Ele infecta milhares de computadores na internet, transformando-os em "zumbis" 🧟. Todos esses zumbis, formando uma **botnet**, tentam entrar na loja ao mesmo tempo, causando um congestionamento gigantesco. É muito mais difícil de parar.
+
+  * **Categorias do Tumulto:**
+
+    1.  **Ataques de Volume:** A multidão tenta entupir a avenida de acesso à loja com milhares de carros (tráfego UDP/ICMP), consumindo toda a largura de banda.
+    2.  **Ataques de Protocolo:** A multidão trava a porta giratória. Cada zumbi empurra a porta até a metade e a abandona, deixando várias portas semiabertas e travando o mecanismo. O ataque **SYN Flood** faz exatamente isso com o protocolo TCP.
+    3.  **Ataques à Camada de Aplicação:** A multidão entra na loja, e cada zumbi vai até um vendedor e faz uma pergunta super complicada que exige uma longa pesquisa, esgotando o tempo e a energia de todos os vendedores (consumindo a CPU e a memória do servidor).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **DoS vs. DDoS:** A diferença é a **origem**. **DoS = uma fonte**. **DDoS = múltiplas fontes**. A banca vai dizer que a única diferença é o volume. **INCORRETO**. A natureza distribuída é o que torna o DDoS tão perigoso.
+> >   * **Objetivo do Ataque:** A banca vai dizer que DDoS visa roubar dados. **ERRADO\!** O objetivo é **tornar o serviço indisponível**.
+> >   * **SYN Flood:** Lembre-se que ele explora o *three-way handshake* do TCP, deixando conexões semiabertas para esgotar os recursos do servidor.
+
+-----
+
+### \#\#\# Força Bruta e Varredura de Portas: Arrombando o Cofre e Espiando as Janelas
+
+  * **Ataque de Força Bruta (Tentando Todas as Chaves):**
+
+      * **O que é?** O ladrão está na frente do cofre da loja e tenta, sistematicamente, **todas as combinações possíveis** do segredo.
+      * **Ataque de Dicionário:** Uma versão mais esperta, onde o ladrão tenta apenas as senhas mais óbvias e comuns que ele tem em sua "lista negra".
+      * **Defesa Principal:** **Autenticação Multifator (MFA)**. Mesmo que o ladrão descubra a senha do cofre, ele ainda precisará da impressão digital do gerente para abri-lo.
+
+  * **Varredura de Portas (*Port Scanning*):**
+
+      * **O que é?** Antes de invadir, o ladrão dá uma volta no quarteirão e **espia por todas as janelas e portas (as portas de rede)** da loja para ver quais estão abertas e o que tem em cada sala (quais serviços estão rodando). É uma fase de **reconhecimento**.
+      * **SYN Scan (Batida Discreta):** O ladrão bate de leve na janela (`SYN`). Se alguém de dentro responde "oi?" (`SYN-ACK`), ele sabe que a sala está ocupada (porta aberta) e sai correndo antes de completar a conversa. É mais furtivo.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Varredura de Portas é Reconhecimento:** A varredura não é o ataque final. É a **fase preparatória** para descobrir as fraquezas da loja.
+> >   * O **SYN Scan** é mais furtivo (*stealth*) que o Connect Scan porque não completa a conexão TCP, dificultando o registro do evento nos logs da aplicação.
+
+-----
+
+### \#\#\# Decepção, Falsificação e Interceptação: Enganação e Espionagem
+
+  * **Phishing (O E-mail do Gerente Falso):**
+
+      * É um ataque de **engenharia social**. O ladrão envia um e-mail para você, **se passando pela sua loja favorita**, dizendo: "Você ganhou um cupom\! Clique aqui e faça o login para resgatar". O link te leva para uma **fachada de loja falsa**, idêntica à original. Quando você digita seu login e senha, o ladrão os rouba.
+
+  * **Eavesdropping (A Escuta na Praça de Alimentação):**
+
+      * O ladrão senta na mesa ao lado da sua na praça de alimentação (uma rede Wi-Fi pública e insegura) e usa um aparelho para **"ouvir" toda a sua conversa** na internet.
+      * **Defesa Principal:** **Criptografia**. Usar HTTPS ou uma VPN é como colocar sua conversa em um envelope lacrado e codificado. O ladrão pode pegar o envelope, mas não consegue ler o que está dentro.
+
+  * **DNS Spoofing (A Troca das Placas de Endereço):**
+
+      * O ataque mais traiçoeiro. Você digita no GPS o endereço correto da sua loja favorita. No meio do caminho, o ladrão **troca as placas de rua (envenena o cache DNS)**. O GPS, enganado, te leva para o endereço de uma loja falsa controlada pelo ladrão, mesmo você tendo digitado o endereço certo.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Phishing é Engenharia Social:** O vetor de ataque é a **manipulação psicológica do usuário**, não uma falha técnica no sistema da loja.
+> >   * **Defesa contra Eavesdropping:** A criptografia (HTTPS, VPN) é a principal defesa. Um firewall controla o acesso, mas não criptografa o conteúdo do tráfego.
+> >   * **DNS Spoofing vs. Phishing:** No **Phishing**, a vítima clica em um link falso. No **DNS Spoofing**, a vítima digita o endereço correto, mas a infraestrutura de rede a redireciona para o lugar errado.
+
+### \#\#\# Mapa Mental: O Ataque DDoS
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["<b>💻 Atacante</b>"]
+    
+    subgraph "🧟 Botnet (Exército de Zumbis)"
+        B1["Computador<br>Infectado 1"]
+        B2["Computador<br>Infectado 2"]
+        B3["..."]
+        B4["Computador<br>Infectado N"]
+    end
+    
+    C["🏬 <b>Servidor Alvo</b><br>(A Loja)"]
+
+    D["👤 <b>Usuário Legítimo</b><br>(O Cliente)"]
+
+    A -- "Comanda o Ataque" --> B1 & B2 & B3 & B4
+    B1 & B2 & B3 & B4 -- "Inundam com Tráfego Malicioso" --> C
+    
+    D -- "Tenta Acessar" --> C
+    C -- "<b>INDISPONÍVEL!</b><br>❌" --- D
+
+    style C fill:#c0a0a0,stroke:#f7768e,stroke-width:2px
+
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Ataques a Redes: Negação de Serviço (DoS/DDoS)
 
