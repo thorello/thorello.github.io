@@ -1,3 +1,99 @@
+### Olá, futuro(a) aprovado(a)\! Vamos organizar as finanças da Receita Pública para que sua aprovação entre no caixa.
+
+Pense na receita pública como todo o **dinheiro que entra na casa de uma grande família** 👨‍👩‍👧‍👦 para pagar as contas do mês. O governo é a família, e a receita é a fonte de renda.
+
+-----
+
+### \#\#\# Conceito e Classificações: De Onde Vem o Dinheiro da Família?
+
+A família precisa saber diferenciar os tipos de dinheiro que entram em casa.
+
+  * **Receitas Orçamentárias vs. Extraorçamentárias:**
+
+      * **Orçamentárias (O Salário da Família 💵):** É o dinheiro que **pertence de fato** à família e que será usado para pagar as contas (aluguel, supermercado, etc.). Ele entra no orçamento mensal.
+      * **Extraorçamentárias (O Dinheiro do Vizinho 🤝):** É um dinheiro que entra no cofre da família, mas **não pertence a ela**. É uma entrada temporária que terá que ser devolvida. Ex: Seu vizinho te dá R$ 100 para você guardar para ele. Esse dinheiro entrou no seu caixa, mas você terá que devolvê-lo.
+
+  * **Receitas Correntes vs. Receitas de Capital (Dinheiro do Trabalho vs. Venda de Bens):**
+    Esta é a classificação que o Cebraspe mais adora\!
+
+      * **Receitas Correntes (O Dinheiro do Dia a Dia 🥖):** São as entradas de dinheiro que mantêm a casa funcionando. Não vêm da venda de um bem durável.
+          * **Tributária:** O salário que o pai e a mãe recebem dos seus empregos (impostos).
+          * **Patrimonial:** O aluguel do quartinho dos fundos que a família aluga para um estudante.
+      * **Receitas de Capital (O Dinheiro Extraordinário 🚗):** São entradas que alteram o patrimônio da família ou vêm de dívidas.
+          * **Alienação de Bens:** A família vende o carro antigo.
+          * **Operações de Crédito:** A família pega um empréstimo no banco.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Receita Extraorçamentária:** A banca vai dizer que uma caução recebida é receita orçamentária. **ERRADO\!** Como a caução terá que ser devolvida, ela é um ingresso **extraorçamentário**.
+> >   * **Corrente vs. Capital:** A banca vai dar exemplos. Lembre-se: **Arrecadação de impostos** (IPVA, IPTU) = **Corrente**. **Venda de um imóvel** do governo ou um **empréstimo** contraído = **Capital**.
+> >   * **Receitas Efetivas vs. Não Efetivas:** Uma receita é **efetiva** quando aumenta a riqueza da família (o salário). É **não efetiva** quando não aumenta a riqueza (um empréstimo, que gera dinheiro no caixa mas também uma dívida no mesmo valor).
+
+-----
+
+### \#\#\# Estágios da Receita: O Caminho do Dinheiro até o Cofre
+
+O "salário" da família passa por 4 estágios até poder ser usado.
+
+1.  **Previsão (A Estimativa do Salário 🔮):**
+    No início do ano, a família faz seu orçamento e **estima** quanto espera ganhar por mês. É a etapa de planejamento.
+
+2.  **Lançamento (O Contracheque 🧾):**
+    A empresa do pai emite o contracheque. É o ato que **formaliza e oficializa** que a empresa deve aquele valor para a família. O direito de receber foi criado.
+
+3.  **Arrecadação (O Dinheiro na Conta\! 🤑):**
+    É o dia do pagamento\! O dinheiro efetivamente **cai na conta corrente** da família. É neste momento que a receita é considerada realizada para o orçamento.
+
+4.  **Recolhimento (Juntando o Dinheiro no Cofre Central 🏦):**
+    A família transfere o dinheiro do salário que caiu na conta corrente para a "Conta Única do Tesouro da Família", de onde saem todos os pagamentos.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A ordem é sagrada: **1º Previsão → 2º Lançamento → 3º Arrecadação → 4º Recolhimento**. A banca vai embaralhar tudo.
+> >   * **Lançamento vs. Arrecadação:** A banca vai dizer que o lançamento é o pagamento. **ERRADO\!** **Lançamento** é o ato de formalizar a dívida (o contracheque). **Arrecadação** é o ato de efetivamente receber o dinheiro.
+> >   * **Regime da Receita:** A receita orçamentária é contabilizada pelo **regime de caixa**, ou seja, quando o dinheiro entra de fato na conta (**arrecadação**).
+
+-----
+
+### \#\#\# Dívida Ativa: A Lista de Caloteiros da Família
+
+  * **A Analogia:** O estudante que aluga o quartinho não pagou o aluguel do mês passado. Ele agora está na **lista de devedores** da família.
+
+  * **O Conceito:** Dívida Ativa é o conjunto de todos os **créditos (direitos de receber) que a família tem contra terceiros, que já venceram e não foram pagos**.
+
+  * **Tipos de Dívida Ativa:**
+
+      * **Tributária:** Impostos não pagos.
+      * **Não Tributária:** O aluguel do quartinho, uma multa de trânsito não paga, etc.
+
+  * **Inscrição em Dívida Ativa:**
+    É o ato de pegar o contrato de aluguel não pago e fazer um **registro formal na "lista de caloteiros"**. A partir da inscrição, a dívida ganha presunção de "certeza e liquidez" e pode ser cobrada judicialmente. A **Certidão de Dívida Ativa (CDA)** é o documento que prova a inscrição e serve de base para a cobrança.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Quando nasce a Dívida Ativa?** Apenas para créditos **vencidos e não pagos**. Um imposto que ainda vai vencer não faz parte da Dívida Ativa.
+> >   * **Dívida Tributária vs. Não Tributária:** A banca vai dizer que uma multa de trânsito é dívida ativa tributária. **ERRADO\!** É **não tributária**. Dívida tributária vem de tributos (impostos, taxas e contribuições de melhoria).
+
+### \#\#\# Mapa Mental: O Ciclo de Vida da Receita Pública
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["<b>1. Previsão</b><br>🔮 Estimar a arrecadação<br>(na Lei Orçamentária)"] --> B["<b>2. Lançamento</b><br>🧾 Formalizar o direito<br>de receber (o 'contracheque')"];
+    
+    B --> C{"O devedor pagou<br>no vencimento?"};
+    
+    C -- Sim --> D["<b>3. Arrecadação</b><br>🤑 O dinheiro entra no caixa<br>(nos bancos)"];
+    D --> E["<b>4. Recolhimento</b><br>🏦 O dinheiro é transferido<br>para a Conta Única do Tesouro"];
+    
+    C -- Não --> F["<b>Inscrição em<br>Dívida Ativa</b><br>📜 O 'calote' é formalizado"];
+    F --> G["⚖️ Cobrança<br>(Administrativa ou Judicial)"];
+
+    style F fill:#c0a0a0,stroke:#f7768e,stroke-width:2px
+
+```
+
+
 ### **Classe:** A
 ### **Conteúdo:** Receita Pública: Conceito e Classificações
 
