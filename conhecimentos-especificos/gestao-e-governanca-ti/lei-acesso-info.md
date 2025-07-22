@@ -1,3 +1,111 @@
+### Olá, futuro(a) aprovado(a)\! Vamos abrir as portas da Lei de Acesso à Informação (LAI) para você dominar o assunto para o Cebraspe.
+
+Pense na LAI como a lei que transformou o governo em uma **"casa de vidro"** 🏠. O princípio é simples: tudo o que acontece lá dentro é público e qualquer cidadão tem o direito de olhar. **A publicidade é a regra, o sigilo é a exceção**.
+
+-----
+
+### \#\#\# Disposições Gerais: A Regra da Casa de Vidro
+
+  * **A Grande Regra:** A casa é de vidro. O governo tem o dever de ser transparente.
+
+  * **Quem Mora na Casa de Vidro? (Abrangência):**
+
+      * **Todos os órgãos públicos:** Prefeitura, Governo do Estado, Presidência da República, Congresso, Tribunais, Ministério Público.
+      * **Toda a administração indireta:** Autarquias (INSS), fundações, empresas públicas (Correios), sociedades de economia mista (Petrobras, Banco do Brasil).
+      * **Até quem não é do governo:** Uma ONG ou entidade privada que recebe recursos públicos para fazer algo de interesse público. A parte do dinheiro público que ela recebeu e como gastou também tem que ser transparente.
+
+  * **As Formas de Transparência:**
+
+      * **Transparência Ativa (Janelas Abertas Active):** O governo, por iniciativa própria, já deixa as janelas abertas, publicando proativamente as informações mais importantes (salários, despesas, contratos) nos **Portais da Transparência**. Você não precisa nem pedir para ver.
+      * **Transparência Passiva (Bater na Porta - Passive):** Você, cidadão, bate na porta e faz um pedido específico: "Quero ver a nota fiscal da compra das novas cadeiras". O governo tem o dever de atender.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Precisa de Justificativa?** A banca vai dizer que você precisa explicar *por que* quer a informação. **ERRADO\!** A LAI proíbe expressamente que o órgão público exija qualquer motivo ou justificativa. Seu direito de saber é garantido.
+> >   * **Abrangência:** A banca vai tentar dizer que uma empresa pública ou uma entidade privada que recebe dinheiro público não precisa seguir a LAI. **ERRADO\!** A lei abrange todas elas.
+> >   * **Tudo é Público?** A banca vai dizer que a publicidade é absoluta. **ERRADO\!** A própria lei cria as exceções: as informações sigilosas (segurança do Estado) e as informações pessoais (privacidade do indivíduo).
+
+-----
+
+### \#\#\# Procedimentos e Restrições: Como Olhar e as Cortinas Fechadas
+
+A lei define como você "bate na porta" e quais são os poucos cômodos que podem ter as cortinas fechadas.
+
+  * **O Procedimento para Pedir (Transparência Passiva):**
+
+      * **Prazo de Resposta:** O órgão tem que te responder **de imediato**. Se não for possível, o prazo é de **até 20 dias**.
+      * **Prorrogação:** Esse prazo pode ser esticado por **mais 10 dias**, desde que eles te avisem e justifiquem.
+      * **Recurso:** Se negarem seu pedido, você tem **10 dias** para recorrer à chefia do setor.
+
+  * **As Restrições (As Cortinas do Sigilo 🤫):**
+    O governo só pode fechar a cortina de um cômodo se a informação lá dentro for **imprescindível à segurança da sociedade ou do Estado**. Existem 3 níveis de "cortina", com prazos máximos:
+
+    | Classificação | Prazo Máximo de Sigilo | Analogia da Cortina |
+    | :--- | :--- | :--- |
+    | **Reservada** | **Até 5 anos** | Cortina fininha |
+    | **Secreta** | **Até 15 anos** | Cortina média |
+    | **Ultrassecreta** | **Até 25 anos** | Cortina blackout |
+
+  * **As Informações Pessoais (O Quarto Privado 🛌):**
+    Informações sobre a intimidade e a vida privada de uma pessoa (ex: prontuário médico, informações bancárias de um servidor) têm uma proteção especial. A "cortina" desse cômodo fica fechada por **até 100 anos**.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Decore os Prazos:** A banca VAI cobrar\! **Resposta = 20 + 10 dias**. **Recurso = 10 dias**.
+> >   * **Decore os Prazos do Sigilo:** Eles vão trocar os valores. Lembre-se da escadinha: **Reservada (5) → Secreta (15) → Ultrassecreta (25)**.
+> >   * **Informação Pessoal vs. Sigilosa:** Não confunda\! O **sigilo** protege o Estado. A restrição à **informação pessoal** protege o indivíduo. O prazo de 100 anos é para a informação pessoal, não para as classificações de sigilo.
+
+-----
+
+### \#\#\# LAI vs. LGPD: A Casa de Vidro e o Direito à Privacidade
+
+A LAI (Lei de Acesso à Informação) e a LGPD (Lei Geral de Proteção de Dados) não são inimigas. Elas são leis complementares que precisam ser harmonizadas.
+
+  * **O Foco de Cada Lei:**
+
+      * **LAI:** Garante o direito da **sociedade** de ver o que o governo faz (o direito de olhar para dentro da casa de vidro). O princípio é a **publicidade**.
+      * **LGPD:** Garante o direito do **indivíduo** de ter seus dados pessoais protegidos (o direito à privacidade do morador da casa). O princípio é a **proteção**.
+
+  * **A Harmonização na Prática:**
+    Imagine que você pede, via LAI, a lista com os salários de todos os servidores de um órgão. O direito à informação e à transparência (LAI) diz que o órgão deve te fornecer a lista.
+    Porém, a LGPD diz que os dados pessoais dos servidores devem ser protegidos.
+    **Solução:** O órgão te entrega a lista com nome, cargo e salário (informação pública), mas **tarja** ou remove o CPF, o endereço residencial e outros dados sensíveis de cada servidor (proteção de dados pessoais). Uma lei não anula a outra; elas se equilibram.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Conflito ou Complementaridade?** A banca vai dizer que as leis são conflitantes. **ERRADO\!** Elas são **complementares**. A LGPD não revogou a LAI, ela apenas detalhou como os dados pessoais devem ser tratados no contexto da transparência.
+> >   * **Acesso a Dados Pessoais de Terceiros:** A banca vai dizer que a LAI te dá o direito de pedir o prontuário médico de um vizinho que é servidor público. **ERRADO\!** O acesso a dados pessoais de terceiros é super restrito. A regra é a proteção à privacidade.
+
+### \#\#\# Mapa Mental: O Fluxo de um Pedido de Informação (LAI)
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["👤 Cidadão faz um Pedido<br>(Sem necessidade de justificativa)"] --> B["🏢 Órgão Público Recebe"];
+    B --> C{"É possível<br>atender de imediato?"};
+    C -- Sim --> D["✅ Acesso Imediato"];
+    
+    subgraph "Prazo Principal"
+        C -- Não --> E["⏳ Prazo de até 20 dias<br>para a resposta"];
+    end
+
+    E --> F{Negado ou não respondido?};
+    F -- Não --> G["✔️ Acesso Concedido"];
+
+    subgraph "Recurso"
+        F -- Sim --> H["😠 Cidadão pode recorrer<br>(Prazo de 10 dias)"];
+        H --> I["👨‍💼 Autoridade Superior<br>Analisa o Recurso"];
+    end
+
+    subgraph "Prorrogação (Opcional)"
+        J["Pode ser prorrogado<br>por mais 10 dias<br>(com justificativa)"];
+        E -- Link Opcional --- J;
+    end
+
+    style J fill:#313149,stroke:#e0af68,stroke-width:2px,stroke-dasharray: 5, 5
+```
+
+
 ### **Classe:** B
 ### **Conteúdo:** Lei de Acesso à Informação: Disposições Gerais e Abrangência
 
