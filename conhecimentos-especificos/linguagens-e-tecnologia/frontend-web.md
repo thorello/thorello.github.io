@@ -1,3 +1,108 @@
+### Olá, futuro(a) aprovado(a)\! Vamos construir seu conhecimento em Frontend Web, tijolo por tijolo, para você garantir uma base sólida na prova do Cebraspe.
+
+Pense na construção de um site como a **construção de uma casa moderna e interativa** 🏠. Cada tecnologia tem um papel fundamental: uma faz a estrutura, outra a decoração e a terceira cuida da eletricidade e da automação.
+
+-----
+
+### \#\#\# HTML5: A Estrutura e a Planta Baixa da Casa
+
+O HTML é o **esqueleto da sua casa**. Ele define os cômodos e a função de cada um.
+
+  * **O Propósito:** HTML define a **estrutura** ("aqui é a parede, aqui é a porta") e a **semântica** ("este cômodo é uma `cozinha`, este é um `quarto`"). Ele não se preocupa com a cor da parede.
+  * **As Novidades do HTML5:**
+      * **Tags Semânticas (`<header>`, `<footer>`, `<nav>`...):** É como ter placas na planta baixa dizendo "Hall de Entrada", "Garagem", "Corredor Principal". Isso é muito mais inteligente e organizado do que chamar tudo de "Cômodo A", "Cômodo B" (como se fazia com as `<div>`).
+      * **Multimídia Nativa (`<audio>`, `<video>`):** Permite construir uma "sala de cinema" na sua casa sem precisar comprar um projetor de uma marca específica (sem plugins como o Flash).
+      * **Web Storage (`localStorage`, `sessionStorage`):** É como ter um **cofre seguro** dentro da casa para guardar as coisas do morador. É mais espaçoso e eficiente que os antigos "bolsos" (*cookies*), pois o conteúdo do cofre não precisa ser mostrado para o mundo exterior (o servidor) toda hora.
+      * **Novos Controles de Formulário:** "Tomadas" especiais para `data`, `email`, `número`, que já vêm com um sistema de verificação embutido.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dizer que HTML é uma linguagem de programação. **ERRADO\!** É uma linguagem de **marcação**. A planta da casa não decide acender as luzes sozinha.
+> >   * A banca vai dizer que `<div id="rodape">` é a mesma coisa que `<footer>`. **ERRADO\!** Semanticamente, `<footer>` é muito mais expressivo e correto para robôs de busca e leitores de tela.
+> >   * **Web Storage vs. Cookies:** Lembre-se, os dados do **Web Storage** ficam só no cliente, enquanto os **cookies** são enviados ao servidor a cada requisição. `localStorage` é um cofre permanente; `sessionStorage` é um cofre que se esvazia quando você sai de casa.
+
+-----
+
+### \#\#\# CSS3: A Decoração, a Pintura e o Acabamento
+
+O CSS é o **decorador** da sua casa. Ele cuida de toda a aparência.
+
+  * **O Propósito:** Separar a **apresentação visual** da estrutura. Define as cores das paredes, o tipo do piso, o estilo dos móveis.
+  * **As Novidades do CSS3:**
+      * **Media Queries (O Design Responsivo):** É a "decoração adaptativa". A casa se arruma de um jeito quando vista em uma tela de celular (pequena) e de outro jeito em um monitor gigante (grande). Os móveis se rearranjam para o melhor aproveitamento do espaço.
+      * **Flexbox e Grid (Os Organizadores de Móveis):**
+          * **Flexbox:** Perfeito para organizar os itens em **uma dimensão**, como alinhar os quadros em uma única parede (uma linha) ou os livros em uma prateleira (uma coluna).
+          * **Grid:** Perfeito para organizar o **layout de um cômodo inteiro**, em **duas dimensões**, com linhas e colunas.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **Flexbox vs. Grid:** A banca vai confundir os dois. Lembre-se: **Flexbox = 1D** (uma fila ou uma coluna). **Grid = 2D** (uma tabela, com linhas e colunas).
+> >   * **Especificidade e Cascata:** Questões clássicas de CSS envolvem duas "regras de pintura" conflitantes. Você precisa saber qual delas é a mais específica (a mais "forte") para decidir qual cor a parede terá no final.
+
+-----
+
+### \#\#\# JavaScript: A Eletricidade e a Automação da Casa
+
+O JavaScript (JS) é o que dá **vida e interatividade** à casa.
+
+  * **O Propósito:** É a **rede elétrica e o sistema de automação**. Ele faz a luz acender quando você aperta o interruptor ou abre a cortina automaticamente quando o sol nasce.
+  * **ES6+ (A Modernização da Rede Elétrica):**
+      * **`var` vs. `let` vs. `const`:** `var` é a fiação antiga, com escopo em toda a casa. `let` e `const` são a fiação moderna, com escopo apenas dentro do cômodo onde foram instalados, o que é muito mais seguro.
+      * **Promises (O Agendamento de Tarefas):** É como programar a máquina de lavar. Você liga, ela te dá um "recibo" (*Promise*) e você pode ir fazer outra coisa. Quando ela terminar, ela te avisa se deu tudo certo ou se deu algum erro.
+  * **Modelo de Execução (O Eletricista Eficiente):**
+    O JS tem apenas **um eletricista (*single-threaded*)**, mas ele é muito esperto. Quando precisa fazer uma tarefa demorada (como esquentar a água do chuveiro), ele liga o aquecedor e, enquanto a água esquenta, ele vai trocar uma lâmpada em outro lugar. Ele não fica parado esperando (**assincronicidade com Event Loop**).
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **JavaScript não trava:** A banca vai dizer que, por ter um só "eletricista", o JS trava a casa inteira enquanto espera uma tarefa demorada. **ERRADO\!** Graças ao **Event Loop**, ele delega tarefas demoradas e continua trabalhando em outras coisas.
+> >   * **Escopo de Variáveis:** A diferença entre o escopo de função (`var`) e o escopo de bloco (`let`, `const`) é um prato cheio para questões.
+
+-----
+
+### \#\#\# Ajax e WebSocket: O Interfone e o Walkie-Talkie
+
+São as tecnologias de comunicação da casa com o mundo exterior.
+
+  * **Ajax (O Interfone 📞):** A comunicação é sempre iniciada por você, de dentro de casa. Você aperta o botão para falar com a portaria (servidor), o porteiro responde e a chamada termina. Para falar de novo, tem que apertar o botão de novo.
+  * **WebSocket (O Walkie-Talkie 📻):** Após um "câmbio" inicial, o canal de comunicação fica aberto. Tanto você quanto o porteiro podem falar a qualquer momento, em tempo real.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * A banca vai dizer que Ajax permite que o servidor envie dados a qualquer momento. **ERRADO\!** Isso é uma característica do **WebSocket** (*server-push*). No Ajax, a comunicação é sempre iniciada pelo cliente.
+> >   * **Caso de Uso:** Para um chat em tempo real, use **WebSocket**. Para enviar um formulário e atualizar um pedacinho da página, use **Ajax**.
+
+-----
+
+### \#\#\# SPA e Angular: A Casa de Conceito Aberto
+
+  * **SPA (Single Page Application):** É uma **casa de conceito aberto**. Você entra por uma única porta e está em um salão gigante (uma única página HTML). Conforme você anda, paredes e painéis inteligentes se movem para criar a "ilusão" de que você está em cômodos diferentes, mas você nunca realmente saiu e entrou de novo na casa. A experiência é muito mais fluida.
+  * **Angular:** É um **kit de construção pré-fabricado da "Google Homes"** para construir esse tipo de casa. É um **framework** completo, que já vem com a planta, o sistema elétrico e as regras de montagem. Ele usa **TypeScript**, que é como uma planta com anotações e especificações de materiais, tornando a construção mais segura que o JavaScript puro.
+
+> #### Foco Cebraspe (Pontos de Atenção e "Pegadinhas")
+>
+> >   * **SPA vs. MPA (Multi-Page Application):** Na **MPA** (a casa tradicional), para ir da sala para a cozinha, você tem que sair da casa e entrar por outra porta (recarregar a página inteira).
+> >   * **Framework vs. Biblioteca:** **Angular** é um **framework** (ele te dá a planta e dita como construir). **React**, por exemplo, é uma **biblioteca** (ele te dá os tijolos e te deixa mais livre para construir como quiser).
+
+### \#\#\# Mapa Mental: As Três Camadas do Frontend
+
+```mermaid
+%%{init: {"theme": "tokyo-midnight", "themeVariables": { "fontFamily": "lexend"}}}%%
+graph TD
+    A["<b>Usuário</b><br>Interage com a Página"]
+    
+    subgraph "Frontend Web (A Casa)"
+        B["💡 <b>JavaScript</b><br>(Comportamento e Interatividade)<br>A Eletricidade"]
+        C["🎨 <b>CSS</b><br>(Apresentação Visual)<br>A Decoração"]
+        D["🏛️ <b>HTML</b><br>(Estrutura e Conteúdo)<br>A Planta Baixa"]
+    end
+
+    A <--> B
+    B -- Manipula --> C
+    B -- Manipula --> D
+    C -- Estiliza --> D
+```
+
+
 ### **Classe:** B
 ### **Conteúdo:** Frontend Web: HTML5
 
