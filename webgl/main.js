@@ -433,24 +433,22 @@ class MindMapViewer {
 
     // ✅ MÉTODO ATUALIZADO
     // --- Função para corrigir a posição da câmera após o zoom DE PINÇA (mobile) ---
+    // ✅ MÉTODO CORRIGIDO
+    // --- Função para corrigir a posição da câmera após o zoom DE PINÇA (mobile) ---
     _onControlsChange() {
-        // Este listener agora serve APENAS para corrigir o zoom de pinça em dispositivos móveis.
-        // O zoom do mouse é tratado de forma independente em _onMouseWheel.
         if (this._isPinching) {
             const currentPointerNDC = this.lastPinchCenterScreen;
 
-            // Posição no mundo DEPOIS do zoom (obtida através do pointerNDC atual)
             const pointerWorldAfterZoom = new THREE.Vector3(currentPointerNDC.x, currentPointerNDC.y, 0).unproject(this.camera);
 
-            // Calcula a diferença (delta) para "panoramar" a câmera e manter o ponto no lugar
+            // Calcula o delta em relação ao ponto original do início da pinça
             const panDelta = new THREE.Vector3().subVectors(this._pointerWorldBeforeZoom, pointerWorldAfterZoom);
 
-            // Aplica a correção de pan na câmera e no alvo dos controles
+            // Aplica a correção de pan
             this.camera.position.add(panDelta);
             this.controls.target.add(panDelta);
 
-            // Atualiza o ponto de referência para o próximo evento 'change' dentro do mesmo gesto de pinça
-            this._pointerWorldBeforeZoom.copy(pointerWorldAfterZoom);
+            // A linha que atualizava o _pointerWorldBeforeZoom foi removida.
         }
     }
 
