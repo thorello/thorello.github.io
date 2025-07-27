@@ -4,20 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Mental com WebGL</title>
+    <title>Mapa Mental com WebGL (Solução Troika)</title>
     <style>
         body {
             margin: 0;
-            background-color: #1f1f1f;
+            background-color: #1a1a2e;
+            /* Ajustado para um fundo mais escuro */
+            overflow: hidden;
+            /* Evita barras de rolagem */
         }
 
         canvas {
             display: block;
         }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -27,8 +27,12 @@
                 "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
                 "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
                 "d3-hierarchy": "https://cdn.skypack.dev/d3-hierarchy",
-                "three-bmfont-text": "https://cdn.skypack.dev/three-bmfont-text",
-                "load-bmfont": "https://cdn.skypack.dev/load-bmfont"
+
+                "troika-three-text": "https://unpkg.com/troika-three-text@latest/dist/troika-three-text.esm.js",
+                "troika-three-utils": "https://unpkg.com/troika-three-utils@latest/dist/troika-three-utils.esm.js",
+                "troika-worker-utils": "https://unpkg.com/troika-worker-utils@latest/dist/troika-worker-utils.esm.js",
+                "webgl-sdf-generator": "https://unpkg.com/webgl-sdf-generator@latest/dist/webgl-sdf-generator.mjs",
+                "bidi-js": "https://unpkg.com/bidi-js@latest/dist/bidi.mjs"
             }
         }
     </script>
