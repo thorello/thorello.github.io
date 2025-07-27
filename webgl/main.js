@@ -61,7 +61,15 @@ class MindMapViewer {
         this.dragHandles = [];
         this.selectedNode = null;
         this.offset = new THREE.Vector3();
-        this.isDraggingNode = false; // New state variable
+        this.isDraggingNode = false;
+
+        // Sidebar elements
+        this.sidebar = document.getElementById('sidebar');
+        this.sidebarTitle = document.getElementById('sidebar-title');
+        this.sidebarContent = document.getElementById('sidebar-content');
+        this.sidebarCloseButton = document.getElementById('sidebar-close');
+        this.isSidebarOpen = false;
+
 
         this._initScene();
         this._initControls();
@@ -124,6 +132,12 @@ class MindMapViewer {
         this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
+
+        // --- ADD CLICK LISTENER FOR NODE SELECTION (AFTER MOUSE UP) ---
+        this.renderer.domElement.addEventListener('click', this._onNodeClick.bind(this));
+
+        // Sidebar close button listener
+        this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
     }
 
     // --- LÓGICA DE CRIAÇÃO E ATUALIZAÇÃO ---
@@ -136,7 +150,8 @@ class MindMapViewer {
     _createNodeMesh(d3Node) {
         return new Promise(resolve => {
             const nodeGroup = new THREE.Group();
-            nodeGroup.userData = { d3Node };
+            // Store the original d3Node data with the mesh
+            nodeGroup.userData = { d3Node: d3Node, isNode: true }; // Add isNode flag
 
             const nodeColor = CONFIG.nodeColors[d3Node.depth % CONFIG.nodeColors.length];
 
@@ -424,6 +439,53 @@ class MindMapViewer {
         this.controls.enabled = true;
     }
 
+    // --- NEW NODE CLICK HANDLER ---
+    _onNodeClick(event) {
+        // Do not trigger click if a drag operation just finished or if right-click/middle-click
+        if (this.isDraggingNode || event.button !== 0) {
+            return;
+        }
+
+        this.mouse.copy(this._getPointerCoordinates(event));
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        // Intersect with all children of mainGroup which might be nodes
+        const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
+
+        let clickedNode = null;
+        for (const intersect of intersects) {
+            // Check if the intersected object or its parent is a node group and not a drag handle
+            if (intersect.object.parent && intersect.object.parent.userData.isNode && !intersect.object.userData.isDragHandle) {
+                clickedNode = intersect.object.parent;
+                break;
+            } else if (intersect.object.userData.isNode && !intersect.object.userData.isDragHandle) {
+                clickedNode = intersect.object; // Direct click on the node's rect or text
+                break;
+            }
+        }
+
+        if (clickedNode) {
+            const d3NodeData = clickedNode.userData.d3Node.data;
+            this.openSidebar(d3NodeData.name, d3NodeData.explanation);
+        } else {
+            // If no node was clicked, close the sidebar
+            this.closeSidebar();
+        }
+    }
+
+    // --- SIDEBAR METHODS ---
+    openSidebar(title, content) {
+        this.sidebarTitle.textContent = title;
+        this.sidebarContent.textContent = content;
+        this.sidebar.classList.add('open');
+        this.isSidebarOpen = true;
+    }
+
+    closeSidebar() {
+        this.sidebar.classList.remove('open');
+        this.isSidebarOpen = false;
+    }
+
 
     // --- LOOP DE ANIMAÇÃO ---
 
@@ -437,6 +499,13 @@ class MindMapViewer {
 
 // --- DADOS DO MAPA MENTAL ---
 
+// Helper function to add Lorem Ipsum to each node
+function addExplanations(node) {
+    node.explanation = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. [Explanation for: ${node.name}]`;
+    if (node.children) {
+        node.children.forEach(addExplanations);
+    }
+}
 
 const mindMapData = {
     "name": "Elastic Stack (ELK)",
@@ -459,7 +528,7 @@ const mindMapData = {
                     "name": "Índice Invertido"
                 },
                 {
-                    "name": "Arquissstetura"
+                    "name": "Arquitetura"
                 }
             ]
         },
@@ -550,7 +619,8 @@ const mindMapData = {
     ]
 };
 
-
+// Add explanations to all nodes in the mindMapData
+addExplanations(mindMapData);
 
 // --- INICIALIZAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {

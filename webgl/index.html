@@ -12,15 +12,74 @@
             /* Ajustado para um fundo mais escuro */
             overflow: hidden;
             /* Evita barras de rolagem */
+            font-family: sans-serif;
+            color: #eeeeee;
         }
 
         canvas {
             display: block;
         }
+
+        #sidebar {
+            position: absolute;
+            top: 0;
+            right: -350px;
+            /* Escondido inicialmente */
+            width: 300px;
+            height: 100%;
+            background-color: #2c2c42;
+            /* Cor mais escura para o sidebar */
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            box-sizing: border-box;
+            transition: right 0.3s ease-in-out;
+            /* Animação para aparecer/desaparecer */
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        #sidebar.open {
+            right: 0;
+            /* Visível */
+        }
+
+        #sidebar h2 {
+            color: #8aff8a;
+            margin-top: 0;
+            border-bottom: 1px solid #4a4a6a;
+            padding-bottom: 10px;
+        }
+
+        #sidebar p {
+            line-height: 1.6;
+            color: #cccccc;
+        }
+
+        #sidebar-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #cccccc;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        #sidebar-close:hover {
+            color: #ffffff;
+        }
     </style>
 </head>
 
 <body>
+    <div id="sidebar">
+        <button id="sidebar-close">&times;</button>
+        <h2 id="sidebar-title"></h2>
+        <p id="sidebar-content"></p>
+    </div>
+
     <script type="importmap">
         {
             "imports": {
