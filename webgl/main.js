@@ -4,7 +4,7 @@ import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
 
 // NOVO: Defina a versão do programa aqui. Mude este valor a cada atualização.
-const APP_VERSION = 'v1.0.0';
+const APP_VERSION = 'v1.0.1 - zooming mobile';
 
 // --- 1. CONFIGURAÇÕES CENTRALIZADAS ---
 const CONFIG = {
@@ -74,8 +74,8 @@ class MindMapViewer {
 
         // Variáveis para controle de toque
         this.initialPinchDistance = 0;
-        this.lastPinchCenterScreen = new THREE.Vector2(); // Posição do centro do pinch na tela
-        this.lastPinchCenterWorld = new THREE.Vector3(); // Posição do centro do pinch no mundo antes do zoom
+        this.lastPinchCenterScreen = new THREE.Vector2(); // Posição do centro do pinch na tela (NDC)
+        this._pointerWorldBeforeZoom = new THREE.Vector3(); // Posição do centro do pinch no mundo ANTES do zoom
         this._isPinching = false;
 
 
@@ -127,7 +127,7 @@ class MindMapViewer {
 
         // --- MUDANÇA: Desabilitamos o zoom padrão ---
         // Isso nos permite implementar nosso próprio comportamento de "zoom no ponteiro".
-        this.controls.enableZoom = false;
+        this.controls.enableZoom = false; // Desabilita o zoom da roda do mouse do OrbitControls
 
         this.controls.enablePan = true;
         this.controls.mouseButtons = {
@@ -137,7 +137,7 @@ class MindMapViewer {
         };
         this.controls.touches = {
             ONE: THREE.TOUCH.PAN,
-            // OrbitControls ainda lida com o pinch-to-zoom e pan de dois dedos
+            // Mantemos TWO: THREE.TOUCH.DOLLY_PAN para que OrbitControls lide com o pinch-to-zoom
             TWO: THREE.TOUCH.DOLLY_PAN
         };
         // Os limites de zoom (min/max) serão aplicados no nosso listener personalizado.
@@ -461,24 +461,27 @@ class MindMapViewer {
         this.isDraggingNode = false;
     }
 
-    // ✅ MÉTODO ATUALIZADO
-    // --- Função para corrigir a posição da câmera após o zoom DE PINÇA (mobile) ---
     // ✅ MÉTODO CORRIGIDO
     // --- Função para corrigir a posição da câmera após o zoom DE PINÇA (mobile) ---
     _onControlsChange() {
+        // Aplica os limites de zoom também quando o OrbitControls altera a câmera (para pinch)
+        this.camera.zoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, this.camera.zoom));
+        this.camera.updateProjectionMatrix();
+
         if (this._isPinching) {
-            const currentPointerNDC = this.lastPinchCenterScreen;
+            // Posição do centro do pinch no mundo com a câmera ATUALIZADA pelo OrbitControls
+            const pointerWorldAfterZoom = new THREE.Vector3(
+                this.lastPinchCenterScreen.x,
+                this.lastPinchCenterScreen.y,
+                0
+            ).unproject(this.camera);
 
-            const pointerWorldAfterZoom = new THREE.Vector3(currentPointerNDC.x, currentPointerNDC.y, 0).unproject(this.camera);
-
-            // Calcula o delta em relação ao ponto original do início da pinça
+            // Calcula o delta para pan, comparando o ponto inicial no mundo com sua nova posição
             const panDelta = new THREE.Vector3().subVectors(this._pointerWorldBeforeZoom, pointerWorldAfterZoom);
 
-            // Aplica a correção de pan
+            // Aplica a correção de pan à câmera e ao target dos controles
             this.camera.position.add(panDelta);
             this.controls.target.add(panDelta);
-
-            // A linha que atualizava o _pointerWorldBeforeZoom foi removida.
         }
     }
 
@@ -510,7 +513,7 @@ class MindMapViewer {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
-            // Calcula a distância inicial entre os dedos
+            // Calcula a distância inicial entre os dedos (não estritamente necessário para a correção, mas útil para o entendimento)
             this.initialPinchDistance = Math.sqrt(
                 (touch1.clientX - touch2.clientX) ** 2 +
                 (touch1.clientY - touch2.clientY) ** 2
@@ -522,8 +525,11 @@ class MindMapViewer {
                 -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
             );
 
-            // Armazena a posição do centro do pinch no mundo ANTES do zoom
-            this._pointerWorldBeforeZoom = new THREE.Vector3(this.lastPinchCenterScreen.x, this.lastPinchCenterScreen.y, 0).unproject(this.camera);
+            // Armazena a posição do centro do pinch no mundo ANTES do zoom começar pelo OrbitControls
+            // Crie uma cópia da câmera para 'unproject' para que não seja afetado pelas mudanças do OrbitControls ainda.
+            const tempCamera = this.camera.clone();
+            this._pointerWorldBeforeZoom = new THREE.Vector3(this.lastPinchCenterScreen.x, this.lastPinchCenterScreen.y, 0).unproject(tempCamera);
+
             this._isPinching = true; // Sinaliza que o pinch está ativo
 
             event.preventDefault(); // Evita ações de toque padrão do navegador (ex: rolagem)
@@ -537,16 +543,19 @@ class MindMapViewer {
                 clientY: event.touches[0].clientY
             });
             event.preventDefault();
-        } else if (event.touches.length === 2) {
+        } else if (event.touches.length === 2 && this._isPinching) {
             event.preventDefault();
 
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
+            // Atualiza a posição do centro do pinch na tela durante o movimento
             this.lastPinchCenterScreen.set(
                 ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
                 -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
             );
+            // O OrbitControls se encarregará de atualizar a câmera e o target, e nossa correção
+            // em _onControlsChange ajustará o pan.
         }
     }
 
@@ -555,7 +564,7 @@ class MindMapViewer {
             this._onMouseUp();
             event.preventDefault();
         }
-        this.controls.enabled = true;
+        this.controls.enabled = true; // Garante que OrbitControls está habilitado novamente para outros gestos
         this.initialPinchDistance = 0;
         this.lastPinchCenterScreen.set(0, 0);
         this._isPinching = false;
@@ -618,7 +627,6 @@ class MindMapViewer {
 
 
 // --- DADOS DO MAPA MENTAL ---
-// (Os dados que você forneceu permanecem inalterados aqui)
 const mindMapData = {
     "name": "Elastic Stack (ELK)",
     "explanation": "O Elastic Stack, anteriormente conhecido como ELK Stack, é um conjunto de ferramentas de código aberto para ingestão, processamento, armazenamento, busca e análise de dados. Ele é amplamente utilizado para monitoramento de sistemas, análise de logs, segurança e business intelligence.",
