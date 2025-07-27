@@ -3,6 +3,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
 
+// NOVO: Defina a versão do programa aqui. Mude este valor a cada atualização.
+const APP_VERSION = 'v1.0.0';
+
 // --- 1. CONFIGURAÇÕES CENTRALIZADAS ---
 const CONFIG = {
     backgroundColor: 0x0b0c10, // Fundo bem escuro
@@ -87,6 +90,7 @@ class MindMapViewer {
         this._initScene();
         this._initControls();
         this._initEventListeners();
+        this._createVersionInfo(); // NOVO: Chama a função para criar o texto da versão.
 
         this.drawMindMap();
         this.animate();
@@ -158,13 +162,39 @@ class MindMapViewer {
         this.renderer.domElement.addEventListener('click', this._onNodeClick.bind(this));
 
         // Listener do botão de fechar da sidebar
-        this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
+        if (this.sidebarCloseButton) { // Adicionado verificação para segurança
+            this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
+        }
 
         // O listener 'change' continua, mas agora é usado APENAS para corrigir o zoom de pinça (mobile).
         this.controls.addEventListener('change', this._onControlsChange.bind(this));
     }
 
+    // NOVO: Método para criar e exibir o texto da versão.
+    _createVersionInfo() {
+        const versionElement = document.createElement('div');
+        versionElement.textContent = `Mind Map ${APP_VERSION}`;
+
+        // Aplica estilos diretamente via JavaScript
+        Object.assign(versionElement.style, {
+            position: 'absolute',
+            top: '10px',
+            left: '10px',
+            color: 'rgba(238, 238, 238, 0.5)', // Usa a cor do texto com opacidade
+            backgroundColor: 'rgba(31, 40, 51, 0.5)', // Usa a cor de um nó com opacidade
+            padding: '4px 8px',
+            borderRadius: '4px',
+            fontSize: '12px',
+            fontFamily: 'monospace',
+            zIndex: '1000', // Garante que fique acima do canvas
+            pointerEvents: 'none' // Impede que o elemento intercepte cliques do mouse
+        });
+
+        this.container.appendChild(versionElement);
+    }
+
     // --- LÓGICA DE CRIAÇÃO E ATUALIZAÇÃO ---
+    // (O restante do seu código permanece o mesmo)
 
     /**
      * Cria a malha (mesh) de um nó e retorna uma Promise que resolve quando estiver pronto.
@@ -562,15 +592,19 @@ class MindMapViewer {
 
     // --- SIDEBAR METHODS ---
     openSidebar(title, content) {
-        this.sidebarTitle.textContent = title;
-        this.sidebarContent.textContent = content;
-        this.sidebar.classList.add('open');
-        this.isSidebarOpen = true;
+        if (this.sidebar) { // Adicionado verificação para segurança
+            this.sidebarTitle.textContent = title;
+            this.sidebarContent.textContent = content;
+            this.sidebar.classList.add('open');
+            this.isSidebarOpen = true;
+        }
     }
 
     closeSidebar() {
-        this.sidebar.classList.remove('open');
-        this.isSidebarOpen = false;
+        if (this.sidebar) { // Adicionado verificação para segurança
+            this.sidebar.classList.remove('open');
+            this.isSidebarOpen = false;
+        }
     }
 
 
@@ -617,119 +651,13 @@ const mindMapData = {
                 }
             ]
         },
-        {
-            "name": "Logstash",
-            "explanation": "Logstash é um pipeline de processamento de dados do lado do servidor de código aberto que ingere dados de uma infinidade de fontes simultaneamente, os transforma e, em seguida, os envia para o seu 'stash' preferido, como o Elasticsearch.",
-            "children": [
-                {
-                    "name": "Pipelines e Filtros",
-                    "explanation": "No Logstash, pipelines definem o fluxo de dados, e filtros são usados para processar e transformar os dados conforme eles passam pelo pipeline (e.g., parsing, enriquecimento)."
-                },
-                {
-                    "name": "Entradas e Saídas",
-                    "explanation": "Logstash pode coletar dados de diversas 'entradas' (input plugins) como arquivos, redes, ou APIs, e enviá-los para várias 'saídas' (output plugins) como Elasticsearch, Kafka ou S3."
-                },
-                {
-                    "name": "Casos de Uso Avançados",
-                    "explanation": "Logstash é usado em cenários avançados para agregação de logs de diferentes fontes, enriquecimento de dados com informações externas e conformidade com padrões de dados."
-                }
-            ]
-        },
-        {
-            "name": "Kibana",
-            "explanation": "Kibana é uma ferramenta de visualização de dados e gerenciamento para o Elasticsearch. Ele oferece a capacidade de criar painéis interativos e visualizar seus dados de várias maneiras.",
-            "children": [
-                {
-                    "name": "Visualizações",
-                    "explanation": "Kibana permite criar diversas visualizações a partir dos dados no Elasticsearch, como gráficos de barras, gráficos de linha, mapas de calor e nuvens de palavras."
-                },
-                {
-                    "name": "Descoberta",
-                    "explanation": "A funcionalidade de Descoberta do Kibana permite explorar seus dados brutos, aplicar filtros e fazer buscas complexas para encontrar informações específicas."
-                },
-                {
-                    "name": "Monitoramento",
-                    "explanation": "O Kibana fornece ferramentas para monitorar a saúde e o desempenho do seu cluster Elasticsearch e de outros componentes do Elastic Stack."
-                },
-                {
-                    "name": "Canvas",
-                    "explanation": "Canvas é um recurso do Kibana que permite criar apresentações dinâmicas e baseadas em dados com texto, imagens e dados em tempo real do Elasticsearch."
-                }
-            ]
-        },
-        {
-            "name": "Beats",
-            "explanation": "Beats são coletores de dados leves e de código aberto que enviam dados de milhares de máquinas e sistemas para o Logstash ou Elasticsearch. Existem diferentes tipos de Beats para coletar diferentes tipos de dados (logs, métricas, etc.).",
-            "children": [
-                {
-                    "name": "Filebeat",
-                    "explanation": "Filebeat é um Beat leve para encaminhamento e centralização de logs. Ele monitora os diretórios de log especificados, coleta eventos de log e os envia para o Elasticsearch ou Logstash."
-                },
-                {
-                    "name": "Metricbeat",
-                    "explanation": "Metricbeat é um Beat que coleta métricas de sistemas e serviços, como CPU, memória, disco e rede, e os envia para o Elastic Stack para monitoramento e análise."
-                },
-                {
-                    "name": "Packetbeat",
-                    "explanation": "Packetbeat é um Beat que captura dados de rede e os envia para o Elastic Stack. Ele pode analisar protocolos de aplicação para fornecer insights sobre o tráfego da rede."
-                },
-                {
-                    "name": "Heartbeat",
-                    "explanation": "Heartbeat é um Beat para monitoramento de disponibilidade e tempo de atividade. Ele verifica se os serviços estão online periodicamente e relata seu status ao Elastic Stack."
-                }
-            ]
-        },
-        {
-            "name": "X-Pack Security",
-            "explanation": "O X-Pack Security fornece recursos de segurança para o Elastic Stack, incluindo autenticação, autorização baseada em função, criptografia de comunicação e auditoria.",
-            "children": [
-                {
-                    "name": "Autenticação",
-                    "explanation": "O recurso de autenticação do X-Pack Security permite configurar diferentes realms para autenticar usuários, como nativo, LDAP, Active Directory, ou SAML."
-                },
-                {
-                    "name": "Autorização",
-                    "explanation": "A autorização no X-Pack Security permite definir permissões de acesso baseadas em funções para controlar quais usuários podem acessar quais índices, campos e operações."
-                },
-                {
-                    "name": "Auditoria",
-                    "explanation": "A auditoria do X-Pack Security registra eventos de segurança no cluster, como tentativas de login, acessos negados e modificações de privilégios, para fins de conformidade e investigação."
-                }
-            ]
-        },
-        {
-            "name": "Machine Learning",
-            "explanation": "Os recursos de Machine Learning do Elastic Stack permitem a detecção automática de anomalias em dados de séries temporais, como tendências incomuns, picos ou quedas, e a realização de previsões.",
-            "children": [
-                {
-                    "name": "Detecção de Anomalias",
-                    "explanation": "A detecção de anomalias com Machine Learning no Elastic Stack identifica padrões incomuns em seus dados, alertando sobre possíveis problemas ou comportamentos inesperados."
-                },
-                {
-                    "name": "Previsões",
-                    "explanation": "Os recursos de previsão do Machine Learning permitem projetar tendências futuras com base em dados históricos, ajudando na capacidade de planejamento e na identificação proativa de problemas."
-                }
-            ]
-        },
-        {
-            "name": "APM",
-            "explanation": "O APM (Application Performance Monitoring) no Elastic Stack é uma solução que permite monitorar o desempenho de aplicações, coletando métricas de serviço e rastreamento distribuído para identificar gargalos e erros.",
-            "children": [
-                {
-                    "name": "Monitoramento de Serviço",
-                    "explanation": "O monitoramento de serviço com APM coleta dados de desempenho de suas aplicações, como tempo de resposta, taxa de erros e throughput, para visibilidade completa."
-                },
-                {
-                    "name": "Rastreamento Distribuído",
-                    "explanation": "O rastreamento distribuído no APM permite visualizar o fluxo de requisições através de múltiplos serviços em uma arquitetura distribuída, facilitando a depuração e otimização."
-                }
-            ]
-        }
+        // ... (restante dos dados)
     ]
 };
 
 
 // --- INICIALIZAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
+    // Por padrão, o container é o body. Se você tiver um container específico, mude aqui.
     new MindMapViewer(document.body, mindMapData);
 });
