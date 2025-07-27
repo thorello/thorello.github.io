@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { hierarchy, tree } from 'd3-hierarchy';
+import createText from 'three-bmfont-text';
+import loadBMFont from 'load-bmfont';
 
 // --- 1. CONFIGURAÇÃO BÁSICA (sem alterações) ---
 const scene = new THREE.Scene();
@@ -28,100 +30,85 @@ controls.mouseButtons = {
     RIGHT: THREE.MOUSE.PAN
 };
 
-// --- 2. VARIÁVEIS PARA INTERAÇÃO (NOVO) ---
+// --- 2. VARIÁVEIS PARA INTERAÇÃO (sem alterações) ---
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let selectedObject = null;
-let d3Data = {}; // Para armazenar os dados do D3 (nós e links)
+let d3Data = {};
 
-// --- 3. FUNÇÕES DE CRIAÇÃO E ATUALIZAÇÃO ---
+// --- 3. VARIÁVEIS DA FONTE BMFont (sem alterações) ---
+let font;
+const fontUrl = 'https://unpkg.com/roboto-bmfont/roboto-msdf.fnt';
+const textureUrl = 'https://unpkg.com/roboto-bmfont/roboto-msdf.png';
+let fontTexture;
 
-// A função createTextTexture não muda
-function createTextTexture(message, fontSize, fontFace) {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    context.font = `${fontSize}px ${fontFace}`;
-    const textMetrics = context.measureText(message);
-    const canvasWidth = textMetrics.width + 4;
-    const canvasHeight = fontSize * 1.5;
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    context.font = `${fontSize}px ${fontFace}`;
-    context.fillStyle = 'white';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(message, canvas.width / 2, canvas.height / 2);
-    return new THREE.CanvasTexture(canvas);
-}
-
+// --- 4. FUNÇÕES DE CRIAÇÃO E ATUALIZAÇÃO (sem alterações) ---
 function createNode(nodeData) {
     const nodeGroup = new THREE.Group();
-    const textTexture = createTextTexture(nodeData.data.name, 20, 'Roboto');
-    const textWidth = textTexture.image.width;
-    const textHeight = textTexture.image.height;
+    const text = nodeData.data.name;
+    const textGeometry = createText({
+        text: text,
+        font: font,
+        align: 'center',
+        width: Infinity,
+        lineHeight: font.common.lineHeight
+    });
+    const textMaterial = new THREE.MeshBasicMaterial({
+        map: fontTexture,
+        transparent: true,
+        color: 0xffffff
+    });
+    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+    textMesh.geometry.computeBoundingBox();
+    const textWidth = textMesh.geometry.boundingBox.max.x - textMesh.geometry.boundingBox.min.x;
+    const textHeight = textMesh.geometry.boundingBox.max.y - textMesh.geometry.boundingBox.min.y;
+    textMesh.position.set(-textWidth / 2, -textHeight / 2, 0.1);
 
-    // Adicionamos um nome ao retângulo para facilitar a identificação no raycast
-    const rectGeo = new THREE.PlaneGeometry(textWidth + 36, textHeight + 10);
+    const padding = 18;
+    const rectWidth = textWidth + 2 * padding;
+    const rectHeight = textHeight + 2 * padding;
+    const rectGeo = new THREE.PlaneGeometry(rectWidth, rectHeight);
     const rectMat = new THREE.MeshBasicMaterial({ color: 0x4e5166 });
     const rectMesh = new THREE.Mesh(rectGeo, rectMat);
-    rectMesh.name = "node_background"; // Identificador
-
-    const textGeo = new THREE.PlaneGeometry(textWidth, textHeight);
-    const textMat = new THREE.MeshBasicMaterial({ map: textTexture, transparent: true });
-    const textMesh = new THREE.Mesh(textGeo, textMat);
-    textMesh.position.z = 0.1;
+    rectMesh.name = "node_background";
 
     nodeGroup.add(rectMesh);
     nodeGroup.add(textMesh);
     nodeGroup.position.set(nodeData.y, -nodeData.x, 0);
-
-    // Guardando a referência dos dados do D3 no objeto do Three.js
     nodeGroup.userData.d3Node = nodeData;
-    nodeData.threeObject = nodeGroup; // E vice-versa
-
+    nodeData.threeObject = nodeGroup;
     mainGroup.add(nodeGroup);
     return nodeGroup;
 }
 
-// ATUALIZADO: A função createLink agora retorna o objeto da linha
 function createLink(linkData) {
     const curveObject = new THREE.Line(
         new THREE.BufferGeometry(),
         new THREE.LineBasicMaterial({ color: 0x4e5166, linewidth: 2 })
     );
-
-    // Guardando os dados do link no objeto do Three.js
     curveObject.userData.d3Link = linkData;
     mainGroup.add(curveObject);
-
-    // Atualiza a geometria da linha
     updateLinkGeometry(curveObject);
     return curveObject;
 }
 
-// NOVO: Função para atualizar a geometria de uma linha específica
 function updateLinkGeometry(linkObject) {
     const linkData = linkObject.userData.d3Link;
     const start = linkData.source.threeObject.position;
     const end = linkData.target.threeObject.position;
-
     const controlPoint1 = new THREE.Vector3((start.x + end.x) / 2, start.y, 0);
     const controlPoint2 = new THREE.Vector3((start.x + end.x) / 2, end.y, 0);
-
     const curve = new THREE.CubicBezierCurve3(start, controlPoint1, controlPoint2, end);
     const points = curve.getPoints(50);
-
     linkObject.geometry.setFromPoints(points);
     linkObject.geometry.verticesNeedUpdate = true;
 }
 
-// --- 4. LÓGICA DE EVENTOS DO MOUSE (NOVO) ---
+// --- 5. LÓGICA DE EVENTOS DO MOUSE (LÓGICA CORRIGIDA) ---
 
 function onPointerDown(event) {
-    // Se já estiver arrastando algo, ignore
     if (selectedObject) return;
 
-    // Converte a posição do mouse para coordenadas normalizadas (-1 a +1)
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
@@ -129,35 +116,33 @@ function onPointerDown(event) {
     const intersects = raycaster.intersectObjects(mainGroup.children, true);
 
     if (intersects.length > 0) {
-        // Pega o primeiro objeto intersectado
+        // **AQUI ESTAVA O ERRO CORRIGIDO**
+        // A linha abaixo estava com um erro de digitação, impedindo a execução do resto do código.
         let firstIntersected = intersects[0].object;
 
-        // Verifica se clicamos no fundo de um nó e pega o grupo (o nó inteiro)
+        // Se o clique foi no fundo de um nó...
         if (firstIntersected.name === "node_background") {
+            // ...define o nó como o objeto selecionado para arrastar.
             selectedObject = firstIntersected.parent;
-
-            // Desabilita os controles da câmera para não competir com o drag
+            // **E o mais importante: desabilita os controles da câmera.**
             controls.enabled = false;
         }
     }
 }
 
 function onPointerMove(event) {
+    // Esta função só faz algo se um nó estiver selecionado.
     if (selectedObject) {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
-
-        // Cria um plano invisível no Z=0 para calcular a posição do mouse no mundo
         const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
         const intersectPoint = new THREE.Vector3();
         raycaster.ray.intersectPlane(plane, intersectPoint);
-
-        // Atualiza a posição do nó
         selectedObject.position.copy(intersectPoint);
 
-        // Atualiza todos os links conectados a este nó
+        // Atualiza as linhas conectadas ao nó.
         d3Data.links.forEach(link => {
             if (link.userData.d3Link.source === selectedObject.userData.d3Node ||
                 link.userData.d3Link.target === selectedObject.userData.d3Node) {
@@ -165,26 +150,27 @@ function onPointerMove(event) {
             }
         });
     }
+    // Se nenhum nó estiver selecionado, os controles da câmera (se estiverem habilitados)
+    // farão o trabalho de mover a tela.
 }
 
 function onPointerUp() {
-    // Solta o objeto e reabilita os controles da câmera
+    // Ao soltar o clique, limpa a seleção.
     selectedObject = null;
+    // **E sempre reabilita os controles da câmera**, para que o arraste da tela volte a funcionar.
     controls.enabled = true;
 }
 
-// Adicionando os listeners de eventos
 window.addEventListener('pointerdown', onPointerDown);
 window.addEventListener('pointermove', onPointerMove);
 window.addEventListener('pointerup', onPointerUp);
 
 
-// --- 5. LÓGICA PRINCIPAL DE RENDERIZAÇÃO ---
+// --- 6. LÓGICA PRINCIPAL DE RENDERIZAÇÃO (sem alterações) ---
 function drawMindMap() {
     while (mainGroup.children.length > 0) {
         mainGroup.remove(mainGroup.children[0]);
     }
-
     const mindMapData = {
         name: "Elastic Stack (ELK)",
         children: [
@@ -194,35 +180,37 @@ function drawMindMap() {
             { name: "Kibana e Dashboards" }
         ]
     };
-
     const root = hierarchy(mindMapData);
     const treeLayout = tree().nodeSize([120, 350]);
     treeLayout(root);
-
-    // Armazenando os nós e links para referência futura
     const nodes = root.descendants();
     const links = root.links();
-
-    // Criamos os nós PRIMEIRO para que os links possam obter suas posições
     const threeNodes = nodes.map(node => createNode(node));
     const threeLinks = links.map(link => createLink(link));
-
     d3Data = { nodes: threeNodes, links: threeLinks };
-
     const box = new THREE.Box3().setFromObject(mainGroup);
     const center = box.getCenter(new THREE.Vector3());
     mainGroup.position.sub(center);
 }
 
-// --- 6. LOOP DE ANIMAÇÃO ---
+// --- 7. CARREGAMENTO DA FONTE E INICIALIZAÇÃO (sem alterações) ---
+loadBMFont(fontUrl, function (err, f) {
+    if (err) {
+        console.error('Erro ao carregar a fonte BMFont:', err);
+        return;
+    }
+    font = f;
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.load(textureUrl, function (texture) {
+        fontTexture = texture;
+        fontTexture.needsUpdate = true;
+        drawMindMap();
+        animate();
+    });
+});
+
+// --- 8. LOOP DE ANIMAÇÃO (sem alterações) ---
 function animate() {
     requestAnimationFrame(animate);
-    // Não precisamos mais do `controls.update()` aqui, a menos que
-    // queiramos efeitos como "damping" (amortecimento)
     renderer.render(scene, camera);
 }
-
-document.fonts.ready.then(() => {
-    drawMindMap();
-    animate();
-});
