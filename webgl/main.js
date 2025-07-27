@@ -26,9 +26,9 @@ const CONFIG = {
     borderRadius: 8,
     dragHandleRadius: 8,
     zoom: {
-        speed: 0.75,
-        min: 0.1,
-        max: 20,
+        speed: 0.75, // Velocidade do zoom
+        min: 0.1,    // Zoom mínimo
+        max: 20,     // Zoom máximo
     }
 };
 
@@ -49,7 +49,7 @@ function createRoundedRectGeometry(width, height, radius) {
     shape.lineTo(x + width, y + height - radius);
     shape.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
     shape.lineTo(x + radius, y + height);
-    shape.quadraticCurveTo(x, y + height, x, y + height - radius); // Corrected line
+    shape.quadraticCurveTo(x, y + height, x, y + height - radius);
     shape.lineTo(x, y + radius);
     shape.quadraticCurveTo(x, y, x + radius, y);
 
@@ -68,6 +68,13 @@ class MindMapViewer {
         this.selectedNode = null;
         this.offset = new THREE.Vector3();
         this.isDraggingNode = false;
+
+        // Variáveis para controle de toque
+        this.initialPinchDistance = 0;
+        this.lastPinchCenterScreen = new THREE.Vector2(); // Posição do centro do pinch na tela
+        this.lastPinchCenterWorld = new THREE.Vector3(); // Posição do centro do pinch no mundo antes do zoom
+        this._isPinching = false;
+
 
         // Sidebar elements
         this.sidebar = document.getElementById('sidebar');
@@ -109,41 +116,52 @@ class MindMapViewer {
         this.mouse = new THREE.Vector2();
     }
 
+    // ✅ MÉTODO ATUALIZADO
     _initControls() {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableRotate = false;
-        // Re-enable default zoom and pan for OrbitControls to handle touch
-        this.controls.enableZoom = true;
+
+        // --- MUDANÇA: Desabilitamos o zoom padrão ---
+        // Isso nos permite implementar nosso próprio comportamento de "zoom no ponteiro".
+        this.controls.enableZoom = false;
+
         this.controls.enablePan = true;
         this.controls.mouseButtons = {
             LEFT: THREE.MOUSE.PAN,
-            MIDDLE: THREE.MOUSE.DOLLY,
+            MIDDLE: THREE.MOUSE.PAN, // Botão do meio agora faz PAN também
             RIGHT: THREE.MOUSE.PAN
         };
-        // Set touch actions for OrbitControls
         this.controls.touches = {
             ONE: THREE.TOUCH.PAN,
-            TWO: THREE.TOUCH.DOLLY_PAN // DOLLY for zoom, PAN for pan
+            // OrbitControls ainda lida com o pinch-to-zoom e pan de dois dedos
+            TWO: THREE.TOUCH.DOLLY_PAN
         };
+        // Os limites de zoom (min/max) serão aplicados no nosso listener personalizado.
     }
 
+    // ✅ MÉTODO ATUALIZADO
     _initEventListeners() {
         window.addEventListener('resize', this._onWindowResize.bind(this));
         this.renderer.domElement.addEventListener('mousedown', this._onMouseDown.bind(this));
         this.renderer.domElement.addEventListener('mousemove', this._onMouseMove.bind(this));
         this.renderer.domElement.addEventListener('mouseup', this._onMouseUp.bind(this));
+
+        // --- MUDANÇA: Adicionamos nosso próprio listener para o evento 'wheel' ---
         this.renderer.domElement.addEventListener('wheel', this._onMouseWheel.bind(this), { passive: false });
 
-        // --- ADD TOUCH EVENT LISTENERS ---
+        // --- LISTENERS DE TOQUE ---
         this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
 
-        // --- ADD CLICK LISTENER FOR NODE SELECTION (AFTER MOUSE UP) ---
+        // --- LISTENER DE CLIQUE NO NÓ ---
         this.renderer.domElement.addEventListener('click', this._onNodeClick.bind(this));
 
-        // Sidebar close button listener
+        // Listener do botão de fechar da sidebar
         this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
+
+        // O listener 'change' continua, mas agora é usado APENAS para corrigir o zoom de pinça (mobile).
+        this.controls.addEventListener('change', this._onControlsChange.bind(this));
     }
 
     // --- LÓGICA DE CRIAÇÃO E ATUALIZAÇÃO ---
@@ -156,8 +174,7 @@ class MindMapViewer {
     _createNodeMesh(d3Node) {
         return new Promise(resolve => {
             const nodeGroup = new THREE.Group();
-            // Store the original d3Node data with the mesh
-            nodeGroup.userData = { d3Node: d3Node, isNode: true }; // Add isNode flag
+            nodeGroup.userData = { d3Node: d3Node, isNode: true };
 
             const nodeColor = CONFIG.nodeColors[d3Node.depth % CONFIG.nodeColors.length];
 
@@ -182,43 +199,26 @@ class MindMapViewer {
                 const rectMesh = new THREE.Mesh(rectGeo, rectMat);
                 rectMesh.position.x = rectWidth / 2;
 
-                // Adiciona sombra aos retângulos
-                // Three.js não tem 'box-shadow' CSS-like diretamente para MeshBasicMaterial.
-                // Para simular uma sombra, você pode:
-                // 1. Usar um material mais complexo com iluminação (MeshLambertMaterial, MeshPhongMaterial)
-                //    e adicionar luzes na cena.
-                // 2. Criar uma segunda geometria ligeiramente maior e mais escura, posicionada
-                //    atrás do retângulo principal, com uma transparência.
-                // Para simplicidade e compatibilidade com MeshBasicMaterial, vamos simular uma "borda brilhante"
-                // ou um pequeno "halo" em vez de uma sombra tradicional, que se alinha mais ao estilo futurista.
-                // Ou, se realmente quiser uma sombra, use MeshStandardMaterial com luzes na cena.
-                // Por agora, vamos manter o BasicMaterial para a cor, e a "sombra" será mais um
-                // efeito de "glow" ou contorno sutil se quisermos uma sombra sem luzes.
-
-                // Exemplo de como adicionar um "halo" ou "borda" para efeito de sombra/brilho
-                // Esta é uma maneira simples de simular um efeito sem adicionar luzes complexas.
                 const borderGeo = createRoundedRectGeometry(rectWidth + 4, rectHeight + 4, CONFIG.borderRadius);
                 const borderMat = new THREE.MeshBasicMaterial({
-                    color: 0x00FFFF, // Cor de destaque para o "brilho"
+                    color: 0x00FFFF,
                     transparent: true,
-                    opacity: 0.15 // Opacidade para o efeito de sombra/brilho
+                    opacity: 0.15
                 });
                 const borderMesh = new THREE.Mesh(borderGeo, borderMat);
                 borderMesh.position.x = rectWidth / 2;
-                borderMesh.position.z = -0.05; // Levemente atrás do nó principal
+                borderMesh.position.z = -0.05;
                 nodeGroup.add(borderMesh);
-
 
                 textMesh.position.x = CONFIG.padding.x;
 
                 nodeGroup.add(rectMesh, textMesh);
                 nodeGroup.userData.nodeWidth = rectWidth;
 
-                // --- Alça para arrastar (Drag Handle) ---
                 const handleGeo = new THREE.CircleGeometry(CONFIG.dragHandleRadius, 32);
                 const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.5 });
                 const handleMesh = new THREE.Mesh(handleGeo, handleMat);
-                handleMesh.position.set(rectWidth, 0, 0.2); // Alinhado à direita
+                handleMesh.position.set(rectWidth, 0, 0.2);
                 handleMesh.userData = { isDragHandle: true, nodeGroup };
 
                 nodeGroup.add(handleMesh);
@@ -284,7 +284,6 @@ class MindMapViewer {
     // --- LÓGICA PRINCIPAL ---
 
     async drawMindMap() {
-        // --- Limpeza da cena ---
         while (this.mainGroup.children.length) {
             this.mainGroup.remove(this.mainGroup.children[0]);
         }
@@ -292,7 +291,6 @@ class MindMapViewer {
         this.linkObjects = [];
         this.dragHandles = [];
 
-        // --- Layout com D3 ---
         const root = hierarchy(this.data);
         const d3Nodes = root.descendants();
         const d3Links = root.links();
@@ -306,7 +304,6 @@ class MindMapViewer {
         const treeLayout = tree().nodeSize([verticalSpacing, horizontalSpacing]);
         treeLayout(root);
 
-        // --- Criação de Nós (Assíncrona) ---
         const nodePromises = d3Nodes.map(d3Node => this._createNodeMesh(d3Node));
         const nodeGroups = await Promise.all(nodePromises);
 
@@ -317,10 +314,8 @@ class MindMapViewer {
             this.nodeMap.set(d3Node, nodeGroup);
         });
 
-        // --- Criação de Links (Síncrona, após nós estarem prontos) ---
         d3Links.forEach(link => this._createLinkMesh(link));
 
-        // --- Centralização do Mapa ---
         const box = new THREE.Box3().setFromObject(this.mainGroup);
         const center = box.getCenter(new THREE.Vector3());
         this.mainGroup.position.sub(center);
@@ -338,7 +333,6 @@ class MindMapViewer {
     }
 
     _getPointerCoordinates(event) {
-        // Handle both mouse and touch events
         const clientX = event.touches ? event.touches[0].clientX : event.clientX;
         const clientY = event.touches ? event.touches[0].clientY : event.clientY;
 
@@ -348,8 +342,50 @@ class MindMapViewer {
         };
     }
 
+    // ✅ NOVO MÉTODO
+    /**
+     * Lida com o evento de scroll do mouse para implementar o zoom no ponteiro.
+     * @param {WheelEvent} event
+     */
+    _onMouseWheel(event) {
+        // Impede o comportamento padrão do navegador (ex: rolar a página)
+        event.preventDefault();
+        event.stopPropagation();
+
+        // 1. Pega a posição do ponteiro em coordenadas normalizadas (-1 a +1)
+        const pointerNDC = this._getPointerCoordinates(event);
+        const pointerVector = new THREE.Vector3(pointerNDC.x, pointerNDC.y, 0);
+
+        // 2. Projeta a posição do ponteiro para o "mundo" da cena ANTES do zoom.
+        // Este é o ponto que queremos que permaneça sob o cursor.
+        const worldPosBefore = pointerVector.clone().unproject(this.camera);
+
+        // 3. Calcula o novo nível de zoom.
+        // event.deltaY < 0 é scroll para cima (zoom in), > 0 é para baixo (zoom out).
+        const zoomFactor = event.deltaY < 0 ? 1.15 : 1 / 1.15;
+        const newZoom = this.camera.zoom * zoomFactor;
+
+        // 4. Aplica o zoom, garantindo que ele fique dentro dos limites definidos.
+        this.camera.zoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
+        this.camera.updateProjectionMatrix();
+
+        // 5. Projeta a MESMA posição do ponteiro para o "mundo" DEPOIS do zoom.
+        const worldPosAfter = pointerVector.clone().unproject(this.camera);
+
+        // 6. Calcula a diferença (delta) entre a posição do ponto antes e depois do zoom.
+        // Este vetor representa o quanto a cena "deslizou" para longe do nosso ponto de interesse.
+        const panDelta = new THREE.Vector3().subVectors(worldPosBefore, worldPosAfter);
+
+        // 7. Aplica a correção, movendo (pan) a câmera para compensar o deslizamento.
+        // Isso efetivamente "puxa" o ponto de volta para debaixo do cursor do mouse.
+        this.camera.position.add(panDelta);
+
+        // 8. ATUALIZA O ALVO DOS CONTROLES. Isto é CRUCIAL.
+        // Sem isso, o próximo pan que você fizer estará desalinhado.
+        this.controls.target.add(panDelta);
+    }
+
     _onMouseDown(event) {
-        // Only handle left click for drag handle interaction
         if (event.button !== 0) return;
 
         this.mouse.copy(this._getPointerCoordinates(event));
@@ -360,7 +396,7 @@ class MindMapViewer {
         if (intersects.length > 0) {
             const handle = intersects[0].object;
             if (handle.userData.isDragHandle) {
-                this.controls.enabled = false; // Disable OrbitControls when dragging a node
+                this.controls.enabled = false;
                 this.selectedNode = handle.userData.nodeGroup;
                 this.isDraggingNode = true;
 
@@ -371,7 +407,7 @@ class MindMapViewer {
                 this.offset.copy(intersectionPoint).sub(this.selectedNode.position);
             }
         } else {
-            this.isDraggingNode = false; // Reset if not starting a node drag
+            this.isDraggingNode = false;
         }
     }
 
@@ -379,7 +415,6 @@ class MindMapViewer {
         if (!this.selectedNode || !this.isDraggingNode) return;
 
         this.mouse.copy(this._getPointerCoordinates(event));
-
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
         const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -391,90 +426,114 @@ class MindMapViewer {
     }
 
     _onMouseUp() {
-        this.controls.enabled = true; // Re-enable OrbitControls after mouse up
+        this.controls.enabled = true;
         this.selectedNode = null;
         this.isDraggingNode = false;
     }
 
-    _onMouseWheel(event) {
-        event.preventDefault();
-        event.stopPropagation();
+    // ✅ MÉTODO ATUALIZADO
+    // --- Função para corrigir a posição da câmera após o zoom DE PINÇA (mobile) ---
+    _onControlsChange() {
+        // Este listener agora serve APENAS para corrigir o zoom de pinça em dispositivos móveis.
+        // O zoom do mouse é tratado de forma independente em _onMouseWheel.
+        if (this._isPinching) {
+            const currentPointerNDC = this.lastPinchCenterScreen;
 
-        const mouseNDC = new THREE.Vector2(
-            (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1,
-            -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1
-        );
+            // Posição no mundo DEPOIS do zoom (obtida através do pointerNDC atual)
+            const pointerWorldAfterZoom = new THREE.Vector3(currentPointerNDC.x, currentPointerNDC.y, 0).unproject(this.camera);
 
-        const mouseWorldBeforeZoom = new THREE.Vector3(mouseNDC.x, mouseNDC.y, 0).unproject(this.camera);
+            // Calcula a diferença (delta) para "panoramar" a câmera e manter o ponto no lugar
+            const panDelta = new THREE.Vector3().subVectors(this._pointerWorldBeforeZoom, pointerWorldAfterZoom);
 
-        const zoomDirection = event.deltaY > 0 ? CONFIG.zoom.speed : 1 / CONFIG.zoom.speed;
-        const newZoom = THREE.MathUtils.clamp(this.camera.zoom * zoomDirection, CONFIG.zoom.min, CONFIG.zoom.max);
+            // Aplica a correção de pan na câmera e no alvo dos controles
+            this.camera.position.add(panDelta);
+            this.controls.target.add(panDelta);
 
-        this.camera.zoom = newZoom;
-        this.camera.updateProjectionMatrix();
-
-        const mouseWorldAfterZoom = new THREE.Vector3(mouseNDC.x, mouseNDC.y, 0).unproject(this.camera);
-
-        const panDelta = new THREE.Vector3().subVectors(mouseWorldBeforeZoom, mouseWorldAfterZoom);
-        this.camera.position.add(panDelta);
-
-        this.controls.target.add(panDelta);
-        this.controls.update();
+            // Atualiza o ponto de referência para o próximo evento 'change' dentro do mesmo gesto de pinça
+            this._pointerWorldBeforeZoom.copy(pointerWorldAfterZoom);
+        }
     }
 
-    // --- NEW TOUCH EVENT HANDLERS ---
+
+    // ✅ MÉTODO ATUALIZADO
     _onTouchStart(event) {
-        // If one finger, try to drag node or pan scene
+        // Se um dedo, tenta arrastar nó ou mover a cena
         if (event.touches.length === 1) {
-            // Simulate a mouse down for drag handle detection
+            // Simula um mouse down para detecção de manipulador de arrasto
             this._onMouseDown({
                 clientX: event.touches[0].clientX,
                 clientY: event.touches[0].clientY,
-                button: 0 // Simulate left click
+                button: 0 // Simula clique esquerdo
             });
-            // If a node was selected, prevent OrbitControls from handling this touch
+            // Se um nó foi selecionado, previne que OrbitControls lide com este toque
             if (this.selectedNode) {
                 event.preventDefault();
             }
+            this._isPinching = false; // Garante que não estamos em modo pinch
         }
-        // If two fingers, OrbitControls will handle zoom/pan by default
+        // Se dois dedos, prepara para zoom e pan
         else if (event.touches.length === 2) {
-            // Disable custom node dragging if multi-touch gesture is detected
+            // Desativa o arrasto de nó personalizado se um gesto multi-toque for detectado
             this.selectedNode = null;
             this.isDraggingNode = false;
-            this.controls.enabled = true; // Ensure OrbitControls is enabled for pinch zoom/pan
-            event.preventDefault(); // Prevent default browser touch actions (e.g., scrolling)
+
+            this.controls.enabled = true; // Garante que OrbitControls esteja habilitado para lidar com o pinch
+
+            const touch1 = event.touches[0];
+            const touch2 = event.touches[1];
+
+            // Calcula a distância inicial entre os dedos
+            this.initialPinchDistance = Math.sqrt(
+                (touch1.clientX - touch2.clientX) ** 2 +
+                (touch1.clientY - touch2.clientY) ** 2
+            );
+
+            // Calcula o centro do pinch na tela (NDC)
+            this.lastPinchCenterScreen.set(
+                ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
+                -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
+            );
+
+            // Armazena a posição do centro do pinch no mundo ANTES do zoom
+            this._pointerWorldBeforeZoom = new THREE.Vector3(this.lastPinchCenterScreen.x, this.lastPinchCenterScreen.y, 0).unproject(this.camera);
+            this._isPinching = true; // Sinaliza que o pinch está ativo
+
+            event.preventDefault(); // Evita ações de toque padrão do navegador (ex: rolagem)
         }
     }
 
     _onTouchMove(event) {
         if (event.touches.length === 1 && this.isDraggingNode) {
-            // If dragging a node with one finger
             this._onMouseMove({
                 clientX: event.touches[0].clientX,
                 clientY: event.touches[0].clientY
             });
-            event.preventDefault(); // Prevent page scrolling
-        } else if (event.touches.length === 2) {
-            // Let OrbitControls handle two-finger pan/zoom
-            // The controls.update() in animate loop will handle camera movement
             event.preventDefault();
+        } else if (event.touches.length === 2) {
+            event.preventDefault();
+
+            const touch1 = event.touches[0];
+            const touch2 = event.touches[1];
+
+            this.lastPinchCenterScreen.set(
+                ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
+                -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
+            );
         }
     }
 
     _onTouchEnd(event) {
-        // If a node was being dragged, clear the selection and re-enable controls
         if (this.isDraggingNode) {
             this._onMouseUp();
             event.preventDefault();
         }
-        // Ensure OrbitControls is re-enabled if no node was being dragged
         this.controls.enabled = true;
+        this.initialPinchDistance = 0;
+        this.lastPinchCenterScreen.set(0, 0);
+        this._isPinching = false;
     }
 
-    // --- NEW NODE CLICK HANDLER ---
     _onNodeClick(event) {
-        // Do not trigger click if a drag operation just finished or if right-click/middle-click
         if (this.isDraggingNode || event.button !== 0) {
             return;
         }
@@ -482,17 +541,15 @@ class MindMapViewer {
         this.mouse.copy(this._getPointerCoordinates(event));
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
-        // Intersect with all children of mainGroup which might be nodes
         const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
 
         let clickedNode = null;
         for (const intersect of intersects) {
-            // Check if the intersected object or its parent is a node group and not a drag handle
             if (intersect.object.parent && intersect.object.parent.userData.isNode && !intersect.object.userData.isDragHandle) {
                 clickedNode = intersect.object.parent;
                 break;
             } else if (intersect.object.userData.isNode && !intersect.object.userData.isDragHandle) {
-                clickedNode = intersect.object; // Direct click on the node's rect or text
+                clickedNode = intersect.object;
                 break;
             }
         }
@@ -501,7 +558,6 @@ class MindMapViewer {
             const d3NodeData = clickedNode.userData.d3Node.data;
             this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível para este tópico.');
         } else {
-            // If no node was clicked, close the sidebar
             this.closeSidebar();
         }
     }
@@ -521,7 +577,6 @@ class MindMapViewer {
 
 
     // --- LOOP DE ANIMAÇÃO ---
-
     animate() {
         requestAnimationFrame(this.animate.bind(this));
         this.controls.update();
@@ -531,7 +586,7 @@ class MindMapViewer {
 
 
 // --- DADOS DO MAPA MENTAL ---
-// As explicações foram adicionadas diretamente a cada nó.
+// (Os dados que você forneceu permanecem inalterados aqui)
 const mindMapData = {
     "name": "Elastic Stack (ELK)",
     "explanation": "O Elastic Stack, anteriormente conhecido como ELK Stack, é um conjunto de ferramentas de código aberto para ingestão, processamento, armazenamento, busca e análise de dados. Ele é amplamente utilizado para monitoramento de sistemas, análise de logs, segurança e business intelligence.",
