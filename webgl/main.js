@@ -4,7 +4,7 @@ import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
 
 // NOVO: Versão atualizada do programa.
-const APP_VERSION = 'v1.0.5 - disable zoom when sidebar is open';
+const APP_VERSION = 'v1.0.6 - sidebar lock';
 
 // --- 1. CONFIGURAÇÕES CENTRALIZADAS ---
 const CONFIG = {
@@ -377,7 +377,7 @@ class MindMapViewer {
      * @param {WheelEvent} event
      */
     _onMouseWheel(event) {
-        // --- ✅ NOVA LINHA: Impede o zoom se a sidebar estiver aberta ---
+        // --- NOVO: Impede o zoom se a sidebar estiver aberta ---
         if (this.isSidebarOpen) {
             event.preventDefault(); // Garante que o scroll não afete a página também
             return;
@@ -468,16 +468,9 @@ class MindMapViewer {
 
     // --- Função para corrigir a posição da câmera após o zoom DE PINÇA (mobile) ---
     _onControlsChange() {
-        // Se a sidebar estiver aberta, impede que as mudanças do OrbitControls (incluindo o dolly/zoom de pinça)
-        // afetem a câmera. O OrbitControls ainda pode disparar 'change' mesmo se estiver desativado,
-        // mas não moverá a câmera se `enableZoom` e `enablePan` forem controlados externamente.
+        // --- NOVO: Impede o ajuste da câmera se a sidebar estiver aberta ---
         if (this.isSidebarOpen) {
-            // Se a sidebar está aberta, não queremos que o OrbitControls mude a posição da câmera
-            // ou o zoom, então podemos "reverter" o estado ou simplesmente não processar.
-            // A forma mais eficaz é desativar o controls.enabled antes que ele comece a agir.
-            // Para o 'change' listener, se _isPinching for true mas isSidebarOpen for true,
-            // podemos apenas retornar para não aplicar a correção de pan.
-            return;
+            return; // Se a sidebar está aberta, ignora as mudanças do OrbitControls
         }
 
         // Aplica os limites de zoom também quando o OrbitControls altera a câmera (para pinch)
@@ -502,10 +495,9 @@ class MindMapViewer {
     }
 
     _onTouchStart(event) {
-        // --- ✅ NOVA LINHA: Impede qualquer interação de toque se a sidebar estiver aberta ---
+        // --- NOVO: Impede qualquer interação de toque se a sidebar estiver aberta ---
         if (this.isSidebarOpen) {
-            // Desativa os controles para garantir que nenhum gesto seja processado
-            this.controls.enabled = false;
+            this.controls.enabled = false; // Desativa os controles para garantir que nenhum gesto seja processado
             return;
         }
 
@@ -525,7 +517,7 @@ class MindMapViewer {
         else if (event.touches.length === 2) {
             this.selectedNode = null;
             this.isDraggingNode = false;
-            // Reativa os controles para permitir o zoom de pinça
+            // Reativa os controles para permitir o zoom de pinça (se a sidebar NÃO estiver aberta)
             this.controls.enabled = true;
 
             const touch1 = event.touches[0];
@@ -548,7 +540,7 @@ class MindMapViewer {
 
 
     _onTouchMove(event) {
-        // --- ✅ NOVA LINHA: Impede qualquer interação de toque se a sidebar estiver aberta ---
+        // --- NOVO: Impede qualquer interação de toque se a sidebar estiver aberta ---
         if (this.isSidebarOpen) {
             return;
         }
