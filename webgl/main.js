@@ -3,8 +3,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
 
-// NOVO: Defina a versão do programa aqui. Mude este valor a cada atualização.
-const APP_VERSION = 'v1.0.3 - neon sidebar removed';
+// NOVO: Versão atualizada do programa.
+const APP_VERSION = 'v1.0.4 - pinch zoom fix';
 
 // --- 1. CONFIGURAÇÕES CENTRALIZADAS ---
 const CONFIG = {
@@ -73,7 +73,6 @@ class MindMapViewer {
         this.isDraggingNode = false;
 
         // Variáveis para controle de toque
-        this.initialPinchDistance = 0;
         this.lastPinchCenterScreen = new THREE.Vector2(); // Posição do centro do pinch na tela (NDC)
         this._pointerWorldBeforeZoom = new THREE.Vector3(); // Posição do centro do pinch no mundo ANTES do zoom
         this._isPinching = false;
@@ -90,7 +89,7 @@ class MindMapViewer {
         this._initScene();
         this._initControls();
         this._initEventListeners();
-        this._createVersionInfo(); // NOVO: Chama a função para criar o texto da versão.
+        this._createVersionInfo();
 
         this.drawMindMap();
         this.animate();
@@ -120,13 +119,15 @@ class MindMapViewer {
         this.mouse = new THREE.Vector2();
     }
 
+    // ✅ MÉTODO CORRIGIDO
     _initControls() {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableRotate = false;
 
-        // --- MUDANÇA: Desabilitamos o zoom padrão ---
-        // Isso nos permite implementar nosso próprio comportamento de "zoom no ponteiro".
-        this.controls.enableZoom = false; // Desabilita o zoom da roda do mouse do OrbitControls
+        // --- MUDANÇA PRINCIPAL: HABILITE O ZOOM ---
+        // Isto permite que o gesto de pinça (DOLLY_PAN) funcione.
+        // O seu listener 'wheel' personalizado continuará funcionando normalmente.
+        this.controls.enableZoom = true;
 
         this.controls.enablePan = true;
         this.controls.mouseButtons = {
@@ -136,10 +137,10 @@ class MindMapViewer {
         };
         this.controls.touches = {
             ONE: THREE.TOUCH.PAN,
-            // Mantemos TWO: THREE.TOUCH.DOLLY_PAN para que OrbitControls lide com o pinch-to-zoom
+            // Agora que enableZoom=true, isto irá funcionar corretamente.
             TWO: THREE.TOUCH.DOLLY_PAN
         };
-        // Os limites de zoom (min/max) serão aplicados no nosso listener personalizado.
+        // Os limites de zoom (min/max) serão aplicados nos seus handlers _onMouseWheel e _onControlsChange.
     }
 
     _initEventListeners() {
@@ -148,51 +149,48 @@ class MindMapViewer {
         this.renderer.domElement.addEventListener('mousemove', this._onMouseMove.bind(this));
         this.renderer.domElement.addEventListener('mouseup', this._onMouseUp.bind(this));
 
-        // --- MUDANÇA: Adicionamos nosso próprio listener para o evento 'wheel' ---
+        // Listener personalizado para a roda do mouse
         this.renderer.domElement.addEventListener('wheel', this._onMouseWheel.bind(this), { passive: false });
 
-        // --- LISTENERS DE TOQUE ---
+        // LISTENERS DE TOQUE
         this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
 
-        // --- LISTENER DE CLIQUE NO NÓ ---
+        // LISTENER DE CLIQUE NO NÓ
         this.renderer.domElement.addEventListener('click', this._onNodeClick.bind(this));
 
         // Listener do botão de fechar da sidebar
-        if (this.sidebarCloseButton) { // Adicionado verificação para segurança
+        if (this.sidebarCloseButton) {
             this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
         }
 
-        // O listener 'change' continua, mas agora é usado APENAS para corrigir o zoom de pinça (mobile).
+        // Listener 'change' para corrigir o pan do zoom de pinça (mobile)
         this.controls.addEventListener('change', this._onControlsChange.bind(this));
     }
 
-    // NOVO: Método para criar e exibir o texto da versão.
     _createVersionInfo() {
         const versionElement = document.createElement('div');
         versionElement.textContent = `Mind Map ${APP_VERSION}`;
 
-        // Aplica estilos diretamente via JavaScript
         Object.assign(versionElement.style, {
             position: 'absolute',
-            bottom: '10px', // MUDANÇA: Altera 'top' para 'bottom'
+            bottom: '10px',
             left: '10px',
-            color: 'rgba(238, 238, 238, 0.5)', // Usa a cor do texto com opacidade
-            backgroundColor: 'rgba(31, 40, 51, 0.5)', // Usa a cor de um nó com opacidade
+            color: 'rgba(238, 238, 238, 0.5)',
+            backgroundColor: 'rgba(31, 40, 51, 0.5)',
             padding: '4px 8px',
             borderRadius: '4px',
             fontSize: '12px',
             fontFamily: 'monospace',
-            zIndex: '1000', // Garante que fique acima do canvas
-            pointerEvents: 'none' // Impede que o elemento intercepte cliques do mouse
+            zIndex: '1000',
+            pointerEvents: 'none'
         });
 
         this.container.appendChild(versionElement);
     }
 
     // --- LÓGICA DE CRIAÇÃO E ATUALIZAÇÃO ---
-    // (O restante do seu código permanece o mesmo)
 
     /**
      * Cria a malha (mesh) de um nó e retorna uma Promise que resolve quando estiver pronto.
@@ -227,6 +225,7 @@ class MindMapViewer {
                 const rectMesh = new THREE.Mesh(rectGeo, rectMat);
                 rectMesh.position.x = rectWidth / 2;
 
+                // Borda para destaque (opcional)
                 const borderGeo = createRoundedRectGeometry(rectWidth + 4, rectHeight + 4, CONFIG.borderRadius);
                 const borderMat = new THREE.MeshBasicMaterial({
                     color: 0x00FFFF,
@@ -375,40 +374,23 @@ class MindMapViewer {
      * @param {WheelEvent} event
      */
     _onMouseWheel(event) {
-        // Impede o comportamento padrão do navegador (ex: rolar a página)
         event.preventDefault();
         event.stopPropagation();
 
-        // 1. Pega a posição do ponteiro em coordenadas normalizadas (-1 a +1)
         const pointerNDC = this._getPointerCoordinates(event);
         const pointerVector = new THREE.Vector3(pointerNDC.x, pointerNDC.y, 0);
-
-        // 2. Projeta a posição do ponteiro para o "mundo" da cena ANTES do zoom.
-        // Este é o ponto que queremos que permaneça sob o cursor.
         const worldPosBefore = pointerVector.clone().unproject(this.camera);
 
-        // 3. Calcula o novo nível de zoom.
-        // event.deltaY < 0 é scroll para cima (zoom in), > 0 é para baixo (zoom out).
         const zoomFactor = event.deltaY < 0 ? 1.15 : 1 / 1.15;
         const newZoom = this.camera.zoom * zoomFactor;
 
-        // 4. Aplica o zoom, garantindo que ele fique dentro dos limites definidos.
         this.camera.zoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
         this.camera.updateProjectionMatrix();
 
-        // 5. Projeta a MESMA posição do ponteiro para o "mundo" DEPOIS do zoom.
         const worldPosAfter = pointerVector.clone().unproject(this.camera);
-
-        // 6. Calcula a diferença (delta) entre a posição do ponto antes e depois do zoom.
-        // Este vetor representa o quanto a cena "deslizou" para longe do nosso ponto de interesse.
         const panDelta = new THREE.Vector3().subVectors(worldPosBefore, worldPosAfter);
 
-        // 7. Aplica a correção, movendo (pan) a câmera para compensar o deslizamento.
-        // Isso efetivamente "puxa" o ponto de volta para debaixo do cursor do mouse.
         this.camera.position.add(panDelta);
-
-        // 8. ATUALIZA O ALVO DOS CONTROLES. Isto é CRUCIAL.
-        // Sem isso, o próximo pan que você fizer estará desalinhado.
         this.controls.target.add(panDelta);
     }
 
@@ -416,7 +398,6 @@ class MindMapViewer {
         if (event.button !== 0) return;
 
         this.mouse.copy(this._getPointerCoordinates(event));
-
         this.raycaster.setFromCamera(this.mouse, this.camera);
         const intersects = this.raycaster.intersectObjects(this.dragHandles);
 
@@ -481,72 +462,55 @@ class MindMapViewer {
         }
     }
 
-
-    // ✅ MÉTODO CORRIGIDO PARA O TOUCH START
     _onTouchStart(event) {
-        // Se um dedo: tenta arrastar nó ou iniciar o pan padrão do OrbitControls
+        // Se um dedo: tenta arrastar nó ou deixa OrbitControls cuidar do pan
         if (event.touches.length === 1) {
-            // Simula um mouse down para detecção de manipulador de arrasto
             this._onMouseDown({
                 clientX: event.touches[0].clientX,
                 clientY: event.touches[0].clientY,
-                button: 0 // Simula clique esquerdo
+                button: 0
             });
-
-            // Se um nó foi selecionado para arrasto, previne o padrão para que o OrbitControls não interfira.
-            // CASO CONTRÁRIO, DEIXE O ORBITCONTROLS LIDAR COM O PAN DE UM DEDO.
             if (this.selectedNode) {
                 event.preventDefault();
             }
-            this._isPinching = false; // Garante que não estamos em modo pinch
+            this._isPinching = false;
         }
-        // Se dois dedos: prepara para zoom e pan (gerenciado pelo OrbitControls)
+        // Se dois dedos: inicia o gesto de zoom de pinça
         else if (event.touches.length === 2) {
-            // Desativa o arrasto de nó personalizado se um gesto multi-toque for detectado
             this.selectedNode = null;
             this.isDraggingNode = false;
-
-            this.controls.enabled = true; // Garante que OrbitControls esteja habilitado para lidar com o pinch
+            this.controls.enabled = true;
 
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
-            // Calcula a distância inicial entre os dedos (útil para lógica, mas OrbitControls faz o zoom)
-            this.initialPinchDistance = Math.sqrt(
-                (touch1.clientX - touch2.clientX) ** 2 +
-                (touch1.clientY - touch2.clientY) ** 2
-            );
-
-            // Calcula o centro do pinch na tela (NDC)
+            // Calcula o centro da pinça em coordenadas normalizadas (NDC)
             this.lastPinchCenterScreen.set(
                 ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
                 -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
             );
 
-            // Armazena a posição do centro do pinch no mundo ANTES do zoom começar pelo OrbitControls
-            // Crie uma cópia da câmera para 'unproject' para que não seja afetado pelas mudanças do OrbitControls ainda.
-            const tempCamera = this.camera.clone();
-            tempCamera.zoom = this.camera.zoom; // Garante que o clone tem o zoom atual
-            tempCamera.position.copy(this.camera.position); // Garante que o clone tem a posição atual
-            tempCamera.updateProjectionMatrix(); // Atualiza a matriz de projeção do clone
-
-            this._pointerWorldBeforeZoom = new THREE.Vector3(this.lastPinchCenterScreen.x, this.lastPinchCenterScreen.y, 0).unproject(tempCamera);
+            // Armazena a posição do centro da pinça no "mundo" ANTES do zoom começar.
+            // Este é o ponto que queremos manter fixo na tela.
+            this._pointerWorldBeforeZoom.set(this.lastPinchCenterScreen.x, this.lastPinchCenterScreen.y, 0).unproject(this.camera);
 
             this._isPinching = true; // Sinaliza que o pinch está ativo
-
-            event.preventDefault(); // Evita ações de toque padrão do navegador (ex: rolagem da página)
+            event.preventDefault();
         }
     }
 
 
     _onTouchMove(event) {
+        // Move o nó se estiver arrastando com um dedo
         if (event.touches.length === 1 && this.isDraggingNode) {
             this._onMouseMove({
                 clientX: event.touches[0].clientX,
                 clientY: event.touches[0].clientY
             });
             event.preventDefault();
-        } else if (event.touches.length === 2 && this._isPinching) {
+        }
+        // Lida com o movimento do zoom de pinça
+        else if (event.touches.length === 2 && this._isPinching) {
             event.preventDefault();
 
             const touch1 = event.touches[0];
@@ -557,8 +521,7 @@ class MindMapViewer {
                 ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
                 -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
             );
-            // O OrbitControls se encarregará de atualizar a câmera e o target, e nossa correção
-            // em _onControlsChange ajustará o pan.
+            // OrbitControls cuida da câmera, e _onControlsChange ajustará o pan.
         }
     }
 
@@ -567,21 +530,15 @@ class MindMapViewer {
             this._onMouseUp();
             event.preventDefault();
         }
-        this.controls.enabled = true; // Garante que OrbitControls está habilitado novamente para outros gestos
-        this.initialPinchDistance = 0;
-        this.lastPinchCenterScreen.set(0, 0);
+        // Reseta o estado do pinch
+        this.controls.enabled = true;
         this._isPinching = false;
     }
 
     _onNodeClick(event) {
-        // Se um nó está sendo arrastado ou o clique não é o botão principal (esquerdo)
         if (this.isDraggingNode || event.button !== 0) {
             return;
         }
-
-        // Se houver múltiplos toques (indicando um gesto de zoom/pan do OrbitControls),
-        // não registre como clique de nó.
-        // Isso evita que um clique acidental ocorra após um gesto de zoom.
         if (event.touches && event.touches.length > 1) {
             return;
         }
@@ -593,7 +550,6 @@ class MindMapViewer {
 
         let clickedNode = null;
         for (const intersect of intersects) {
-            // Verifica se o objeto intersectado é um nó (ou parte de um nó) e não o handle de arrasto
             if (intersect.object.parent && intersect.object.parent.userData.isNode && !intersect.object.userData.isDragHandle) {
                 clickedNode = intersect.object.parent;
                 break;
@@ -613,7 +569,7 @@ class MindMapViewer {
 
     // --- SIDEBAR METHODS ---
     openSidebar(title, content) {
-        if (this.sidebar) { // Adicionado verificação para segurança
+        if (this.sidebar) {
             this.sidebarTitle.textContent = title;
             this.sidebarContent.textContent = content;
             this.sidebar.classList.add('open');
@@ -622,7 +578,7 @@ class MindMapViewer {
     }
 
     closeSidebar() {
-        if (this.sidebar) { // Adicionado verificação para segurança
+        if (this.sidebar) {
             this.sidebar.classList.remove('open');
             this.isSidebarOpen = false;
         }
