@@ -466,7 +466,7 @@ class MindMapViewer {
 
         if (clickedNode) {
             const d3NodeData = clickedNode.userData.d3Node.data;
-            this.openSidebar(d3NodeData.name, d3NodeData.explanation);
+            this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível para este tópico.');
         } else {
             // If no node was clicked, close the sidebar
             this.closeSidebar();
@@ -498,129 +498,150 @@ class MindMapViewer {
 
 
 // --- DADOS DO MAPA MENTAL ---
-
-// Helper function to add Lorem Ipsum to each node
-function addExplanations(node) {
-    node.explanation = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. [Explanation for: ${node.name}]`;
-    if (node.children) {
-        node.children.forEach(addExplanations);
-    }
-}
-
+// As explicações foram adicionadas diretamente a cada nó.
 const mindMapData = {
     "name": "Elastic Stack (ELK)",
+    "explanation": "O Elastic Stack, anteriormente conhecido como ELK Stack, é um conjunto de ferramentas de código aberto para ingestão, processamento, armazenamento, busca e análise de dados. Ele é amplamente utilizado para monitoramento de sistemas, análise de logs, segurança e business intelligence.",
     "children": [
         {
             "name": "Visão Geral",
+            "explanation": "Esta seção fornece uma visão geral do Elastic Stack, abordando sua definição e os principais casos de uso para os quais ele é empregado.",
             "children": [
                 {
-                    "name": "Definição"
+                    "name": "Definição",
+                    "explanation": "O Elastic Stack é um conjunto de produtos open source da Elastic para ingestão, armazenamento, busca e análise de dados de maneira escalável e em tempo real."
                 },
                 {
-                    "name": "Casos de Uso"
+                    "name": "Casos de Uso",
+                    "explanation": "Os casos de uso do Elastic Stack incluem análise de logs, monitoramento de infraestrutura, busca empresarial, análise de segurança (SIEM), e business intelligence."
                 }
             ]
         },
         {
             "name": "Elasticsearch",
+            "explanation": "Elasticsearch é um mecanismo de busca e análise distribuído e de código aberto, construído sobre o Apache Lucene. Ele permite armazenar, buscar e analisar grandes volumes de dados de forma quase em tempo real.",
             "children": [
                 {
-                    "name": "Índice Invertido"
+                    "name": "Índice Invertido",
+                    "explanation": "O índice invertido é a estrutura de dados central do Elasticsearch, que permite buscas de texto completo de forma extremamente rápida. Ele mapeia palavras para os documentos nos quais elas aparecem."
                 },
                 {
-                    "name": "Arquitetura"
+                    "name": "Arquitetura",
+                    "explanation": "A arquitetura do Elasticsearch é distribuída e escalável, consistindo em nós que podem ser mestres, de dados, de ingestão, ou de machine learning, trabalhando juntos em um cluster."
                 }
             ]
         },
         {
             "name": "Logstash",
+            "explanation": "Logstash é um pipeline de processamento de dados do lado do servidor de código aberto que ingere dados de uma infinidade de fontes simultaneamente, os transforma e, em seguida, os envia para o seu 'stash' preferido, como o Elasticsearch.",
             "children": [
                 {
-                    "name": "Pipelines e Filtros"
+                    "name": "Pipelines e Filtros",
+                    "explanation": "No Logstash, pipelines definem o fluxo de dados, e filtros são usados para processar e transformar os dados conforme eles passam pelo pipeline (e.g., parsing, enriquecimento)."
                 },
                 {
-                    "name": "Entradas e Saídas"
+                    "name": "Entradas e Saídas",
+                    "explanation": "Logstash pode coletar dados de diversas 'entradas' (input plugins) como arquivos, redes, ou APIs, e enviá-los para várias 'saídas' (output plugins) como Elasticsearch, Kafka ou S3."
                 },
                 {
-                    "name": "Casos de Uso Avançados"
+                    "name": "Casos de Uso Avançados",
+                    "explanation": "Logstash é usado em cenários avançados para agregação de logs de diferentes fontes, enriquecimento de dados com informações externas e conformidade com padrões de dados."
                 }
             ]
         },
         {
             "name": "Kibana",
+            "explanation": "Kibana é uma ferramenta de visualização de dados e gerenciamento para o Elasticsearch. Ele oferece a capacidade de criar painéis interativos e visualizar seus dados de várias maneiras.",
             "children": [
                 {
-                    "name": "Visualizações"
+                    "name": "Visualizações",
+                    "explanation": "Kibana permite criar diversas visualizações a partir dos dados no Elasticsearch, como gráficos de barras, gráficos de linha, mapas de calor e nuvens de palavras."
                 },
                 {
-                    "name": "Descoberta"
+                    "name": "Descoberta",
+                    "explanation": "A funcionalidade de Descoberta do Kibana permite explorar seus dados brutos, aplicar filtros e fazer buscas complexas para encontrar informações específicas."
                 },
                 {
-                    "name": "Monitoramento"
+                    "name": "Monitoramento",
+                    "explanation": "O Kibana fornece ferramentas para monitorar a saúde e o desempenho do seu cluster Elasticsearch e de outros componentes do Elastic Stack."
                 },
                 {
-                    "name": "Canvas"
+                    "name": "Canvas",
+                    "explanation": "Canvas é um recurso do Kibana que permite criar apresentações dinâmicas e baseadas em dados com texto, imagens e dados em tempo real do Elasticsearch."
                 }
             ]
         },
         {
             "name": "Beats",
+            "explanation": "Beats são coletores de dados leves e de código aberto que enviam dados de milhares de máquinas e sistemas para o Logstash ou Elasticsearch. Existem diferentes tipos de Beats para coletar diferentes tipos de dados (logs, métricas, etc.).",
             "children": [
                 {
-                    "name": "Filebeat"
+                    "name": "Filebeat",
+                    "explanation": "Filebeat é um Beat leve para encaminhamento e centralização de logs. Ele monitora os diretórios de log especificados, coleta eventos de log e os envia para o Elasticsearch ou Logstash."
                 },
                 {
-                    "name": "Metricbeat"
+                    "name": "Metricbeat",
+                    "explanation": "Metricbeat é um Beat que coleta métricas de sistemas e serviços, como CPU, memória, disco e rede, e os envia para o Elastic Stack para monitoramento e análise."
                 },
                 {
-                    "name": "Packetbeat"
+                    "name": "Packetbeat",
+                    "explanation": "Packetbeat é um Beat que captura dados de rede e os envia para o Elastic Stack. Ele pode analisar protocolos de aplicação para fornecer insights sobre o tráfego da rede."
                 },
                 {
-                    "name": "Heartbeat"
+                    "name": "Heartbeat",
+                    "explanation": "Heartbeat é um Beat para monitoramento de disponibilidade e tempo de atividade. Ele verifica se os serviços estão online periodicamente e relata seu status ao Elastic Stack."
                 }
             ]
         },
         {
             "name": "X-Pack Security",
+            "explanation": "O X-Pack Security fornece recursos de segurança para o Elastic Stack, incluindo autenticação, autorização baseada em função, criptografia de comunicação e auditoria.",
             "children": [
                 {
-                    "name": "Autenticação"
+                    "name": "Autenticação",
+                    "explanation": "O recurso de autenticação do X-Pack Security permite configurar diferentes realms para autenticar usuários, como nativo, LDAP, Active Directory, ou SAML."
                 },
                 {
-                    "name": "Autorização"
+                    "name": "Autorização",
+                    "explanation": "A autorização no X-Pack Security permite definir permissões de acesso baseadas em funções para controlar quais usuários podem acessar quais índices, campos e operações."
                 },
                 {
-                    "name": "Auditoria"
+                    "name": "Auditoria",
+                    "explanation": "A auditoria do X-Pack Security registra eventos de segurança no cluster, como tentativas de login, acessos negados e modificações de privilégios, para fins de conformidade e investigação."
                 }
             ]
         },
         {
             "name": "Machine Learning",
+            "explanation": "Os recursos de Machine Learning do Elastic Stack permitem a detecção automática de anomalias em dados de séries temporais, como tendências incomuns, picos ou quedas, e a realização de previsões.",
             "children": [
                 {
-                    "name": "Detecção de Anomalias"
+                    "name": "Detecção de Anomalias",
+                    "explanation": "A detecção de anomalias com Machine Learning no Elastic Stack identifica padrões incomuns em seus dados, alertando sobre possíveis problemas ou comportamentos inesperados."
                 },
                 {
-                    "name": "Previsões"
+                    "name": "Previsões",
+                    "explanation": "Os recursos de previsão do Machine Learning permitem projetar tendências futuras com base em dados históricos, ajudando na capacidade de planejamento e na identificação proativa de problemas."
                 }
             ]
         },
         {
             "name": "APM",
+            "explanation": "O APM (Application Performance Monitoring) no Elastic Stack é uma solução que permite monitorar o desempenho de aplicações, coletando métricas de serviço e rastreamento distribuído para identificar gargalos e erros.",
             "children": [
                 {
-                    "name": "Monitoramento de Serviço"
+                    "name": "Monitoramento de Serviço",
+                    "explanation": "O monitoramento de serviço com APM coleta dados de desempenho de suas aplicações, como tempo de resposta, taxa de erros e throughput, para visibilidade completa."
                 },
                 {
-                    "name": "Rastreamento Distribuído"
+                    "name": "Rastreamento Distribuído",
+                    "explanation": "O rastreamento distribuído no APM permite visualizar o fluxo de requisições através de múltiplos serviços em uma arquitetura distribuída, facilitando a depuração e otimização."
                 }
             ]
         }
     ]
 };
 
-// Add explanations to all nodes in the mindMapData
-addExplanations(mindMapData);
 
 // --- INICIALIZAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
