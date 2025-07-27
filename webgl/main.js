@@ -5,14 +5,20 @@ import { Text } from 'troika-three-text';
 
 // --- 1. CONFIGURAÇÕES CENTRALIZADAS ---
 const CONFIG = {
-    backgroundColor: 0x1a1a2e,
+    backgroundColor: 0x0b0c10, // Fundo bem escuro
     nodeColors: [
-        0x3f546c, 0x5c6b73, 0x7b888e, 0x2c3b4e,
-        0x4a5a6a, 0x6d7a86, 0x2e3a47, 0x54606b
+        0x1f2833, // Azul escuro acinzentado (Base)
+        0x2e4a5a, // Azul escuro um pouco mais claro
+        0x123C4F, // Um tom de azul mais profundo
+        0x0A2B3E, // Um azul muito escuro para contraste
+        0x334a52,
+        0x5c848d,
+        0x22333b,
+        0x7fc7d9
     ],
-    linkColor: 0x888888,
-    dragHandleColor: 0x8aff8a,
-    textColor: 0xeeeeee,
+    linkColor: 0x45a299, // Teal para as linhas
+    dragHandleColor: 0x66fcf1, // Teal/ciano brilhante para o manipulador de arrasto
+    textColor: 0xEEEEEE, // Cor de texto clara para alto contraste nos retângulos escuros
     font: {
         size: 14,
     },
@@ -175,6 +181,33 @@ class MindMapViewer {
                 const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
                 const rectMesh = new THREE.Mesh(rectGeo, rectMat);
                 rectMesh.position.x = rectWidth / 2;
+
+                // Adiciona sombra aos retângulos
+                // Three.js não tem 'box-shadow' CSS-like diretamente para MeshBasicMaterial.
+                // Para simular uma sombra, você pode:
+                // 1. Usar um material mais complexo com iluminação (MeshLambertMaterial, MeshPhongMaterial)
+                //    e adicionar luzes na cena.
+                // 2. Criar uma segunda geometria ligeiramente maior e mais escura, posicionada
+                //    atrás do retângulo principal, com uma transparência.
+                // Para simplicidade e compatibilidade com MeshBasicMaterial, vamos simular uma "borda brilhante"
+                // ou um pequeno "halo" em vez de uma sombra tradicional, que se alinha mais ao estilo futurista.
+                // Ou, se realmente quiser uma sombra, use MeshStandardMaterial com luzes na cena.
+                // Por agora, vamos manter o BasicMaterial para a cor, e a "sombra" será mais um
+                // efeito de "glow" ou contorno sutil se quisermos uma sombra sem luzes.
+
+                // Exemplo de como adicionar um "halo" ou "borda" para efeito de sombra/brilho
+                // Esta é uma maneira simples de simular um efeito sem adicionar luzes complexas.
+                const borderGeo = createRoundedRectGeometry(rectWidth + 4, rectHeight + 4, CONFIG.borderRadius);
+                const borderMat = new THREE.MeshBasicMaterial({
+                    color: 0x00FFFF, // Cor de destaque para o "brilho"
+                    transparent: true,
+                    opacity: 0.15 // Opacidade para o efeito de sombra/brilho
+                });
+                const borderMesh = new THREE.Mesh(borderGeo, borderMat);
+                borderMesh.position.x = rectWidth / 2;
+                borderMesh.position.z = -0.05; // Levemente atrás do nó principal
+                nodeGroup.add(borderMesh);
+
 
                 textMesh.position.x = CONFIG.padding.x;
 
