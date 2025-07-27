@@ -4,7 +4,7 @@ import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
 
 // NOVO: Defina a versão do programa aqui. Mude este valor a cada atualização.
-const APP_VERSION = 'v1.0.1 - zooming mobile';
+const APP_VERSION = 'v1.0.2 - mobile pinch zoom fix';
 
 // --- 1. CONFIGURAÇÕES CENTRALIZADAS ---
 const CONFIG = {
@@ -120,7 +120,6 @@ class MindMapViewer {
         this.mouse = new THREE.Vector2();
     }
 
-    // ✅ MÉTODO ATUALIZADO
     _initControls() {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableRotate = false;
@@ -143,7 +142,6 @@ class MindMapViewer {
         // Os limites de zoom (min/max) serão aplicados no nosso listener personalizado.
     }
 
-    // ✅ MÉTODO ATUALIZADO
     _initEventListeners() {
         window.addEventListener('resize', this._onWindowResize.bind(this));
         this.renderer.domElement.addEventListener('mousedown', this._onMouseDown.bind(this));
@@ -372,7 +370,6 @@ class MindMapViewer {
         };
     }
 
-    // ✅ NOVO MÉTODO
     /**
      * Lida com o evento de scroll do mouse para implementar o zoom no ponteiro.
      * @param {WheelEvent} event
@@ -461,7 +458,6 @@ class MindMapViewer {
         this.isDraggingNode = false;
     }
 
-    // ✅ MÉTODO CORRIGIDO
     // --- Função para corrigir a posição da câmera após o zoom DE PINÇA (mobile) ---
     _onControlsChange() {
         // Aplica os limites de zoom também quando o OrbitControls altera a câmera (para pinch)
@@ -486,9 +482,9 @@ class MindMapViewer {
     }
 
 
-    // ✅ MÉTODO ATUALIZADO
+    // ✅ MÉTODO CORRIGIDO PARA O TOUCH START
     _onTouchStart(event) {
-        // Se um dedo, tenta arrastar nó ou mover a cena
+        // Se um dedo: tenta arrastar nó ou iniciar o pan padrão do OrbitControls
         if (event.touches.length === 1) {
             // Simula um mouse down para detecção de manipulador de arrasto
             this._onMouseDown({
@@ -496,13 +492,15 @@ class MindMapViewer {
                 clientY: event.touches[0].clientY,
                 button: 0 // Simula clique esquerdo
             });
-            // Se um nó foi selecionado, previne que OrbitControls lide com este toque
+
+            // Se um nó foi selecionado para arrasto, previne o padrão para que o OrbitControls não interfira.
+            // CASO CONTRÁRIO, DEIXE O ORBITCONTROLS LIDAR COM O PAN DE UM DEDO.
             if (this.selectedNode) {
                 event.preventDefault();
             }
             this._isPinching = false; // Garante que não estamos em modo pinch
         }
-        // Se dois dedos, prepara para zoom e pan
+        // Se dois dedos: prepara para zoom e pan (gerenciado pelo OrbitControls)
         else if (event.touches.length === 2) {
             // Desativa o arrasto de nó personalizado se um gesto multi-toque for detectado
             this.selectedNode = null;
@@ -513,7 +511,7 @@ class MindMapViewer {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
-            // Calcula a distância inicial entre os dedos (não estritamente necessário para a correção, mas útil para o entendimento)
+            // Calcula a distância inicial entre os dedos (útil para lógica, mas OrbitControls faz o zoom)
             this.initialPinchDistance = Math.sqrt(
                 (touch1.clientX - touch2.clientX) ** 2 +
                 (touch1.clientY - touch2.clientY) ** 2
@@ -528,13 +526,18 @@ class MindMapViewer {
             // Armazena a posição do centro do pinch no mundo ANTES do zoom começar pelo OrbitControls
             // Crie uma cópia da câmera para 'unproject' para que não seja afetado pelas mudanças do OrbitControls ainda.
             const tempCamera = this.camera.clone();
+            tempCamera.zoom = this.camera.zoom; // Garante que o clone tem o zoom atual
+            tempCamera.position.copy(this.camera.position); // Garante que o clone tem a posição atual
+            tempCamera.updateProjectionMatrix(); // Atualiza a matriz de projeção do clone
+
             this._pointerWorldBeforeZoom = new THREE.Vector3(this.lastPinchCenterScreen.x, this.lastPinchCenterScreen.y, 0).unproject(tempCamera);
 
             this._isPinching = true; // Sinaliza que o pinch está ativo
 
-            event.preventDefault(); // Evita ações de toque padrão do navegador (ex: rolagem)
+            event.preventDefault(); // Evita ações de toque padrão do navegador (ex: rolagem da página)
         }
     }
+
 
     _onTouchMove(event) {
         if (event.touches.length === 1 && this.isDraggingNode) {
@@ -571,7 +574,15 @@ class MindMapViewer {
     }
 
     _onNodeClick(event) {
+        // Se um nó está sendo arrastado ou o clique não é o botão principal (esquerdo)
         if (this.isDraggingNode || event.button !== 0) {
+            return;
+        }
+
+        // Se houver múltiplos toques (indicando um gesto de zoom/pan do OrbitControls),
+        // não registre como clique de nó.
+        // Isso evita que um clique acidental ocorra após um gesto de zoom.
+        if (event.touches && event.touches.length > 1) {
             return;
         }
 
@@ -582,6 +593,7 @@ class MindMapViewer {
 
         let clickedNode = null;
         for (const intersect of intersects) {
+            // Verifica se o objeto intersectado é um nó (ou parte de um nó) e não o handle de arrasto
             if (intersect.object.parent && intersect.object.parent.userData.isNode && !intersect.object.userData.isDragHandle) {
                 clickedNode = intersect.object.parent;
                 break;
@@ -659,7 +671,70 @@ const mindMapData = {
                 }
             ]
         },
-        // ... (restante dos dados)
+        {
+            "name": "Kibana",
+            "explanation": "Kibana é a plataforma de visualização e interface do usuário para o Elastic Stack. Ele permite explorar, visualizar e gerenciar dados armazenados no Elasticsearch.",
+            "children": [
+                {
+                    "name": "Dashboards",
+                    "explanation": "Dashboards no Kibana são coleções de visualizações que fornecem uma visão consolidada de seus dados, permitindo monitoramento e análise em tempo real."
+                },
+                {
+                    "name": "Visualizações",
+                    "explanation": "O Kibana oferece uma variedade de visualizações, como gráficos de barras, gráficos de linhas, mapas, tabelas e nuvens de tags, para representar seus dados."
+                }
+            ]
+        },
+        {
+            "name": "Logstash",
+            "explanation": "Logstash é uma ferramenta de pipeline de dados de código aberto que coleta dados de várias fontes, transforma-os e os envia para o Elasticsearch ou outras saídas.",
+            "children": [
+                {
+                    "name": "Plugins de Entrada",
+                    "explanation": "Logstash suporta vários plugins de entrada, como arquivos, syslog, beats, Kafka, e S3, para coletar dados de diversas fontes."
+                },
+                {
+                    "name": "Plugins de Filtro",
+                    "explanation": "Os plugins de filtro do Logstash, como Grok, Mutate, Date, e GeoIP, permitem parsear e transformar dados antes de serem indexados."
+                }
+            ]
+        },
+        {
+            "name": "Beats",
+            "explanation": "Beats são 'shippers' de dados leves e de código aberto que enviam dados de servidores e sistemas para o Logstash ou Elasticsearch.",
+            "children": [
+                {
+                    "name": "Filebeat",
+                    "explanation": "Filebeat é um Beat para encaminhamento de logs, que monitora arquivos de log em diretórios específicos e os envia de forma eficiente."
+                },
+                {
+                    "name": "Metricbeat",
+                    "explanation": "Metricbeat é um Beat para coleta de métricas, que coleta métricas de sistemas e serviços (CPU, memória, rede, Docker, etc.)."
+                },
+                {
+                    "name": "Packetbeat",
+                    "explanation": "Packetbeat é um Beat para análise de rede, que captura dados de pacotes de rede e os decodifica para insights sobre o tráfego da aplicação."
+                }
+            ]
+        },
+        {
+            "name": "Recursos Adicionais (X-Pack)",
+            "explanation": "X-Pack é um conjunto de recursos que estende as capacidades do Elastic Stack, oferecendo funcionalidades de segurança, monitoramento, alertas, relatórios e machine learning.",
+            "children": [
+                {
+                    "name": "Segurança",
+                    "explanation": "Recursos de segurança do X-Pack incluem autenticação, autorização baseada em funções, criptografia de comunicação e auditoria."
+                },
+                {
+                    "name": "Machine Learning",
+                    "explanation": "Funcionalidades de Machine Learning do X-Pack permitem detectar anomalias em seus dados automaticamente."
+                },
+                {
+                    "name": "Alertas e Monitoramento",
+                    "explanation": "O X-Pack oferece ferramentas para monitorar o Elastic Stack e criar alertas baseados em condições nos seus dados."
+                }
+            ]
+        }
     ]
 };
 
