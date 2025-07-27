@@ -27,6 +27,7 @@
             position: absolute;
             top: 0;
             right: -350px;
+            /* Sidebar is hidden by default */
             width: 300px;
             height: 100%;
             background-color: #1f2833;
@@ -46,6 +47,7 @@
 
         #sidebar.open {
             right: 0;
+            /* Moves sidebar into view when 'open' class is added */
         }
 
         #sidebar h2 {
@@ -113,6 +115,7 @@
             #sidebar {
                 width: 100%;
                 right: -100%;
+                /* Sidebar is hidden by default on mobile */
                 padding: 15px;
                 /* --- REMOVENDO O EFEITO NEON PARA MOBILE --- */
                 box-shadow: none;
@@ -121,6 +124,7 @@
 
             #sidebar.open {
                 right: 0;
+                /* Moves sidebar into view when 'open' class is added on mobile */
             }
 
             #sidebar h2 {
