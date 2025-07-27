@@ -4,7 +4,7 @@ import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
 
 // NOVO: Defina a versão do programa aqui. Mude este valor a cada atualização.
-const APP_VERSION = 'v1.0.2 - mobile pinch zoom fix';
+const APP_VERSION = 'v1.0.3 - neon sidebar removed';
 
 // --- 1. CONFIGURAÇÕES CENTRALIZADAS ---
 const CONFIG = {

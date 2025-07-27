@@ -31,6 +31,7 @@
             height: 100%;
             background-color: #1f2833;
             /* Dark blue-gray for sidebar */
+            /* --- Efeito Neon Padrão (para desktop) --- */
             box-shadow: -8px 0 20px rgba(0, 255, 255, 0.2), 0 0 50px rgba(0, 255, 255, 0.1);
             /* Teal glow */
             padding: 25px;
@@ -51,6 +52,7 @@
             font-family: 'Orbitron', sans-serif;
             /* Bold, futuristic font for titles */
             color: #66fcf1;
+            /* --- Efeito Neon no Título (padrão para desktop) --- */
             text-shadow: 0 0 10px #66fcf1, 0 0 20px #66fcf1;
             /* Neon glow effect */
             margin-top: 0;
@@ -112,6 +114,9 @@
                 width: 100%;
                 right: -100%;
                 padding: 15px;
+                /* --- REMOVENDO O EFEITO NEON PARA MOBILE --- */
+                box-shadow: none;
+                /* Remove a sombra de neon da sidebar */
             }
 
             #sidebar.open {
@@ -120,6 +125,9 @@
 
             #sidebar h2 {
                 font-size: 1.5em;
+                /* --- REMOVENDO O EFEITO NEON DO TÍTULO PARA MOBILE --- */
+                text-shadow: none;
+                /* Remove o brilho de neon do título */
             }
 
             #sidebar p {
