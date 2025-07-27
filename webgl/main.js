@@ -178,7 +178,7 @@ class MindMapViewer {
         // Aplica estilos diretamente via JavaScript
         Object.assign(versionElement.style, {
             position: 'absolute',
-            top: '10px',
+            bottom: '10px', // MUDANÇA: Altera 'top' para 'bottom'
             left: '10px',
             color: 'rgba(238, 238, 238, 0.5)', // Usa a cor do texto com opacidade
             backgroundColor: 'rgba(31, 40, 51, 0.5)', // Usa a cor de um nó com opacidade
