@@ -5,7 +5,7 @@ import { Text } from 'troika-three-text';
 import { exportMindMapToPDF } from './pdfExport.js'; // Importa a função de exportação
 
 // NOVO: Versão do programa atualizada com correções de exportação e novo tema.
-const APP_VERSION = 'v1.2.1 - PDF Export Fix & Light Theme';
+const APP_VERSION = 'v2.0.0';
 
 // --- 1. CONFIGURAÇÕES CENTRALIZADAS (TEMA CLARO) ---
 const CONFIG = {
@@ -75,6 +75,9 @@ class MindMapViewer {
         this.isDraggingNode = false;
         this.initialIntersectionPoint = new THREE.Vector3();
 
+        // Adiciona a propriedade para armazenar a instância do nó raiz D3
+        this.d3RootNode = null;
+
         // --- Variáveis de Estado para Controle de Câmera Personalizado ---
         this.isPanning = false;
         this.lastPointerPosition = new THREE.Vector2();
@@ -101,9 +104,9 @@ class MindMapViewer {
         this._initEventListeners();
         this._createVersionInfo();
 
+        // O drawMindMap agora popula this.d3RootNode
         this.drawMindMap();
-        // NOVO: Foca a câmera no nó principal após o desenho do mapa
-        this._focusCameraOnNode(this.nodeMap.get(hierarchy(this.data)));
+
         this.animate();
     }
 
@@ -144,9 +147,6 @@ class MindMapViewer {
         this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
-
-        // Removemos o listener de 'click' aqui, pois o tratamento será feito em _onMouseUp e _onTouchEnd
-        // this.renderer.domElement.addEventListener('click', this._onNodeClick.bind(this)); 
 
         if (this.sidebarCloseButton) {
             this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
@@ -353,11 +353,12 @@ class MindMapViewer {
         this.linkObjects = [];
         this.dragHandles = [];
 
-        const root = hierarchy(this.data);
-        const d3Links = root.links();
-        const d3Nodes = root.descendants();
+        // Armazena a instância do nó raiz D3
+        this.d3RootNode = hierarchy(this.data);
+        const d3Links = this.d3RootNode.links();
+        const d3Nodes = this.d3RootNode.descendants();
 
-        const originalChildren = root.children || [];
+        const originalChildren = this.d3RootNode.children || [];
         if (originalChildren.length > 0) {
             const leftCount = Math.ceil(originalChildren.length / 2);
             const leftChildren = originalChildren.slice(0, leftCount);
@@ -377,6 +378,7 @@ class MindMapViewer {
                         node.userData = node.userData || {};
                         Object.assign(node.userData, { assignedDirection: 0, d3X: 0, d3Y: 0 });
                     }
+                    // Garante que o userData é aplicado ao objeto d3Node da lista principal
                     const originalNodeInD3Nodes = d3Nodes.find(n => n.data === node.data && n.depth === node.depth);
                     if (originalNodeInD3Nodes) {
                         originalNodeInD3Nodes.userData = originalNodeInD3Nodes.userData || {};
@@ -399,6 +401,7 @@ class MindMapViewer {
                         node.userData = node.userData || {};
                         Object.assign(node.userData, { assignedDirection: 0, d3X: 0, d3Y: 0 });
                     }
+                    // Garante que o userData é aplicado ao objeto d3Node da lista principal
                     const originalNodeInD3Nodes = d3Nodes.find(n => n.data === node.data && n.depth === node.depth);
                     if (originalNodeInD3Nodes) {
                         originalNodeInD3Nodes.userData = originalNodeInD3Nodes.userData || {};
@@ -407,9 +410,9 @@ class MindMapViewer {
                 });
             }
 
-            root.children = originalChildren;
+            this.d3RootNode.children = originalChildren;
         }
-        root.userData = { ...root.userData, assignedDirection: 0, d3X: 0, d3Y: 0 };
+        this.d3RootNode.userData = { ...this.d3RootNode.userData, assignedDirection: 0, d3X: 0, d3Y: 0 };
 
 
         const nodeCreationPromises = d3Nodes.map(d3Node => {
@@ -471,7 +474,7 @@ class MindMapViewer {
                 // Lógica de cálculo de espaçamento condicional à profundidade
                 if (d3Node.depth === 1) {
                     // Para profundidade 1, use um offset fixo em relação à raiz
-                    const rootNodeGroup = this.nodeMap.get(root);
+                    const rootNodeGroup = this.nodeMap.get(this.d3RootNode); // Usa this.d3RootNode
                     const rootWidth = rootNodeGroup ? rootNodeGroup.userData.nodeWidth : 0;
 
                     // Conecte-se à borda da raiz e adicione um offset fixo e metade da largura do nó atual.
@@ -509,6 +512,9 @@ class MindMapViewer {
         const center = box.getCenter(new THREE.Vector3());
         this.mainGroup.position.sub(center);
 
+        // Chame a função para focar a câmera no nó principal após o mapa ser desenhado
+        this._focusCameraOnNode(this.nodeMap.get(this.d3RootNode));
+
         this.camera.updateProjectionMatrix();
     }
 
@@ -518,23 +524,24 @@ class MindMapViewer {
      */
     _focusCameraOnNode(nodeGroup) {
         if (!nodeGroup) {
-            console.warn("Nó para focar a câmera não encontrado.");
+            console.warn("Nó para focar a câmera não encontrado. Verifique se o nó principal foi mapeado corretamente.");
             return;
         }
 
-        // Obtém a posição do nó no sistema de coordenadas globais do Three.js
+        // Obtém a posição do nó no sistema de coordenadas globais do Three.js.
+        // Como o mainGroup já foi centralizado, esta posição já representa o centro global do nó.
         const targetPosition = new THREE.Vector3();
         nodeGroup.getWorldPosition(targetPosition);
 
-        // Ajusta a posição da câmera para focar no nó
-        // A posição do mainGroup já foi ajustada para centralizar o mind map.
-        // A câmera deve ser ajustada para olhar para a posição do nó em relação ao centro do mainGroup.
-        this.camera.position.x = targetPosition.x + this.mainGroup.position.x;
-        this.camera.position.y = targetPosition.y + this.mainGroup.position.y;
+        // Define a posição da câmera diretamente para a posição global (x e y) do nó.
+        // Isso fará com que o centro do viewport da câmera (o centro da tela)
+        // se alinhe com o centro do nó.
+        this.camera.position.x = targetPosition.x;
+        this.camera.position.y = targetPosition.y;
         this.camera.position.z = 150; // Mantém a distância original da câmera
 
         // Você também pode ajustar o zoom para que o nó principal fique bem visível
-        // Um valor de zoom de 1 geralmente é um bom ponto de partida para o nó principal
+        // Um valor de zoom de 1.0 geralmente é um bom ponto de partida para o nó principal
         this.camera.zoom = 1.0;
         this.camera.updateProjectionMatrix();
     }
@@ -792,38 +799,6 @@ class MindMapViewer {
         this._isPinching = false;
         this.isConsideredClick = true; // Reseta para o próximo evento
     }
-
-    // O _onNodeClick original é removido porque a lógica de clique agora está em _onMouseUp e _onTouchEnd
-    /*
-    _onNodeClick(event) {
-        if (this.isDraggingNode || this.isPanning || this._isPinching || event.button !== 0) return;
-        this.mouse.copy(this._getPointerCoordinates(event));
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-        const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
-        let clickedNode = null;
-        for (const intersect of intersects) {
-            let currentObject = intersect.object;
-            while (currentObject) {
-                if (currentObject.userData.isDragHandle) {
-                    clickedNode = null;
-                    break;
-                }
-                if (currentObject.userData.isNode) {
-                    clickedNode = currentObject;
-                    break;
-                }
-                currentObject = currentObject.parent;
-            }
-            if (clickedNode) break;
-        }
-        if (clickedNode) {
-            const d3NodeData = clickedNode.userData.d3Node.data;
-            this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível.');
-        } else if (this.isSidebarOpen) {
-            this.closeSidebar();
-        }
-    }
-    */
 
     // --- MÉTODOS DA SIDEBAR ---
     openSidebar(title, content) {
