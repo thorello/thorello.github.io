@@ -653,103 +653,171 @@ class MindMapViewer {
 
 // --- DADOS DO MAPA MENTAL ---
 const mindMapData = {
-    "name": "Elastic Stack (ELK)",
-    "explanation": "O Elastic Stack, anteriormente conhecido como ELK Stack, é um conjunto de ferramentas de código aberto para ingestão, processamento, armazenamento, busca e análise de dados. Ele é amplamente utilizado para monitoramento de sistemas, análise de logs, segurança e business intelligence.",
+    "name": "Auditoria e Controle Interno",
+    "explanation": "Uma visão geral sobre os conceitos fundamentais de auditoria, sua relação com o controle interno, os diferentes tipos de auditoria e as fases do processo de auditoria, com foco em pontos de atenção para concursos.",
     "children": [
         {
-            "name": "Visão Geral",
-            "explanation": "Esta seção fornece uma visão geral do Elastic Stack, abordando sua definição e os principais casos de uso para os quais ele é empregado.",
+            "name": "1. Auditoria e Controle Interno",
+            "explanation": "Define os conceitos de Auditoria e Controle Interno, detalha o framework COSO e explora a relação crucial entre essas duas áreas, destacando o papel da Auditoria Interna como a Terceira Linha de Defesa.",
             "children": [
                 {
-                    "name": "Definição",
-                    "explanation": "O Elastic Stack é um conjunto de produtos open source da Elastic para ingestão, armazenamento, busca e análise de dados de maneira escalável e em tempo real."
+                    "name": "Conceito de Auditoria",
+                    "explanation": "Processo sistemático, independente e documentado para obter evidência objetiva e avaliá-la. Em TI, foca em garantir a confidencialidade, integridade e disponibilidade dos sistemas."
                 },
                 {
-                    "name": "Casos de Uso",
-                    "explanation": "Os casos de uso do Elastic Stack incluem análise de logs, monitoramento de infraestrutura, busca empresarial, análise de segurança (SIEM), e business intelligence."
+                    "name": "Controle Interno (COSO)",
+                    "explanation": "Processo conduzido pela governança e administração para proporcionar segurança razoável quanto à realização dos objetivos de operações, divulgação e conformidade.",
+                    "children": [
+                        {
+                            "name": "Componentes do COSO",
+                            "explanation": "O framework COSO estabelece cinco componentes integrados: 1. Ambiente de Controle, 2. Avaliação de Riscos, 3. Atividades de Controle, 4. Informação e Comunicação, 5. Atividades de Monitoramento."
+                        }
+                    ]
+                },
+                {
+                    "name": "Relação Auditoria e Controle Interno",
+                    "explanation": "A Auditoria Interna avalia a eficácia dos processos de governança, gerenciamento de riscos e controles internos, funcionando como a Terceira Linha de Defesa na estrutura de governança.",
+                    "children": [
+                        {
+                            "name": "Auditoria Interna",
+                            "explanation": "Atividade independente e objetiva de avaliação e consultoria, desenhada para adicionar valor e melhorar as operações de uma organização."
+                        },
+                        {
+                            "name": "Terceira Linha de Defesa",
+                            "explanation": "A Auditoria Interna fornece uma avaliação independente à alta administração sobre a eficácia da primeira (gestão operacional) e segunda (supervisão de riscos) linhas de defesa."
+                        }
+                    ]
+                },
+                {
+                    "name": "Foco CEBRASPE (Pontos de Atenção)",
+                    "explanation": "Principais 'pegadinhas' e pontos de atenção cobrados pela banca CEBRASPE sobre a relação entre Auditoria e Controle Interno.",
+                    "children": [
+                        {
+                            "name": "Auditoria Interna vs. Controle Interno",
+                            "explanation": "ERRO COMUM: Afirmar que a Auditoria Interna é parte do controle interno. CORRETO: A Auditoria Interna AVALIA o controle interno, mas é um componente da GOVERNANÇA para manter sua independência."
+                        },
+                        {
+                            "name": "Segurança Razoável vs. Absoluta",
+                            "explanation": "O controle interno proporciona segurança 'razoável', não absoluta. Limitações inerentes como erro humano, conluio e decisões gerenciais impedem a eliminação total dos riscos."
+                        },
+                        {
+                            "name": "Posicionamento da Auditoria Interna",
+                            "explanation": "A independência é crítica. A Auditoria Interna deve se reportar funcionalmente ao mais alto nível da organização (Conselho de Administração, Comitê de Auditoria) para garantir autonomia."
+                        }
+                    ]
                 }
             ]
         },
         {
-            "name": "Elasticsearch",
-            "explanation": "Elasticsearch é um mecanismo de busca e análise distribuído e de código aberto, construído sobre o Apache Lucene. Ele permite armazenar, buscar e analisar grandes volumes de dados de forma quase em tempo real.",
+            "name": "2. Tipos de Auditoria",
+            "explanation": "Classificação das auditorias governamentais (segundo ISSAI e TCU) em três tipos principais de acordo com seus objetivos: Financeira, de Conformidade e Operacional.",
             "children": [
                 {
-                    "name": "Índice Invertido",
-                    "explanation": "O índice invertido é a estrutura de dados central do Elasticsearch, que permite buscas de texto completo de forma extremamente rápida. Ele mapeia palavras para os documentos nos quais elas aparecem."
+                    "name": "Auditoria Financeira",
+                    "explanation": "Objetivo: Expressar opinião sobre a fidedignidade e correção das demonstrações financeiras. Foco na conformidade com o arcabouço de relatório financeiro aplicável. Exemplo em TI: verificar se ativos de hardware/software estão corretamente registrados."
                 },
                 {
-                    "name": "Arquitetura",
-                    "explanation": "A arquitetura do Elasticsearch é distribuída e escalável, consistindo em nós que podem ser mestres, de dados, de ingestão, ou de machine learning, trabalhando juntos em um cluster."
+                    "name": "Auditoria de Conformidade (Regularidade)",
+                    "explanation": "Objetivo: Expressar opinião se as atividades e transações estão em conformidade com leis e normas. Foco na legalidade, legitimidade e regularidade. Exemplo em TI: verificar conformidade com a Lei nº 14.133/2021 ou LGPD."
+                },
+                {
+                    "name": "Auditoria Operacional (Desempenho)",
+                    "explanation": "Objetivo: Examinar a economicidade, eficiência, eficácia e efetividade ('4 Es') das operações. Foco na avaliação do desempenho da gestão e identificação de melhorias. Exemplo em TI: avaliar se um novo sistema atinge seus objetivos de forma eficiente.",
+                    "children": [
+                        {
+                            "name": "Os '4 Es'",
+                            "explanation": "Economia (minimizar custo dos insumos), Eficiência (relação produto/insumo), Eficácia (grau de alcance dos objetivos) e Efetividade (impacto final na sociedade)."
+                        }
+                    ]
+                },
+                {
+                    "name": "Foco CEBRASPE (Pontos de Atenção)",
+                    "explanation": "Diferenças cruciais entre os tipos de auditoria que são frequentemente exploradas em questões.",
+                    "children": [
+                        {
+                            "name": "Distinção dos Objetivos",
+                            "explanation": "Associações mandatórias: Financeira → Fidedignidade Contábil; Conformidade → Legalidade/Normas; Operacional → Desempenho e os '4 Es'. A banca pode confundir esses focos."
+                        },
+                        {
+                            "name": "Conhecimento dos '4 Es'",
+                            "explanation": "É fundamental conhecer o significado de cada 'E' da Auditoria Operacional (Economia, Eficiência, Eficácia, Efetividade), pois são conceitos distintos e frequentemente cobrados."
+                        }
+                    ]
                 }
             ]
         },
         {
-            "name": "Kibana",
-            "explanation": "Kibana é a plataforma de visualização e interface do usuário para o Elastic Stack. Ele permite explorar, visualizar e gerenciar dados armazenados no Elasticsearch.",
+            "name": "3. O Processo de Auditoria",
+            "explanation": "Descreve as fases fundamentais do trabalho de auditoria (Planejamento, Execução, Relatório) e os principais instrumentos e documentos gerados, como papéis de trabalho e achados.",
             "children": [
                 {
-                    "name": "Dashboards",
-                    "explanation": "Dashboards no Kibana são coleções de visualizações que fornecem uma visão consolidada de seus dados, permitindo monitoramento e análise em tempo real."
+                    "name": "Fases da Auditoria",
+                    "explanation": "O trabalho de auditoria é estruturado em três fases sequenciais e interdependentes.",
+                    "children": [
+                        {
+                            "name": "1. Planejamento",
+                            "explanation": "Fase crítica que define escopo, objetivos, materialidade e abordagem. Envolve conhecer a entidade e avaliar riscos e controles para definir os procedimentos."
+                        },
+                        {
+                            "name": "2. Execução",
+                            "explanation": "Fase de aplicação dos procedimentos definidos no planejamento, com coleta de evidências através de testes de controle e procedimentos substantivos."
+                        },
+                        {
+                            "name": "3. Relatório",
+                            "explanation": "Fase de comunicação dos resultados, conclusões e recomendações da auditoria para as partes interessadas, sendo o produto final do trabalho."
+                        }
+                    ]
                 },
                 {
-                    "name": "Visualizações",
-                    "explanation": "O Kibana oferece uma variedade de visualizações, como gráficos de barras, gráficos de linhas, mapas, tabelas e nuvens de tags, para representar seus dados."
-                }
-            ]
-        },
-        {
-            "name": "Logstash",
-            "explanation": "Logstash é uma ferramenta de pipeline de dados de código aberto que coleta dados de várias fontes, transforma-os e os envia para o Elasticsearch ou outras saídas.",
-            "children": [
-                {
-                    "name": "Plugins de Entrada",
-                    "explanation": "Logstash suporta vários plugins de entrada, como arquivos, syslog, beats, Kafka, e S3, para coletar dados de diversas fontes."
+                    "name": "Instrumentos da Auditoria",
+                    "explanation": "Conjunto de documentos e ferramentas que formalizam e evidenciam o trabalho do auditor.",
+                    "children": [
+                        {
+                            "name": "Papéis de Trabalho",
+                            "explanation": "Conjunto de documentos e registros que constituem a evidência do trabalho realizado, suportando as conclusões do relatório."
+                        },
+                        {
+                            "name": "Achado de Auditoria",
+                            "explanation": "Resultado da comparação entre a 'situação encontrada' (condição) e o 'critério' (o que deveria ser). Um achado completo possui os '4 Cs'.",
+                            "children": [
+                                {
+                                    "name": "Os '4 Cs' do Achado",
+                                    "explanation": "Condição (o que é), Critério (o que deveria ser), Causa (razão da divergência) e Consequência/Efeito (impacto ou risco)."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Matriz de Achados",
+                            "explanation": "Instrumento usado no planejamento para consolidar os achados, suas causas, efeitos e as propostas de recomendação."
+                        },
+                        {
+                            "name": "Relatório de Auditoria",
+                            "explanation": "Produto final e principal instrumento de comunicação dos resultados da auditoria."
+                        }
+                    ]
                 },
                 {
-                    "name": "Plugins de Filtro",
-                    "explanation": "Os plugins de filtro do Logstash, como Grok, Mutate, Date, e GeoIP, permitem parsear e transformar dados antes de serem indexados."
-                }
-            ]
-        },
-        {
-            "name": "Beats",
-            "explanation": "Beats são 'shippers' de dados leves e de código aberto que enviam dados de servidores e sistemas para o Logstash ou Elasticsearch.",
-            "children": [
-                {
-                    "name": "Filebeat",
-                    "explanation": "Filebeat é um Beat para encaminhamento de logs, que monitora arquivos de log em diretórios específicos e os envia de forma eficiente."
-                },
-                {
-                    "name": "Metricbeat",
-                    "explanation": "Metricbeat é um Beat para coleta de métricas, que coleta métricas de sistemas e serviços (CPU, memória, rede, Docker, etc.)."
-                },
-                {
-                    "name": "Packetbeat",
-                    "explanation": "Packetbeat é um Beat para análise de rede, que captura dados de pacotes de rede e os decodifica para insights sobre o tráfego da aplicação."
-                }
-            ]
-        },
-        {
-            "name": "Recursos Adicionais (X-Pack)",
-            "explanation": "X-Pack é um conjunto de recursos que estende as capacidades do Elastic Stack, oferecendo funcionalidades de segurança, monitoramento, alertas, relatórios e machine learning.",
-            "children": [
-                {
-                    "name": "Segurança",
-                    "explanation": "Recursos de segurança do X-Pack incluem autenticação, autorização baseada em funções, criptografia de comunicação e auditoria."
-                },
-                {
-                    "name": "Machine Learning",
-                    "explanation": "Funcionalidades de Machine Learning do X-Pack permitem detectar anomalias em seus dados automaticamente."
-                },
-                {
-                    "name": "Alertas e Monitoramento",
-                    "explanation": "O X-Pack oferece ferramentas para monitorar o Elastic Stack e criar alertas baseados em condições nos seus dados."
+                    "name": "Foco CEBRASPE (Pontos de Atenção)",
+                    "explanation": "Aspectos do processo de auditoria que são alvos frequentes de questões de concurso.",
+                    "children": [
+                        {
+                            "name": "Importância do Planejamento",
+                            "explanation": "O planejamento é a fase mais crítica, não a execução. Um planejamento inadequado, não baseado em riscos, compromete todo o trabalho."
+                        },
+                        {
+                            "name": "Atributos do Achado ('4 Cs')",
+                            "explanation": "A banca frequentemente testa o conhecimento sobre os '4 Cs', questionando a validade ou completude de um achado que não apresente todos os quatro atributos."
+                        },
+                        {
+                            "name": "Evidência de Auditoria",
+                            "explanation": "As conclusões devem ser baseadas em evidência 'suficiente e apropriada'. Suficiência refere-se à QUANTIDADE de evidência; Apropriação refere-se à QUALIDADE (relevância e fidedignidade)."
+                        }
+                    ]
                 }
             ]
         }
     ]
-};
+}
 
 
 // --- INICIALIZAÇÃO ---
