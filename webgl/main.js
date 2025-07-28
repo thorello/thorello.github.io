@@ -1,37 +1,34 @@
 import * as THREE from 'three';
-// Removido: import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
 
 // NOVO: Versão atualizada do programa.
-const APP_VERSION = 'v1.0.7 - custom camera controls'; // Atualizado para refletir os novos controles
+const APP_VERSION = 'v1.0.8 - modern style improvements'; // Atualizado para refletir o novo estilo
 
-// --- 1. CONFIGURAÇÕES CENTRALIZADAS ---
+// --- 1. CONFIGURAÇÕES CENTRALIZADAS (ESTILO MODERNO) ---
 const CONFIG = {
-    backgroundColor: 0x161823, // Fundo bem escuro
+    backgroundColor: 0x0F111A, // Azul muito escuro, quase preto para um fundo moderno
     nodeColors: [
-        0x3B3486, // Roxo azulado escuro (Base)
-        0x4E3486, // Roxo azulado um pouco mais claro
-        0x5F4B8B, // Um tom de roxo mais profundo
-        0x6C5B7B, // Um roxo muito escuro para contraste
-        0x355C7D,
-        0x6C5B7B,
-        0xC06C84,
-        0xF67280
+        0x334466, // Azul petróleo suave (Base)
+        0x556688, // Azul médio
+        0x7788AA, // Azul acinzentado claro
+        0x99AABB, // Azul acinzentado muito claro
+        0xF9A825, // Amarelo/Laranja vibrante para destaque ou profundidade (se usar mais de 4 níveis)
+        0x4CAF50  // Verde suave para outro nível (se usar mais de 5 níveis)
     ],
-    linkColor: 0x45a299, // Teal para as linhas
-    dragHandleColor: 0x66fcf1, // Teal/ciano brilhante para o manipulador de arrasto
-    textColor: 0xEEEEEE, // Cor de texto clara para alto contraste nos retângulos escuros
+    linkColor: 0x81D4FA, // Azul claro, vibrante e moderno
+    dragHandleColor: 0xFFFFFF, // Branco puro para sutilidade
+    textColor: 0xFFFFFF, // Branco puro para contraste máximo
     font: {
-        size: 14,
+        size: 16, // Um pouco maior para melhor legibilidade
     },
-    padding: { x: 18, y: 5 },
-    borderRadius: 8,
-    dragHandleRadius: 8,
+    padding: { x: 20, y: 10 }, // Aumentar um pouco o padding interno do nó
+    borderRadius: 12, // Cantos mais arredondados para um toque mais suave
+    dragHandleRadius: 6, // Um pouco menor e mais discreto
     zoom: {
         speed: 0.2, // Velocidade do zoom para roda do mouse e pinch (ajustável)
-        min: 0.1,    // Zoom mínimo (mais afastado)
-        max: 5,     // Zoom máximo (mais aproximado)
+        min: 0.05,  // Permite mais zoom out (mais afastado)
+        max: 8,     // Permite mais zoom in (mais aproximado)
     }
 };
 
@@ -82,7 +79,12 @@ class MindMapViewer {
         this.initialPinchZoom = 1; // Zoom da câmera no início do pinch
         this.pinchCenterWorld = new THREE.Vector3(); // Ponto central do pinch no mundo
 
-        // Sidebar elements
+        // NOVO: Variáveis para diferenciar tap de drag em touch
+        this.initialTouchCoords = new THREE.Vector2(); // Armazena a posição inicial do toque
+        this.isConsideredClick = true; // Flag para determinar se a sequência de toque foi um clique
+        this.tapThreshold = 5; // Limiar de movimento em pixels para considerar um drag ao invés de um click/tap
+
+        // Sidebar elements (assumindo que existam no seu HTML)
         this.sidebar = document.getElementById('sidebar');
         this.sidebarTitle = document.getElementById('sidebar-title');
         this.sidebarContent = document.getElementById('sidebar-content');
@@ -90,7 +92,6 @@ class MindMapViewer {
         this.isSidebarOpen = false;
 
         this._initScene();
-        // Removido: this._initControls(); // Não usamos mais OrbitControls
         this._initEventListeners();
         this._createVersionInfo();
 
@@ -123,8 +124,6 @@ class MindMapViewer {
         this.mouse = new THREE.Vector2();
     }
 
-    // Removido: _initControls() - Completamente substituído por controle customizado
-
     _initEventListeners() {
         window.addEventListener('resize', this._onWindowResize.bind(this));
         // MOUSE EVENTS
@@ -138,15 +137,14 @@ class MindMapViewer {
         this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
 
-        // LISTENER DE CLIQUE NO NÓ
+        // LISTENER DE CLIQUE NO NÓ (MANTIDO PARA DESKTOP, MAS TAPS MOBILE SÃO TRATADOS EM _onTouchEnd)
         this.renderer.domElement.addEventListener('click', this._onNodeClick.bind(this));
+
 
         // Listener do botão de fechar da sidebar
         if (this.sidebarCloseButton) {
             this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
         }
-
-        // Removido: Não há mais um listener 'change' do OrbitControls
     }
 
     _createVersionInfo() {
@@ -157,8 +155,8 @@ class MindMapViewer {
             position: 'absolute',
             bottom: '10px',
             left: '10px',
-            color: 'rgba(238, 238, 238, 0.5)',
-            backgroundColor: 'rgba(31, 40, 51, 0.5)',
+            color: 'rgba(255, 255, 255, 0.5)', // Cor branca suave para o texto da versão
+            backgroundColor: 'rgba(15, 17, 26, 0.5)', // Cor do fundo do botão para combinar com o background da cena
             padding: '4px 8px',
             borderRadius: '4px',
             fontSize: '12px',
@@ -190,12 +188,13 @@ class MindMapViewer {
             textMesh.color = CONFIG.textColor;
             textMesh.anchorX = 'left';
             textMesh.anchorY = 'middle';
-            textMesh.position.z = 0.1;
+            textMesh.position.z = 0.1; // Levemente à frente do retângulo
 
             textMesh.sync(() => {
                 const bounds = textMesh.textRenderInfo.bounds;
-                const textWidth = bounds ? bounds.x[1] - bounds.x[0] : d3Node.data.name.length * 8;
-                const textHeight = bounds ? bounds.y[1] - bounds.y[0] : 20;
+                // Fallback se bounds não estiverem disponíveis imediatamente
+                const textWidth = bounds ? bounds.x[1] - bounds.x[0] : d3Node.data.name.length * (CONFIG.font.size * 0.6);
+                const textHeight = bounds ? bounds.y[1] - bounds.y[0] : CONFIG.font.size * 1.2;
 
                 const rectWidth = textWidth + CONFIG.padding.x * 2;
                 const rectHeight = textHeight + CONFIG.padding.y * 2;
@@ -203,29 +202,31 @@ class MindMapViewer {
                 const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
                 const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
                 const rectMesh = new THREE.Mesh(rectGeo, rectMat);
-                rectMesh.position.x = rectWidth / 2;
+                rectMesh.position.x = rectWidth / 2; // Centraliza o retângulo para que o texto comece no padding.x
+                nodeGroup.add(rectMesh);
 
-                // Borda para destaque (opcional)
+                // Borda para destaque (opcional, mais sutil agora)
                 const borderGeo = createRoundedRectGeometry(rectWidth + 4, rectHeight + 4, CONFIG.borderRadius);
                 const borderMat = new THREE.MeshBasicMaterial({
-                    color: 0x00FFFF,
+                    color: nodeColor, // Usar a mesma cor do nó para uma borda sutil
                     transparent: true,
-                    opacity: 0.15
+                    opacity: 0.2 // Aumentar um pouco a opacidade para ser mais perceptível
                 });
                 const borderMesh = new THREE.Mesh(borderGeo, borderMat);
                 borderMesh.position.x = rectWidth / 2;
-                borderMesh.position.z = -0.05;
+                borderMesh.position.z = -0.05; // Levemente para trás do retângulo principal
                 nodeGroup.add(borderMesh);
 
-                textMesh.position.x = CONFIG.padding.x;
+                textMesh.position.x = CONFIG.padding.x; // Posição do texto alinhada com o padding
 
-                nodeGroup.add(rectMesh, textMesh);
+                nodeGroup.add(textMesh);
                 nodeGroup.userData.nodeWidth = rectWidth;
 
+                // Drag Handle
                 const handleGeo = new THREE.CircleGeometry(CONFIG.dragHandleRadius, 32);
-                const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.5 });
+                const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.6 });
                 const handleMesh = new THREE.Mesh(handleGeo, handleMat);
-                handleMesh.position.set(rectWidth, 0, 0.2);
+                handleMesh.position.set(rectWidth, 0, 0.2); // Posição à direita do nó
                 handleMesh.userData = { isDragHandle: true, nodeGroup };
 
                 nodeGroup.add(handleMesh);
@@ -242,20 +243,28 @@ class MindMapViewer {
 
         if (!sourceNodeGroup || !targetNodeGroup) return;
 
+        // Ponto de início: direita do nó fonte
         const start = new THREE.Vector3(
             sourceNodeGroup.position.x + sourceNodeGroup.userData.nodeWidth,
             sourceNodeGroup.position.y,
             0
         );
+        // Ponto de término: esquerda do nó destino
         const end = targetNodeGroup.position;
 
+        // Pontos de controle para uma curva suave (Bezier)
         const controlPoint1 = new THREE.Vector3((start.x + end.x) / 2, start.y, 0);
         const controlPoint2 = new THREE.Vector3((start.x + end.x) / 2, end.y, 0);
 
         const curve = new THREE.CubicBezierCurve3(start, controlPoint1, controlPoint2, end);
-        const points = curve.getPoints(50);
+        const points = curve.getPoints(50); // Mais pontos para uma curva mais suave
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: CONFIG.linkColor, linewidth: 2, transparent: true, opacity: 0.5 });
+        const material = new THREE.LineBasicMaterial({
+            color: CONFIG.linkColor,
+            linewidth: 3, // Aumenta a espessura da linha
+            transparent: true,
+            opacity: 0.4 // Reduz a opacidade para um visual mais suave
+        });
 
         const curveObject = new THREE.Line(geometry, material);
         curveObject.userData = { linkData };
@@ -291,6 +300,7 @@ class MindMapViewer {
     // --- LÓGICA PRINCIPAL ---
 
     async drawMindMap() {
+        // Limpa a cena antes de redesenhar
         while (this.mainGroup.children.length) {
             this.mainGroup.remove(this.mainGroup.children[0]);
         }
@@ -302,11 +312,15 @@ class MindMapViewer {
         const d3Nodes = root.descendants();
         const d3Links = root.links();
 
-        const maxDepth = d3Nodes.reduce((max, n) => Math.max(max, n.depth), 0);
+        // Calcular a largura máxima do texto para espaçamento horizontal
         const maxTextLength = d3Nodes.reduce((max, n) => Math.max(max, n.data.name.length), 0);
+        // Ajustar espaçamento baseado no tamanho da fonte e padding configurados
+        const horizontalNodeSpacing = CONFIG.padding.x * 2 + CONFIG.font.size * maxTextLength * 0.6; // Estimativa de largura do texto
+        const verticalNodeSpacing = CONFIG.padding.y * 2 + CONFIG.font.size * 1.5; // Estimativa de altura da linha
 
-        const verticalSpacing = 0 + (maxDepth * 15);
-        const horizontalSpacing = 100 + (maxTextLength * 7);
+        // Ajuste do espaçamento entre os nós
+        const horizontalSpacing = horizontalNodeSpacing + 80; // Adiciona um valor fixo para espaço extra
+        const verticalSpacing = verticalNodeSpacing + 30; // Adiciona um valor fixo para espaço extra
 
         const treeLayout = tree().nodeSize([verticalSpacing, horizontalSpacing]);
         treeLayout(root);
@@ -316,6 +330,8 @@ class MindMapViewer {
 
         nodeGroups.forEach(nodeGroup => {
             const d3Node = nodeGroup.userData.d3Node;
+            // Posição ajustada: d3.tree retorna y para profundidade e x para ordem.
+            // Invertemos para layout horizontal e centralizamos os nós verticalmente.
             nodeGroup.position.set(d3Node.y, -d3Node.x, 0);
             this.mainGroup.add(nodeGroup);
             this.nodeMap.set(d3Node, nodeGroup);
@@ -323,6 +339,7 @@ class MindMapViewer {
 
         d3Links.forEach(link => this._createLinkMesh(link));
 
+        // Centralizar o mapa mental na cena
         const box = new THREE.Box3().setFromObject(this.mainGroup);
         const center = box.getCenter(new THREE.Vector3());
         this.mainGroup.position.sub(center);
@@ -356,7 +373,7 @@ class MindMapViewer {
             return; // Se a sidebar estiver aberta, ignore o evento de zoom
         }
 
-        // 1. Posição do mouse em NDC
+        // 1. Posição do mouse em NDC (Normalized Device Coordinates)
         this.mouse.copy(this._getPointerCoordinates(event));
 
         // 2. Converter a posição do mouse NDC para Coordenadas do Mundo ANTES do zoom
@@ -378,13 +395,11 @@ class MindMapViewer {
         const worldPosAfterZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0);
         worldPosAfterZoom.unproject(this.camera);
 
-        // 7. Calcular o deslocamento (pan) necessário
+        // 7. Calcular o deslocamento (pan) necessário para manter o ponto sob o mouse fixo
         const panDelta = new THREE.Vector3().subVectors(worldPosBeforeZoom, worldPosAfterZoom);
 
         // 8. Aplicar o deslocamento à posição da câmera
         this.camera.position.add(panDelta);
-
-        // Não há controls.target para atualizar, pois removemos OrbitControls
     }
 
     _onMouseDown(event) {
@@ -402,10 +417,11 @@ class MindMapViewer {
                 this.selectedNode = handle.userData.nodeGroup;
                 this.isDraggingNode = true;
 
-                const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+                const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0); // Plano XY em Z=0
                 const intersectionPoint = new THREE.Vector3();
                 this.raycaster.ray.intersectPlane(plane, intersectionPoint);
 
+                // Calcula o offset do ponto de clique em relação ao centro do nó
                 this.offset.copy(intersectionPoint).sub(this.selectedNode.position);
                 this.isPanning = false; // Desativa pan da câmera se estiver arrastando um nó
             }
@@ -463,7 +479,11 @@ class MindMapViewer {
 
         event.preventDefault(); // Previne o comportamento padrão (scroll, etc.)
 
+        this.isConsideredClick = true; // Assume que é um clique/tap inicialmente
+
         if (event.touches.length === 1) {
+            this.initialTouchCoords.set(event.touches[0].clientX, event.touches[0].clientY); // Guarda a posição inicial do toque para detecção de tap
+
             // Tenta arrastar nó (prioridade) ou pan da câmera
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -493,15 +513,15 @@ class MindMapViewer {
             this.isDraggingNode = false; // Desativa arrasto de nó
             this.isPanning = false; // Desativa pan de um dedo
             this._isPinching = true;
+            this.isConsideredClick = false; // Dois dedos significa que não é um clique
 
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
             // Calcula a distância inicial entre os dois toques
-            this.initialPinchDistance = touch1.clientX - touch2.clientX;
             this.initialPinchDistance = Math.sqrt(
-                this.initialPinchDistance * this.initialPinchDistance +
-                (touch1.clientY - touch2.clientY) * (touch1.clientY - touch2.clientY)
+                Math.pow(touch1.clientX - touch2.clientX, 2) +
+                Math.pow(touch1.clientY - touch2.clientY, 2)
             );
 
             this.initialPinchZoom = this.camera.zoom; // Guarda o zoom atual para o cálculo relativo
@@ -522,6 +542,19 @@ class MindMapViewer {
         }
 
         event.preventDefault(); // Previne o comportamento padrão (scroll, etc.)
+
+        // NOVO: Verifica se houve movimento significativo para desativar a detecção de "click"
+        if (this.isConsideredClick && event.touches.length === 1) {
+            const currentX = event.touches[0].clientX;
+            const currentY = event.touches[0].clientY;
+            const deltaX = currentX - this.initialTouchCoords.x;
+            const deltaY = currentY - this.initialTouchCoords.y;
+            const moveDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            if (moveDistance > this.tapThreshold) {
+                this.isConsideredClick = false; // Moveu demais, não é um clique/tap
+            }
+        }
 
         if (this.isDraggingNode && this.selectedNode) {
             // Move o nó se estiver arrastando com um dedo
@@ -547,18 +580,19 @@ class MindMapViewer {
             this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
         } else if (this._isPinching && event.touches.length === 2) {
             // Zoom de pinça com dois dedos
+            this.isConsideredClick = false; // Pinching is never a click
+
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
             // Calcula a distância atual entre os dois toques
-            const currentPinchDistance = touch1.clientX - touch2.clientX;
-            const dist = Math.sqrt(
-                currentPinchDistance * currentPinchDistance +
-                (touch1.clientY - touch2.clientY) * (touch1.clientY - touch2.clientY)
+            const currentPinchDistance = Math.sqrt(
+                Math.pow(touch1.clientX - touch2.clientX, 2) +
+                Math.pow(touch1.clientY - touch2.clientY, 2)
             );
 
             // Calcula o novo zoom com base na proporção da distância de pinça e o zoom inicial
-            let newZoom = this.initialPinchZoom * (dist / this.initialPinchDistance);
+            let newZoom = this.initialPinchZoom * (currentPinchDistance / this.initialPinchDistance);
 
             // Aplica os limites de zoom
             newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
@@ -586,17 +620,55 @@ class MindMapViewer {
     }
 
     _onTouchEnd(event) {
+        // NOVO: Se foi considerado um clique/tap (sem movimento significativo ou multi-touch)
+        if (this.isConsideredClick) {
+            // Reutiliza as coordenadas do toque inicial ou as últimas coordenadas do mouse
+            // para o raycaster. Para taps, a posição inicial é a mais precisa.
+            // Para garantir que o raycaster use a posição correta do touch,
+            // podemos recalcular a partir da posição do `touchend` se necessário,
+            // mas `this.mouse` já deve estar atualizado do `_onTouchStart`.
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+
+            const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
+
+            let clickedNode = null;
+            for (const intersect of intersects) {
+                // Prioriza o grupo do nó (o pai) se for um elemento do nó e não o drag handle
+                if (intersect.object.parent && intersect.object.parent.userData.isNode && !intersect.object.userData.isDragHandle) {
+                    clickedNode = intersect.object.parent;
+                    break;
+                } else if (intersect.object.userData.isNode && !intersect.object.userData.isDragHandle) {
+                    // Caso o próprio objeto seja o nó (ex: o mesh do retângulo)
+                    clickedNode = intersect.object;
+                    break;
+                }
+            }
+
+            if (clickedNode) {
+                const d3NodeData = clickedNode.userData.d3Node.data;
+                this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível para este tópico.');
+            } else {
+                // Se o clique for fora de um nó e a sidebar estiver aberta, fecha-a.
+                if (this.isSidebarOpen) {
+                    this.closeSidebar();
+                }
+            }
+        }
+
         // Redefine todos os estados de interação de toque
         this.isDraggingNode = false;
         this.isPanning = false;
         this._isPinching = false;
+        this.isConsideredClick = true; // Reseta para a próxima interação
     }
 
+    // Mantido para clicks de mouse em desktop (e não afetará o touch)
     _onNodeClick(event) {
         // Se estiver arrastando um nó ou pan, não processa o clique para evitar ações acidentais.
-        // O event.button !== 0 filtra cliques que não sejam com o botão esquerdo.
-        // event.touches && event.touches.length > 1 filtra toques com múltiplos dedos.
-        if (this.isDraggingNode || this.isPanning || this._isPinching || event.button !== 0 || (event.touches && event.touches.length > 1)) {
+        // event.button !== 0 filtra cliques que não sejam com o botão esquerdo.
+        // event.touches && event.touches.length > 1 é uma verificação que é redundante aqui se
+        // este listener é para o evento 'click' do navegador (que não tem 'touches').
+        if (this.isDraggingNode || this.isPanning || this._isPinching || event.button !== 0) {
             return;
         }
 
@@ -648,11 +720,10 @@ class MindMapViewer {
         }
     }
 
-
     // --- LOOP DE ANIMAÇÃO ---
     animate() {
         requestAnimationFrame(this.animate.bind(this));
-        // Não há OrbitControls para atualizar aqui. A câmera é movida diretamente pelos eventos.
+        // A câmera é movida diretamente pelos eventos, sem necessidade de update de controles externos.
         this.renderer.render(this.scene, this.camera);
     }
 }
@@ -829,6 +900,6 @@ const mindMapData = {
 
 // --- INICIALIZAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Por padrão, o container é o body. Se você tiver um container específico, mude aqui.
+    // Por padrão, o container é o body. Se você tiver um container específico (ex: <div id="mindmap-container">), mude aqui.
     new MindMapViewer(document.body, mindMapData);
 });
