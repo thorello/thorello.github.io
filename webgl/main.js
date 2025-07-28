@@ -1,23 +1,23 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+// Removido: import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
 
 // NOVO: Versão atualizada do programa.
-const APP_VERSION = 'v1.0.6 - sidebar lock';
+const APP_VERSION = 'v1.0.7 - custom camera controls'; // Atualizado para refletir os novos controles
 
 // --- 1. CONFIGURAÇÕES CENTRALIZADAS ---
 const CONFIG = {
-    backgroundColor: 0x0b0c10, // Fundo bem escuro
+    backgroundColor: 0x161823, // Fundo bem escuro
     nodeColors: [
-        0x1f2833, // Azul escuro acinzentado (Base)
-        0x2e4a5a, // Azul escuro um pouco mais claro
-        0x123C4F, // Um tom de azul mais profundo
-        0x0A2B3E, // Um azul muito escuro para contraste
-        0x334a52,
-        0x5c848d,
-        0x22333b,
-        0x7fc7d9
+        0x3B3486, // Roxo azulado escuro (Base)
+        0x4E3486, // Roxo azulado um pouco mais claro
+        0x5F4B8B, // Um tom de roxo mais profundo
+        0x6C5B7B, // Um roxo muito escuro para contraste
+        0x355C7D,
+        0x6C5B7B,
+        0xC06C84,
+        0xF67280
     ],
     linkColor: 0x45a299, // Teal para as linhas
     dragHandleColor: 0x66fcf1, // Teal/ciano brilhante para o manipulador de arrasto
@@ -29,9 +29,9 @@ const CONFIG = {
     borderRadius: 8,
     dragHandleRadius: 8,
     zoom: {
-        speed: 0.75, // Velocidade do zoom
-        min: 0.1,    // Zoom mínimo
-        max: 20,     // Zoom máximo
+        speed: 0.2, // Velocidade do zoom para roda do mouse e pinch (ajustável)
+        min: 0.1,    // Zoom mínimo (mais afastado)
+        max: 5,     // Zoom máximo (mais aproximado)
     }
 };
 
@@ -72,11 +72,15 @@ class MindMapViewer {
         this.offset = new THREE.Vector3();
         this.isDraggingNode = false;
 
-        // Variáveis para controle de toque
-        this.lastPinchCenterScreen = new THREE.Vector2(); // Posição do centro do pinch na tela (NDC)
-        this._pointerWorldBeforeZoom = new THREE.Vector3(); // Posição do centro do pinch no mundo ANTES do zoom
-        this._isPinching = false;
+        // --- Variáveis de Estado para Controle de Câmera Customizado ---
+        this.isPanning = false; // Indica se o usuário está arrastando a cena
+        this.lastPointerPosition = new THREE.Vector2(); // Última posição do ponteiro para cálculo do pan
 
+        // Variáveis para controle de toque (pinch-to-zoom)
+        this._isPinching = false;
+        this.initialPinchDistance = 0; // Distância entre os dois toques no início do pinch
+        this.initialPinchZoom = 1; // Zoom da câmera no início do pinch
+        this.pinchCenterWorld = new THREE.Vector3(); // Ponto central do pinch no mundo
 
         // Sidebar elements
         this.sidebar = document.getElementById('sidebar');
@@ -85,9 +89,8 @@ class MindMapViewer {
         this.sidebarCloseButton = document.getElementById('sidebar-close');
         this.isSidebarOpen = false;
 
-
         this._initScene();
-        this._initControls();
+        // Removido: this._initControls(); // Não usamos mais OrbitControls
         this._initEventListeners();
         this._createVersionInfo();
 
@@ -106,7 +109,8 @@ class MindMapViewer {
             window.innerHeight / 2, window.innerHeight / -2,
             1, 1000
         );
-        this.camera.position.z = 100;
+        this.camera.position.z = 150; // Posição padrão da câmera
+        this.camera.zoom = 1; // Zoom inicial da câmera
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -119,43 +123,17 @@ class MindMapViewer {
         this.mouse = new THREE.Vector2();
     }
 
-    // ✅ MÉTODO CORRIGIDO
-    _initControls() {
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.enableRotate = false;
-
-        // 1. Mantemos o zoom habilitado para que o DOLLY_PAN (pinch) funcione no mobile.
-        // A desativação lógica será feita nos event handlers.
-        this.controls.enableZoom = true;
-
-        // --- ✅ NOVA LINHA: DESATIVA O HANDLER INTERNO DA RODA DO MOUSE ---
-        // Ao substituir a função interna por uma vazia, impedimos que o OrbitControls
-        // processe o evento 'wheel', deixando nosso handler personalizado (_onMouseWheel)
-        // com controle total sobre o zoom no desktop.
-        this.controls.onMouseWheel = () => { };
-
-        this.controls.enablePan = true;
-        this.controls.mouseButtons = {
-            LEFT: THREE.MOUSE.PAN,
-            MIDDLE: THREE.MOUSE.PAN,
-            RIGHT: THREE.MOUSE.PAN
-        };
-        this.controls.touches = {
-            ONE: THREE.TOUCH.PAN,
-            TWO: THREE.TOUCH.DOLLY_PAN
-        };
-    }
+    // Removido: _initControls() - Completamente substituído por controle customizado
 
     _initEventListeners() {
         window.addEventListener('resize', this._onWindowResize.bind(this));
+        // MOUSE EVENTS
         this.renderer.domElement.addEventListener('mousedown', this._onMouseDown.bind(this));
         this.renderer.domElement.addEventListener('mousemove', this._onMouseMove.bind(this));
         this.renderer.domElement.addEventListener('mouseup', this._onMouseUp.bind(this));
+        this.renderer.domElement.addEventListener('wheel', this._onMouseWheel.bind(this), { passive: false }); // Zoom da roda do mouse
 
-        // Listener personalizado para a roda do mouse
-        this.renderer.domElement.addEventListener('wheel', this._onMouseWheel.bind(this), { passive: false });
-
-        // LISTENERS DE TOQUE
+        // TOUCH EVENTS (PARA PAN E ZOOM DE PINÇA)
         this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
@@ -168,8 +146,7 @@ class MindMapViewer {
             this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
         }
 
-        // Listener 'change' para corrigir o pan do zoom de pinça (mobile)
-        this.controls.addEventListener('change', this._onControlsChange.bind(this));
+        // Removido: Não há mais um listener 'change' do OrbitControls
     }
 
     _createVersionInfo() {
@@ -278,7 +255,7 @@ class MindMapViewer {
         const curve = new THREE.CubicBezierCurve3(start, controlPoint1, controlPoint2, end);
         const points = curve.getPoints(50);
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: CONFIG.linkColor, linewidth: 2 });
+        const material = new THREE.LineBasicMaterial({ color: CONFIG.linkColor, linewidth: 2, transparent: true, opacity: 0.5 });
 
         const curveObject = new THREE.Line(geometry, material);
         curveObject.userData = { linkData };
@@ -328,8 +305,8 @@ class MindMapViewer {
         const maxDepth = d3Nodes.reduce((max, n) => Math.max(max, n.depth), 0);
         const maxTextLength = d3Nodes.reduce((max, n) => Math.max(max, n.data.name.length), 0);
 
-        const verticalSpacing = 40 + (maxDepth * 15);
-        const horizontalSpacing = 150 + (maxTextLength * 7);
+        const verticalSpacing = 0 + (maxDepth * 15);
+        const horizontalSpacing = 100 + (maxTextLength * 7);
 
         const treeLayout = tree().nodeSize([verticalSpacing, horizontalSpacing]);
         treeLayout(root);
@@ -351,7 +328,7 @@ class MindMapViewer {
         this.mainGroup.position.sub(center);
     }
 
-    // --- EVENT HANDLERS ---
+    // --- EVENT HANDLERS (CONTROLES CUSTOMIZADOS) ---
 
     _onWindowResize() {
         this.camera.left = window.innerWidth / -2;
@@ -372,46 +349,48 @@ class MindMapViewer {
         };
     }
 
-    /**
-     * Lida com o evento de scroll do mouse para implementar o zoom no ponteiro.
-     * @param {WheelEvent} event
-     */
     _onMouseWheel(event) {
-        // --- NOVO: Impede o zoom se a sidebar estiver aberta ---
+        event.preventDefault(); // Impede o scroll da página
+
         if (this.isSidebarOpen) {
-            event.preventDefault(); // Garante que o scroll não afete a página também
-            return;
+            return; // Se a sidebar estiver aberta, ignore o evento de zoom
         }
 
-        event.preventDefault();
-        event.stopPropagation();
+        // 1. Posição do mouse em NDC
+        this.mouse.copy(this._getPointerCoordinates(event));
 
-        const pointerNDC = this._getPointerCoordinates(event);
-        const pointerVector = new THREE.Vector3(pointerNDC.x, pointerNDC.y, 0);
-        const worldPosBefore = pointerVector.clone().unproject(this.camera);
+        // 2. Converter a posição do mouse NDC para Coordenadas do Mundo ANTES do zoom
+        const worldPosBeforeZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0);
+        worldPosBeforeZoom.unproject(this.camera);
 
-        const zoomFactor = event.deltaY < 0 ? 1.15 : 1 / 1.15;
-        const newZoom = this.camera.zoom * zoomFactor;
+        // 3. Calcular o novo fator de zoom
+        const zoomExponent = event.deltaY * -0.01 * CONFIG.zoom.speed;
+        let newZoom = this.camera.zoom * Math.pow(2, zoomExponent);
 
-        this.camera.zoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
+        // 4. Aplicar os limites de zoom
+        newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
+
+        // 5. Aplicar o novo zoom à câmera
+        this.camera.zoom = newZoom;
         this.camera.updateProjectionMatrix();
 
-        const worldPosAfter = pointerVector.clone().unproject(this.camera);
-        const panDelta = new THREE.Vector3().subVectors(worldPosBefore, worldPosAfter);
+        // 6. Converter a posição do mouse NDC para Coordenadas do Mundo DEPOIS do zoom
+        const worldPosAfterZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0);
+        worldPosAfterZoom.unproject(this.camera);
 
+        // 7. Calcular o deslocamento (pan) necessário
+        const panDelta = new THREE.Vector3().subVectors(worldPosBeforeZoom, worldPosAfterZoom);
+
+        // 8. Aplicar o deslocamento à posição da câmera
         this.camera.position.add(panDelta);
-        this.controls.target.add(panDelta);
+
+        // Não há controls.target para atualizar, pois removemos OrbitControls
     }
 
     _onMouseDown(event) {
-        // Se a sidebar estiver aberta, o controle do OrbitControls para pan e zoom é desativado
-        // e o arrasto de nós também não deve acontecer para evitar interações indesejadas.
-        if (this.isSidebarOpen) {
-            this.controls.enabled = false;
+        if (this.isSidebarOpen || event.button !== 0) { // Verifica se é o botão esquerdo do mouse
             return;
         }
-
-        if (event.button !== 0) return;
 
         this.mouse.copy(this._getPointerCoordinates(event));
         this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -420,7 +399,6 @@ class MindMapViewer {
         if (intersects.length > 0) {
             const handle = intersects[0].object;
             if (handle.userData.isDragHandle) {
-                this.controls.enabled = false;
                 this.selectedNode = handle.userData.nodeGroup;
                 this.isDraggingNode = true;
 
@@ -429,163 +407,196 @@ class MindMapViewer {
                 this.raycaster.ray.intersectPlane(plane, intersectionPoint);
 
                 this.offset.copy(intersectionPoint).sub(this.selectedNode.position);
+                this.isPanning = false; // Desativa pan da câmera se estiver arrastando um nó
             }
         } else {
+            // Se nenhum handle foi clicado, inicie o pan da câmera
             this.isDraggingNode = false;
-            // Se nenhum handle for clicado e a sidebar não estiver aberta, reative os controles.
-            this.controls.enabled = true;
+            this.isPanning = true;
+            this.lastPointerPosition.set(event.clientX, event.clientY); // Guarda a posição inicial do ponteiro na tela
         }
     }
 
     _onMouseMove(event) {
-        // Se a sidebar estiver aberta, não permite mover os nós.
         if (this.isSidebarOpen) {
             return;
         }
 
-        if (!this.selectedNode || !this.isDraggingNode) return;
+        if (this.isDraggingNode && this.selectedNode) {
+            // Lógica para arrastar o nó
+            this.mouse.copy(this._getPointerCoordinates(event));
+            this.raycaster.setFromCamera(this.mouse, this.camera);
 
-        this.mouse.copy(this._getPointerCoordinates(event));
-        this.raycaster.setFromCamera(this.mouse, this.camera);
+            const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+            const intersectionPoint = new THREE.Vector3();
+            this.raycaster.ray.intersectPlane(plane, intersectionPoint);
 
-        const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-        const intersectionPoint = new THREE.Vector3();
-        this.raycaster.ray.intersectPlane(plane, intersectionPoint);
+            this.selectedNode.position.copy(intersectionPoint).sub(this.offset);
+            this.updateLinks();
+        } else if (this.isPanning) {
+            // Lógica para pan da câmera
+            const deltaX = event.clientX - this.lastPointerPosition.x;
+            const deltaY = event.clientY - this.lastPointerPosition.y;
 
-        this.selectedNode.position.copy(intersectionPoint.sub(this.offset));
-        this.updateLinks();
+            // A velocidade do pan deve ser escalada pelo inverso do zoom atual da câmera.
+            // Isso garante que um mesmo movimento do mouse na tela corresponda ao mesmo
+            // deslocamento visual, independentemente do nível de zoom.
+            const panSpeed = 1 / this.camera.zoom;
+
+            this.camera.position.x -= deltaX * panSpeed;
+            this.camera.position.y += deltaY * panSpeed; // Y do mundo é invertido em relação ao Y da tela
+
+            this.lastPointerPosition.set(event.clientX, event.clientY); // Atualiza a última posição
+        }
     }
 
     _onMouseUp() {
-        // Reativa os controles apenas se não estiver arrastando um nó.
-        // Se a sidebar estiver aberta, os controles já estarão desativados e devem permanecer assim.
-        if (!this.isDraggingNode && !this.isSidebarOpen) {
-            this.controls.enabled = true;
-        }
         this.selectedNode = null;
         this.isDraggingNode = false;
-    }
-
-    // --- Função para corrigir a posição da câmera após o zoom DE PINÇA (mobile) ---
-    _onControlsChange() {
-        // --- NOVO: Impede o ajuste da câmera se a sidebar estiver aberta ---
-        if (this.isSidebarOpen) {
-            return; // Se a sidebar está aberta, ignora as mudanças do OrbitControls
-        }
-
-        // Aplica os limites de zoom também quando o OrbitControls altera a câmera (para pinch)
-        this.camera.zoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, this.camera.zoom));
-        this.camera.updateProjectionMatrix();
-
-        if (this._isPinching) {
-            // Posição do centro do pinch no mundo com a câmera ATUALIZADA pelo OrbitControls
-            const pointerWorldAfterZoom = new THREE.Vector3(
-                this.lastPinchCenterScreen.x,
-                this.lastPinchCenterScreen.y,
-                0
-            ).unproject(this.camera);
-
-            // Calcula o delta para pan, comparando o ponto inicial no mundo com sua nova posição
-            const panDelta = new THREE.Vector3().subVectors(this._pointerWorldBeforeZoom, pointerWorldAfterZoom);
-
-            // Aplica a correção de pan à câmera e ao target dos controles
-            this.camera.position.add(panDelta);
-            this.controls.target.add(panDelta);
-        }
+        this.isPanning = false; // Finaliza o pan da câmera
     }
 
     _onTouchStart(event) {
-        // --- NOVO: Impede qualquer interação de toque se a sidebar estiver aberta ---
         if (this.isSidebarOpen) {
-            this.controls.enabled = false; // Desativa os controles para garantir que nenhum gesto seja processado
             return;
         }
 
-        // Se um dedo: tenta arrastar nó ou deixa OrbitControls cuidar do pan
+        event.preventDefault(); // Previne o comportamento padrão (scroll, etc.)
+
         if (event.touches.length === 1) {
-            this._onMouseDown({
-                clientX: event.touches[0].clientX,
-                clientY: event.touches[0].clientY,
-                button: 0
-            });
-            if (this.selectedNode) {
-                event.preventDefault();
+            // Tenta arrastar nó (prioridade) ou pan da câmera
+            this.mouse.copy(this._getPointerCoordinates(event));
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+            const intersects = this.raycaster.intersectObjects(this.dragHandles);
+
+            if (intersects.length > 0) {
+                const handle = intersects[0].object;
+                if (handle.userData.isDragHandle) {
+                    this.selectedNode = handle.userData.nodeGroup;
+                    this.isDraggingNode = true;
+
+                    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+                    const intersectionPoint = new THREE.Vector3();
+                    this.raycaster.ray.intersectPlane(plane, intersectionPoint);
+
+                    this.offset.copy(intersectionPoint).sub(this.selectedNode.position);
+                    this.isPanning = false; // Desativa pan se estiver arrastando nó
+                }
+            } else {
+                // Se nenhum handle, inicia o pan da câmera
+                this.isDraggingNode = false;
+                this.isPanning = true;
+                this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
             }
-            this._isPinching = false;
-        }
-        // Se dois dedos: inicia o gesto de zoom de pinça
-        else if (event.touches.length === 2) {
-            this.selectedNode = null;
-            this.isDraggingNode = false;
-            // Reativa os controles para permitir o zoom de pinça (se a sidebar NÃO estiver aberta)
-            this.controls.enabled = true;
+        } else if (event.touches.length === 2) {
+            // Inicia o gesto de zoom de pinça
+            this.isDraggingNode = false; // Desativa arrasto de nó
+            this.isPanning = false; // Desativa pan de um dedo
+            this._isPinching = true;
 
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
-            // Calcula o centro da pinça em coordenadas normalizadas (NDC)
-            this.lastPinchCenterScreen.set(
+            // Calcula a distância inicial entre os dois toques
+            this.initialPinchDistance = touch1.clientX - touch2.clientX;
+            this.initialPinchDistance = Math.sqrt(
+                this.initialPinchDistance * this.initialPinchDistance +
+                (touch1.clientY - touch2.clientY) * (touch1.clientY - touch2.clientY)
+            );
+
+            this.initialPinchZoom = this.camera.zoom; // Guarda o zoom atual para o cálculo relativo
+
+            // Calcula o centro do pinch em NDC para manter o zoom centrado
+            this.mouse.set(
                 ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
                 -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
             );
-
-            // Armazena a posição do centro da pinça no "mundo" ANTES do zoom começar.
-            // Este é o ponto que queremos manter fixo na tela.
-            this._pointerWorldBeforeZoom.set(this.lastPinchCenterScreen.x, this.lastPinchCenterScreen.y, 0).unproject(this.camera);
-
-            this._isPinching = true; // Sinaliza que o pinch está ativo
-            event.preventDefault();
+            // Converte o centro do pinch em NDC para coordenadas do mundo para a referência
+            this.pinchCenterWorld.set(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
         }
     }
 
-
     _onTouchMove(event) {
-        // --- NOVO: Impede qualquer interação de toque se a sidebar estiver aberta ---
         if (this.isSidebarOpen) {
             return;
         }
 
-        // Move o nó se estiver arrastando com um dedo
-        if (event.touches.length === 1 && this.isDraggingNode) {
-            this._onMouseMove({
-                clientX: event.touches[0].clientX,
-                clientY: event.touches[0].clientY
-            });
-            event.preventDefault();
-        }
-        // Lida com o movimento do zoom de pinça
-        else if (event.touches.length === 2 && this._isPinching) {
-            event.preventDefault();
+        event.preventDefault(); // Previne o comportamento padrão (scroll, etc.)
 
+        if (this.isDraggingNode && this.selectedNode) {
+            // Move o nó se estiver arrastando com um dedo
+            this.mouse.copy(this._getPointerCoordinates(event));
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+
+            const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+            const intersectionPoint = new THREE.Vector3();
+            this.raycaster.ray.intersectPlane(plane, intersectionPoint);
+
+            this.selectedNode.position.copy(intersectionPoint).sub(this.offset);
+            this.updateLinks();
+        } else if (this.isPanning && event.touches.length === 1) {
+            // Pan da câmera com um dedo
+            const deltaX = event.touches[0].clientX - this.lastPointerPosition.x;
+            const deltaY = event.touches[0].clientY - this.lastPointerPosition.y;
+
+            const panSpeed = 1 / this.camera.zoom;
+
+            this.camera.position.x -= deltaX * panSpeed;
+            this.camera.position.y += deltaY * panSpeed;
+
+            this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
+        } else if (this._isPinching && event.touches.length === 2) {
+            // Zoom de pinça com dois dedos
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
-            // Atualiza a posição do centro do pinch na tela durante o movimento
-            this.lastPinchCenterScreen.set(
+            // Calcula a distância atual entre os dois toques
+            const currentPinchDistance = touch1.clientX - touch2.clientX;
+            const dist = Math.sqrt(
+                currentPinchDistance * currentPinchDistance +
+                (touch1.clientY - touch2.clientY) * (touch1.clientY - touch2.clientY)
+            );
+
+            // Calcula o novo zoom com base na proporção da distância de pinça e o zoom inicial
+            let newZoom = this.initialPinchZoom * (dist / this.initialPinchDistance);
+
+            // Aplica os limites de zoom
+            newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
+
+            // Aplica o novo zoom à câmera
+            this.camera.zoom = newZoom;
+            this.camera.updateProjectionMatrix();
+
+            // Ajusta a posição da câmera para manter o centro do pinch fixo
+            // 1. Obtenha a posição atual do centro do pinch na tela NDC
+            this.mouse.set(
                 ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
                 -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
             );
-            // OrbitControls cuida da câmera, e _onControlsChange ajustará o pan.
+
+            // 2. Converta o centro do pinch atual em NDC para o mundo (depois do zoom)
+            const currentPinchCenterWorld = new THREE.Vector3(this.mouse.x, this.mouse.y, 0);
+            currentPinchCenterWorld.unproject(this.camera);
+
+            // 3. Calcule o deslocamento necessário para manter o pinchCenterWorld fixo
+            const panDelta = new THREE.Vector3().subVectors(this.pinchCenterWorld, currentPinchCenterWorld);
+
+            this.camera.position.add(panDelta);
         }
     }
 
     _onTouchEnd(event) {
-        if (this.isDraggingNode) {
-            this._onMouseUp();
-            event.preventDefault();
-        }
-        // Reseta o estado do pinch, e reativa os controles se a sidebar não estiver aberta.
+        // Redefine todos os estados de interação de toque
+        this.isDraggingNode = false;
+        this.isPanning = false;
         this._isPinching = false;
-        if (!this.isSidebarOpen) {
-            this.controls.enabled = true;
-        }
     }
 
     _onNodeClick(event) {
-        // Se a sidebar estiver aberta, ou se estiver arrastando um nó, ou se for um toque com múltiplos dedos,
-        // não processa o clique no nó para abrir a sidebar. Isso evita cliques acidentais e
-        // interações sobrepostas.
-        if (this.isDraggingNode || event.button !== 0 || (event.touches && event.touches.length > 1)) {
+        // Se estiver arrastando um nó ou pan, não processa o clique para evitar ações acidentais.
+        // O event.button !== 0 filtra cliques que não sejam com o botão esquerdo.
+        // event.touches && event.touches.length > 1 filtra toques com múltiplos dedos.
+        if (this.isDraggingNode || this.isPanning || this._isPinching || event.button !== 0 || (event.touches && event.touches.length > 1)) {
             return;
         }
 
@@ -596,10 +607,12 @@ class MindMapViewer {
 
         let clickedNode = null;
         for (const intersect of intersects) {
+            // Prioriza o grupo do nó (o pai) se for um elemento do nó e não o drag handle
             if (intersect.object.parent && intersect.object.parent.userData.isNode && !intersect.object.userData.isDragHandle) {
                 clickedNode = intersect.object.parent;
                 break;
             } else if (intersect.object.userData.isNode && !intersect.object.userData.isDragHandle) {
+                // Caso o próprio objeto seja o nó (ex: o mesh do retângulo)
                 clickedNode = intersect.object;
                 break;
             }
@@ -610,7 +623,6 @@ class MindMapViewer {
             this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível para este tópico.');
         } else {
             // Se o clique for fora de um nó e a sidebar estiver aberta, fecha-a.
-            // Se estiver fechada, não faz nada.
             if (this.isSidebarOpen) {
                 this.closeSidebar();
             }
@@ -624,8 +636,8 @@ class MindMapViewer {
             this.sidebarContent.textContent = content;
             this.sidebar.classList.add('open');
             this.isSidebarOpen = true;
-            // Desativa os controles quando a sidebar abre
-            this.controls.enabled = false;
+            // A lógica de controle de câmera customizada já verifica this.isSidebarOpen
+            // para desativar as interações quando a sidebar está aberta.
         }
     }
 
@@ -633,8 +645,6 @@ class MindMapViewer {
         if (this.sidebar) {
             this.sidebar.classList.remove('open');
             this.isSidebarOpen = false;
-            // Reativa os controles quando a sidebar fecha
-            this.controls.enabled = true;
         }
     }
 
@@ -642,10 +652,7 @@ class MindMapViewer {
     // --- LOOP DE ANIMAÇÃO ---
     animate() {
         requestAnimationFrame(this.animate.bind(this));
-        // O update dos controls só deve acontecer se estiverem habilitados
-        if (this.controls.enabled) {
-            this.controls.update();
-        }
+        // Não há OrbitControls para atualizar aqui. A câmera é movida diretamente pelos eventos.
         this.renderer.render(this.scene, this.camera);
     }
 }
