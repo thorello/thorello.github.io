@@ -85,10 +85,10 @@ class MindMapViewer {
         this.initialPinchZoom = 1;
         this.pinchCenterWorld = new THREE.Vector3();
 
-        // Variáveis para diferenciar toque de arrastar no touch
-        this.initialTouchCoords = new THREE.Vector2();
+        // Variáveis para diferenciar toque/clique de arrastar
+        this.initialPointerCoords = new THREE.Vector2(); // Unificado para mouse e toque
         this.isConsideredClick = true;
-        this.tapThreshold = 5;
+        this.tapThreshold = 5; // Limiar de movimento para cancelar um "clique"
 
         // Elementos da sidebar
         this.sidebar = document.getElementById('sidebar');
@@ -102,6 +102,8 @@ class MindMapViewer {
         this._createVersionInfo();
 
         this.drawMindMap();
+        // NOVO: Foca a câmera no nó principal após o desenho do mapa
+        this._focusCameraOnNode(this.nodeMap.get(hierarchy(this.data)));
         this.animate();
     }
 
@@ -143,7 +145,8 @@ class MindMapViewer {
         this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
 
-        this.renderer.domElement.addEventListener('click', this._onNodeClick.bind(this));
+        // Removemos o listener de 'click' aqui, pois o tratamento será feito em _onMouseUp e _onTouchEnd
+        // this.renderer.domElement.addEventListener('click', this._onNodeClick.bind(this)); 
 
         if (this.sidebarCloseButton) {
             this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
@@ -174,11 +177,18 @@ class MindMapViewer {
             const nodeGroup = new THREE.Group();
             nodeGroup.userData = { d3Node: d3Node, isNode: true, direction: direction };
 
-            const nodeColor = CONFIG.nodeColors[d3Node.depth % CONFIG.nodeColors.length];
+            // NOVO: Define a cor do nó e do texto com base se é o nó raiz
+            const isRootNode = d3Node.depth === 0;
+            const rootNodeColor = 0x3498db; // Cor do botão Exportar PDF
+            const rootTextColor = 0xFFFFFF; // Branco para o texto do nó raiz
+
+            const nodeColor = isRootNode ? rootNodeColor : CONFIG.nodeColors[d3Node.depth % CONFIG.nodeColors.length];
+            const textColor = isRootNode ? rootTextColor : CONFIG.textColor;
+
             const textMesh = new Text();
             textMesh.text = d3Node.data.name;
             textMesh.fontSize = CONFIG.font.size;
-            textMesh.color = CONFIG.textColor;
+            textMesh.color = textColor; // Usa a cor do texto definida acima
             textMesh.position.z = 0.1;
             textMesh.anchorX = direction === -1 ? 'right' : (direction === 1 ? 'left' : 'center');
             textMesh.anchorY = 'middle';
@@ -194,15 +204,19 @@ class MindMapViewer {
                 const rectHeight = textHeight + CONFIG.padding.y * 2;
 
                 const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
-                const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
-                const edges = new THREE.EdgesGeometry(rectGeo);
-                const lineMat = new THREE.LineBasicMaterial({ color: 0xCCCCCC, linewidth: 2 });
-                const wireframe = new THREE.LineSegments(edges, lineMat);
+                const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor }); // Usa a cor do nó definida acima
 
                 const rectMesh = new THREE.Mesh(rectGeo, rectMat);
                 rectMesh.name = 'nodeRectMesh';
                 nodeGroup.add(rectMesh);
-                nodeGroup.add(wireframe);
+
+                // NOVO: Adiciona a borda (wireframe) APENAS se NÃO for o nó raiz
+                if (!isRootNode) {
+                    const edges = new THREE.EdgesGeometry(rectGeo);
+                    const lineMat = new THREE.LineBasicMaterial({ color: 0xCCCCCC, linewidth: 2 });
+                    const wireframe = new THREE.LineSegments(edges, lineMat);
+                    nodeGroup.add(wireframe);
+                }
 
                 if (direction === 1) {
                     textMesh.position.x = -rectWidth / 2 + CONFIG.padding.x;
@@ -497,6 +511,34 @@ class MindMapViewer {
 
         this.camera.updateProjectionMatrix();
     }
+
+    /**
+     * Foca a câmera em um nó específico.
+     * @param {THREE.Group} nodeGroup O grupo THREE.js que representa o nó.
+     */
+    _focusCameraOnNode(nodeGroup) {
+        if (!nodeGroup) {
+            console.warn("Nó para focar a câmera não encontrado.");
+            return;
+        }
+
+        // Obtém a posição do nó no sistema de coordenadas globais do Three.js
+        const targetPosition = new THREE.Vector3();
+        nodeGroup.getWorldPosition(targetPosition);
+
+        // Ajusta a posição da câmera para focar no nó
+        // A posição do mainGroup já foi ajustada para centralizar o mind map.
+        // A câmera deve ser ajustada para olhar para a posição do nó em relação ao centro do mainGroup.
+        this.camera.position.x = targetPosition.x + this.mainGroup.position.x;
+        this.camera.position.y = targetPosition.y + this.mainGroup.position.y;
+        this.camera.position.z = 150; // Mantém a distância original da câmera
+
+        // Você também pode ajustar o zoom para que o nó principal fique bem visível
+        // Um valor de zoom de 1 geralmente é um bom ponto de partida para o nó principal
+        this.camera.zoom = 1.0;
+        this.camera.updateProjectionMatrix();
+    }
+
     // --- MANIPULADORES DE EVENTOS ---
 
     _onWindowResize() {
@@ -536,6 +578,9 @@ class MindMapViewer {
     _onMouseDown(event) {
         if (this.isSidebarOpen || event.button !== 0) return;
 
+        this.isConsideredClick = true; // Assume que é um clique no início
+        this.initialPointerCoords.set(event.clientX, event.clientY);
+
         this.mouse.copy(this._getPointerCoordinates(event));
         this.raycaster.setFromCamera(this.mouse, this.camera);
         const intersects = this.raycaster.intersectObjects(this.dragHandles);
@@ -560,6 +605,17 @@ class MindMapViewer {
     _onMouseMove(event) {
         if (this.isSidebarOpen) return;
 
+        // Se estivermos arrastando com o mouse ou pan, verificamos se o movimento excede o limite de clique
+        if (this.isConsideredClick && (this.isDraggingNode || this.isPanning)) {
+            const moveDistance = Math.hypot(
+                event.clientX - this.initialPointerCoords.x,
+                event.clientY - this.initialPointerCoords.y
+            );
+            if (moveDistance > this.tapThreshold) {
+                this.isConsideredClick = false; // Cancela o "clique" se houver arrasto
+            }
+        }
+
         if (this.isDraggingNode && this.selectedNode) {
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -580,19 +636,48 @@ class MindMapViewer {
         }
     }
 
-    _onMouseUp() {
+    _onMouseUp(event) {
+        if (this.isConsideredClick) { // Só dispara o clique se não houve arrasto
+            // Reutiliza a lógica de detecção de nó clicado do _onNodeClick original
+            this.mouse.copy(this._getPointerCoordinates(event));
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+            const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
+            let clickedNode = null;
+            for (const intersect of intersects) {
+                let currentObject = intersect.object;
+                while (currentObject) {
+                    if (currentObject.userData.isDragHandle) {
+                        clickedNode = null; // Não é um clique de nó se for no handle
+                        break;
+                    }
+                    if (currentObject.userData.isNode) {
+                        clickedNode = currentObject;
+                        break;
+                    }
+                    currentObject = currentObject.parent;
+                }
+                if (clickedNode) break;
+            }
+            if (clickedNode) {
+                const d3NodeData = clickedNode.userData.d3Node.data;
+                this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível.');
+            } else if (this.isSidebarOpen) {
+                this.closeSidebar();
+            }
+        }
         this.selectedNode = null;
         this.isDraggingNode = false;
         this.isPanning = false;
+        this.isConsideredClick = true; // Reseta para o próximo evento
     }
 
     _onTouchStart(event) {
         if (this.isSidebarOpen) return;
         event.preventDefault();
         this.isConsideredClick = true;
+        this.initialPointerCoords.set(event.touches[0].clientX, event.touches[0].clientY);
 
         if (event.touches.length === 1) {
-            this.initialTouchCoords.set(event.touches[0].clientX, event.touches[0].clientY);
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.dragHandles);
@@ -615,7 +700,7 @@ class MindMapViewer {
             this.isDraggingNode = false;
             this.isPanning = false;
             this._isPinching = true;
-            this.isConsideredClick = false;
+            this.isConsideredClick = false; // Múltiplos toques não são cliques simples
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             this.initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
@@ -632,13 +717,14 @@ class MindMapViewer {
         if (this.isSidebarOpen) return;
         event.preventDefault();
 
+        // Se estivermos arrastando com um único toque, verificamos se o movimento excede o limite de clique
         if (this.isConsideredClick && event.touches.length === 1) {
             const moveDistance = Math.hypot(
-                event.touches[0].clientX - this.initialTouchCoords.x,
-                event.touches[0].clientY - this.initialTouchCoords.y
+                event.touches[0].clientX - this.initialPointerCoords.x,
+                event.touches[0].clientY - this.initialPointerCoords.y
             );
             if (moveDistance > this.tapThreshold) {
-                this.isConsideredClick = false;
+                this.isConsideredClick = false; // Cancela o "clique" se houver arrasto
             }
         }
 
@@ -679,7 +765,7 @@ class MindMapViewer {
     }
 
     _onTouchEnd(event) {
-        if (this.isConsideredClick) {
+        if (this.isConsideredClick) { // Só considera como clique se não houve arrasto/pinch
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
             let clickedNode = null;
@@ -704,9 +790,11 @@ class MindMapViewer {
         this.isDraggingNode = false;
         this.isPanning = false;
         this._isPinching = false;
-        this.isConsideredClick = true;
+        this.isConsideredClick = true; // Reseta para o próximo evento
     }
 
+    // O _onNodeClick original é removido porque a lógica de clique agora está em _onMouseUp e _onTouchEnd
+    /*
     _onNodeClick(event) {
         if (this.isDraggingNode || this.isPanning || this._isPinching || event.button !== 0) return;
         this.mouse.copy(this._getPointerCoordinates(event));
@@ -735,6 +823,7 @@ class MindMapViewer {
             this.closeSidebar();
         }
     }
+    */
 
     // --- MÉTODOS DA SIDEBAR ---
     openSidebar(title, content) {

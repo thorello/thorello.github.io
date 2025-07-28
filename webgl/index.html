@@ -5,100 +5,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa Mental com WebGL</title>
-    <!-- NOVO: Adicionada a biblioteca jsPDF para exportação -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* Import Google Fonts for a futuristic look */
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
+        /* Import Google Fonts - Removendo fontes futuristas e adicionando uma mais clássica */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;600&display=swap');
 
         body {
             margin: 0;
-            background-color: #0b0c10;
-            /* Darker, almost black background */
+            background-color: #f0f2f5;
+            /* Fundo cinza claro para um visual suave */
             overflow: hidden;
-            /* Prevent scrollbars from appearing */
-            font-family: 'Share Tech Mono', monospace;
-            /* Futuristic monospaced font */
-            color: #66fcf1;
-            /* Cyberpunk teal/cyan for general text */
+            font-family: 'Open Sans', sans-serif;
+            /* Fonte legível e moderna */
+            color: #333333;
+            /* Texto principal em cinza escuro */
         }
 
         canvas {
             display: block;
-            /* Ensure canvas takes full width and removes extra space below */
             width: 100vw;
-            /* Make canvas fill viewport width */
             height: 100vh;
-            /* Make canvas fill viewport height */
         }
 
         /* Styles for the interactive sidebar */
         #sidebar {
             position: fixed;
-            /* Changed to fixed for pop-up behavior */
             top: 50%;
             left: 50%;
-            /* Centered and slightly scaled down initially */
             transform: translate(-50%, -50%) scale(0.9);
             width: 500px;
-            /* Adjust width for pop-up */
             max-width: 90%;
-            /* Ensure it doesn't overflow on smaller screens */
             max-height: 90%;
-            /* Limit height to prevent overflow */
-            background-color: #1f2833;
-            /* Dark blue-gray for pop-up */
-            /* Stronger teal glow for pop-up */
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), 0 0 80px rgba(0, 255, 255, 0.2);
+            /* NOVO: Fundo branco sólido */
+            background-color: #ffffff;
+            /* NOVO: Sombra suave e sem brilho neon */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            /* NOVO: Bordas suavemente arredondadas (revertendo o clip-path) */
+            border-radius: 8px;
+            /* NOVO: Sem borda visível, a sombra já define */
+            border: 1px solid #e0e0e0;
+            /* Borda sutil */
+
             padding: 30px;
-            /* Adjust padding */
             box-sizing: border-box;
-            /* Include padding in width/height */
-            border-radius: 15px;
-            /* Rounded corners for pop-up */
-            /* Smooth transition for opacity and transform */
             transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             overflow-y: auto;
-            /* Enable vertical scrolling for content */
             z-index: 1000;
-            /* Ensure sidebar is on top */
-            border: 2px solid #45a299;
-            /* Accent border */
 
             opacity: 0;
-            /* Hidden by default */
             pointer-events: none;
-            /* Prevents interaction when hidden */
+
+            /* Removendo clip-path para bordas arredondadas */
+            clip-path: none;
+            /* Removendo padrões de fundo */
+            background-image: none;
         }
 
         #sidebar.open {
             opacity: 1;
-            /* Fully visible when open */
             transform: translate(-50%, -50%) scale(1);
-            /* Scale to normal size */
             pointer-events: auto;
-            /* Allows interaction when open */
         }
 
         #sidebar h2 {
-            font-family: 'Orbitron', sans-serif;
-            /* Bold, futuristic font for titles */
-            color: #66fcf1;
-            /* Neon glow effect for desktop */
-            text-shadow: 0 0 10px #66fcf1, 0 0 20px #66fcf1;
+            font-family: 'Roboto', sans-serif;
+            /* Fonte mais robusta para títulos */
+            color: #2c3e50;
+            /* Azul escuro ou preto para o título */
+            text-shadow: none;
+            /* Sem sombra de texto */
             margin-top: 0;
-            border-bottom: 1px dashed #45a299;
-            /* Dashed accent line */
+            /* NOVO: Borda inferior simples e elegante */
+            border-bottom: 2px solid #3498db;
+            /* Cor de destaque para a borda */
             padding-bottom: 15px;
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* NOVO: Remover detalhe decorativo do título */
+        #sidebar h2::after {
+            content: none;
         }
 
         #sidebar p {
             line-height: 1.8;
-            /* Improve readability */
-            color: #c5c6c7;
-            /* Lighter gray for content text */
-            font-size: 0.95em;
+            color: #555555;
+            /* Cinza médio para o texto do corpo */
+            font-size: 1em;
+            /* Aumentado levemente para legibilidade */
+            text-shadow: none;
+            /* Sem sombra de texto */
         }
 
         #sidebar-close {
@@ -106,38 +103,49 @@
             top: 15px;
             right: 15px;
             background: none;
+            /* NOVO: Botão de fechar simples e elegante */
             border: none;
-            font-size: 30px;
-            color: #66fcf1;
-            /* Matching teal color */
+            font-family: 'Roboto', sans-serif;
+            font-size: 28px;
+            /* Tamanho maior para visibilidade */
+            color: #888888;
+            /* Cinza neutro */
             cursor: pointer;
             z-index: 1001;
-            /* Ensure close button is clickable */
             transition: color 0.3s ease;
+            box-shadow: none;
+            /* Sem sombra */
+            font-weight: bold;
+            /* Deixa o 'x' mais robusto */
         }
 
         #sidebar-close:hover {
-            color: #ffffff;
-            text-shadow: 0 0 8px #ffffff;
+            color: #e74c3c;
+            /* Vermelho suave ao passar o mouse */
+            background-color: transparent;
+            text-shadow: none;
+            box-shadow: none;
         }
 
-        /* Custom scrollbar styling for a futuristic look */
+        /* Custom scrollbar styling for a classic look */
         #sidebar::-webkit-scrollbar {
             width: 8px;
         }
 
         #sidebar::-webkit-scrollbar-track {
-            background: #1f2833;
+            background: #f0f0f0;
+            /* Fundo da barra de rolagem claro */
         }
 
         #sidebar::-webkit-scrollbar-thumb {
-            background-color: #45a299;
+            background-color: #cccccc;
+            /* Cor do "polegar" da barra de rolagem */
             border-radius: 10px;
-            border: 2px solid #1f2833;
+            border: 2px solid #f0f0f0;
         }
 
         #sidebar::-webkit-scrollbar-thumb:hover {
-            background-color: #66fcf1;
+            background-color: #aaaaaa;
         }
 
         /* Version information display */
@@ -145,38 +153,42 @@
             position: absolute;
             bottom: 10px;
             left: 10px;
-            color: rgba(255, 255, 255, 0.5);
-            background-color: rgba(15, 17, 26, 0.5);
+            color: rgba(0, 0, 0, 0.5);
+            /* Cor mais escura e discreta */
+            background-color: rgba(255, 255, 255, 0.7);
+            /* Fundo semitransparente branco */
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 12px;
-            font-family: monospace;
+            font-family: 'Open Sans', sans-serif;
+            /* Usar a fonte principal */
             z-index: 1000;
             pointer-events: none;
-            /* Ignore mouse events */
         }
 
-        /* NOVO: Estilos para o botão de exportar PDF */
+        /* NOVO: Estilos para o botão de exportar PDF - Adaptação para o novo tema */
         #export-pdf-button {
             position: absolute;
             top: 10px;
             right: 10px;
             z-index: 100;
-            background-color: #1f2833;
-            border: 1px solid #45a299;
-            color: #66fcf1;
+            background-color: #3498db;
+            /* Azul suave */
+            border: none;
+            color: #ffffff;
             padding: 8px 16px;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'Open Sans', sans-serif;
             font-size: 14px;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         #export-pdf-button:hover {
-            background-color: #45a299;
-            color: #ffffff;
-            box-shadow: 0 0 15px rgba(102, 252, 241, 0.5);
+            background-color: #2980b9;
+            /* Azul mais escuro no hover */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
 
@@ -184,15 +196,13 @@
         @media (max-width: 768px) {
             #sidebar {
                 width: 90%;
-                /* Wider on mobile */
                 height: 80%;
-                /* Taller on mobile */
                 padding: 20px;
-                box-shadow: none;
-                /* Remove neon shadow for mobile */
-                border-radius: 10px;
-                /* Slightly less rounded corners */
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+                border-radius: 8px;
                 transform: translate(-50%, -50%) scale(0.95);
+                clip-path: none;
+                /* Remover clip-path também no mobile */
             }
 
             #sidebar.open {
@@ -201,35 +211,35 @@
 
             #sidebar h2 {
                 font-size: 1.5em;
-                text-shadow: none;
-                /* Remove neon glow from title for mobile */
+                border-bottom: 1px solid #3498db;
             }
 
             #sidebar p {
                 font-size: 0.9em;
+            }
+
+            #sidebar-close {
+                font-size: 24px;
+                padding: 0;
+                /* Remover padding no mobile */
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- The sidebar for displaying node information -->
     <div id="sidebar">
         <button id="sidebar-close">&times;</button>
         <h2 id="sidebar-title"></h2>
         <p id="sidebar-content"></p>
     </div>
 
-    <!-- NOVO: Botão para iniciar a exportação para PDF -->
     <button id="export-pdf-button">Exportar PDF</button>
 
-    <!-- This div will be the container for the Three.js canvas -->
     <div id="mindmap-container"></div>
 
-    <!-- Version information display -->
     <div id="version-info">Mind Map v1.1.0 - Modern bilateral layout</div>
 
-    <!-- Import Map for ES Modules -->
     <script type="importmap">
         {
             "imports": {
@@ -244,7 +254,6 @@
             }
         }
     </script>
-    <!-- Your main JavaScript application logic -->
     <script type="module" src="main.js"></script>
 </body>
 
