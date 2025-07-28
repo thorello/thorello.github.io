@@ -24,30 +24,47 @@
         }
 
         #sidebar {
-            position: absolute;
-            top: 0;
-            right: -350px;
-            /* Sidebar is hidden by default */
-            width: 300px;
-            height: 100%;
+            position: fixed;
+            /* Changed to fixed for pop-up behavior */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            /* Centered and slightly scaled down initially */
+            width: 500px;
+            /* Adjust width for pop-up */
+            max-width: 90%;
+            /* Ensure it doesn't overflow on larger screens */
+            max-height: 90%;
+            /* Limit height */
             background-color: #1f2833;
-            /* Dark blue-gray for sidebar */
-            /* --- Efeito Neon Padrão (para desktop) --- */
-            box-shadow: -8px 0 20px rgba(0, 255, 255, 0.2), 0 0 50px rgba(0, 255, 255, 0.1);
-            /* Teal glow */
-            padding: 25px;
+            /* Dark blue-gray for pop-up */
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), 0 0 80px rgba(0, 255, 255, 0.2);
+            /* Stronger teal glow for pop-up */
+            padding: 30px;
+            /* Adjust padding */
             box-sizing: border-box;
-            transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            /* Smoother transition */
+            border-radius: 15px;
+            /* Rounded corners for pop-up */
+            transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            /* Smooth transition for opacity and transform */
             overflow-y: auto;
             z-index: 1000;
-            border-left: 2px solid #45a299;
+            border: 2px solid #45a299;
             /* Accent border */
+
+            opacity: 0;
+            /* Hidden by default */
+            pointer-events: none;
+            /* Prevents interaction when hidden */
         }
 
         #sidebar.open {
-            right: 0;
-            /* Moves sidebar into view when 'open' class is added */
+            opacity: 1;
+            /* Fully visible when open */
+            transform: translate(-50%, -50%) scale(1);
+            /* Scale to normal size */
+            pointer-events: auto;
+            /* Allows interaction when open */
         }
 
         #sidebar h2 {
@@ -113,25 +130,26 @@
         /* --- Responsive rules for mobile devices --- */
         @media (max-width: 768px) {
             #sidebar {
-                width: 100%;
-                right: -100%;
-                /* Sidebar is hidden by default on mobile */
-                padding: 15px;
-                /* --- REMOVENDO O EFEITO NEON PARA MOBILE --- */
+                width: 90%;
+                /* Wider on mobile */
+                height: 80%;
+                /* Taller on mobile */
+                padding: 20px;
                 box-shadow: none;
-                /* Remove a sombra de neon da sidebar */
+                /* Remove neon shadow for mobile */
+                border-radius: 10px;
+                /* Slightly less rounded corners */
+                transform: translate(-50%, -50%) scale(0.95);
             }
 
             #sidebar.open {
-                right: 0;
-                /* Moves sidebar into view when 'open' class is added on mobile */
+                transform: translate(-50%, -50%) scale(1);
             }
 
             #sidebar h2 {
                 font-size: 1.5em;
-                /* --- REMOVENDO O EFEITO NEON DO TÍTULO PARA MOBILE --- */
                 text-shadow: none;
-                /* Remove o brilho de neon do título */
+                /* Remove neon glow from title for mobile */
             }
 
             #sidebar p {
