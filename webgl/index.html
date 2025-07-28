@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa Mental com WebGL</title>
+    <!-- NOVO: Adicionada a biblioteca jsPDF para exportação -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* Import Google Fonts for a futuristic look */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
@@ -154,6 +156,30 @@
             /* Ignore mouse events */
         }
 
+        /* NOVO: Estilos para o botão de exportar PDF */
+        #export-pdf-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+            background-color: #1f2833;
+            border: 1px solid #45a299;
+            color: #66fcf1;
+            padding: 8px 16px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        #export-pdf-button:hover {
+            background-color: #45a299;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.5);
+        }
+
+
         /* Responsive rules for mobile devices */
         @media (max-width: 768px) {
             #sidebar {
@@ -193,6 +219,9 @@
         <h2 id="sidebar-title"></h2>
         <p id="sidebar-content"></p>
     </div>
+
+    <!-- NOVO: Botão para iniciar a exportação para PDF -->
+    <button id="export-pdf-button">Exportar PDF</button>
 
     <!-- This div will be the container for the Three.js canvas -->
     <div id="mindmap-container"></div>
