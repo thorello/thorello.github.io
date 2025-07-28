@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Mental com WebGL (Solução Troika)</title>
+    <title>Mapa Mental com WebGL</title>
     <style>
+        /* Import Google Fonts for a futuristic look */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
 
         body {
@@ -13,6 +14,7 @@
             background-color: #0b0c10;
             /* Darker, almost black background */
             overflow: hidden;
+            /* Prevent scrollbars from appearing */
             font-family: 'Share Tech Mono', monospace;
             /* Futuristic monospaced font */
             color: #66fcf1;
@@ -21,34 +23,43 @@
 
         canvas {
             display: block;
+            /* Ensure canvas takes full width and removes extra space below */
+            width: 100vw;
+            /* Make canvas fill viewport width */
+            height: 100vh;
+            /* Make canvas fill viewport height */
         }
 
+        /* Styles for the interactive sidebar */
         #sidebar {
             position: fixed;
             /* Changed to fixed for pop-up behavior */
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
             /* Centered and slightly scaled down initially */
+            transform: translate(-50%, -50%) scale(0.9);
             width: 500px;
             /* Adjust width for pop-up */
             max-width: 90%;
-            /* Ensure it doesn't overflow on larger screens */
+            /* Ensure it doesn't overflow on smaller screens */
             max-height: 90%;
-            /* Limit height */
+            /* Limit height to prevent overflow */
             background-color: #1f2833;
             /* Dark blue-gray for pop-up */
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), 0 0 80px rgba(0, 255, 255, 0.2);
             /* Stronger teal glow for pop-up */
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), 0 0 80px rgba(0, 255, 255, 0.2);
             padding: 30px;
             /* Adjust padding */
             box-sizing: border-box;
+            /* Include padding in width/height */
             border-radius: 15px;
             /* Rounded corners for pop-up */
-            transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             /* Smooth transition for opacity and transform */
+            transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             overflow-y: auto;
+            /* Enable vertical scrolling for content */
             z-index: 1000;
+            /* Ensure sidebar is on top */
             border: 2px solid #45a299;
             /* Accent border */
 
@@ -71,9 +82,8 @@
             font-family: 'Orbitron', sans-serif;
             /* Bold, futuristic font for titles */
             color: #66fcf1;
-            /* --- Efeito Neon no Título (padrão para desktop) --- */
+            /* Neon glow effect for desktop */
             text-shadow: 0 0 10px #66fcf1, 0 0 20px #66fcf1;
-            /* Neon glow effect */
             margin-top: 0;
             border-bottom: 1px dashed #45a299;
             /* Dashed accent line */
@@ -83,6 +93,7 @@
 
         #sidebar p {
             line-height: 1.8;
+            /* Improve readability */
             color: #c5c6c7;
             /* Lighter gray for content text */
             font-size: 0.95em;
@@ -99,6 +110,7 @@
             /* Matching teal color */
             cursor: pointer;
             z-index: 1001;
+            /* Ensure close button is clickable */
             transition: color 0.3s ease;
         }
 
@@ -107,7 +119,7 @@
             text-shadow: 0 0 8px #ffffff;
         }
 
-        /* Scrollbar styling for a futuristic look */
+        /* Custom scrollbar styling for a futuristic look */
         #sidebar::-webkit-scrollbar {
             width: 8px;
         }
@@ -126,8 +138,23 @@
             background-color: #66fcf1;
         }
 
+        /* Version information display */
+        #version-info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            background-color: rgba(15, 17, 26, 0.5);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+            /* Ignore mouse events */
+        }
 
-        /* --- Responsive rules for mobile devices --- */
+        /* Responsive rules for mobile devices */
         @media (max-width: 768px) {
             #sidebar {
                 width: 90%;
@@ -160,19 +187,26 @@
 </head>
 
 <body>
+    <!-- The sidebar for displaying node information -->
     <div id="sidebar">
         <button id="sidebar-close">&times;</button>
         <h2 id="sidebar-title"></h2>
         <p id="sidebar-content"></p>
     </div>
 
+    <!-- This div will be the container for the Three.js canvas -->
+    <div id="mindmap-container"></div>
+
+    <!-- Version information display -->
+    <div id="version-info">Mind Map v1.1.0 - Modern bilateral layout</div>
+
+    <!-- Import Map for ES Modules -->
     <script type="importmap">
         {
             "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
                 "d3-hierarchy": "https://cdn.skypack.dev/d3-hierarchy",
-
                 "troika-three-text": "https://unpkg.com/troika-three-text@latest/dist/troika-three-text.esm.js",
                 "troika-three-utils": "https://unpkg.com/troika-three-utils@latest/dist/troika-three-utils.esm.js",
                 "troika-worker-utils": "https://unpkg.com/troika-worker-utils@latest/dist/troika-worker-utils.esm.js",
@@ -181,6 +215,7 @@
             }
         }
     </script>
+    <!-- Your main JavaScript application logic -->
     <script type="module" src="main.js"></script>
 </body>
 

@@ -2,41 +2,41 @@ import * as THREE from 'three';
 import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
 
-// NOVO: Versão atualizada do programa.
-const APP_VERSION = 'v1.0.8 - modern style improvements'; // Atualizado para refletir o novo estilo
+// NEW: Updated program version.
+const APP_VERSION = 'v1.1.1 - Bilateral text alignment fix'; // Updated to reflect the new style and fix
 
-// --- 1. CONFIGURAÇÕES CENTRALIZADAS (ESTILO MODERNO) ---
+// --- 1. CENTRALIZED CONFIGURATIONS (MODERN STYLE) ---
 const CONFIG = {
-    backgroundColor: 0x0F111A, // Azul muito escuro, quase preto para um fundo moderno
+    backgroundColor: 0x0F111A, // Very dark blue, almost black for a modern background
     nodeColors: [
-        0x334466, // Azul petróleo suave (Base)
-        0x556688, // Azul médio
-        0x7788AA, // Azul acinzentado claro
-        0x99AABB, // Azul acinzentado muito claro
-        0xF9A825, // Amarelo/Laranja vibrante para destaque ou profundidade (se usar mais de 4 níveis)
-        0x4CAF50  // Verde suave para outro nível (se usar mais de 5 níveis)
+        0x334466, // Soft petrol blue (Base)
+        0x556688, // Medium blue
+        0x7788AA, // Light grayish blue
+        0x99AABB, // Very light grayish blue
+        0xF9A825, // Vibrant yellow/orange for highlight or depth (if using more than 4 levels)
+        0x4CAF50  // Soft green for another level (if using more than 5 levels)
     ],
-    linkColor: 0x81D4FA, // Azul claro, vibrante e moderno
-    dragHandleColor: 0xFFFFFF, // Branco puro para sutilidade
-    textColor: 0xFFFFFF, // Branco puro para contraste máximo
+    linkColor: 0x81D4FA, // Light blue, vibrant and modern
+    dragHandleColor: 0xFFFFFF, // Pure white for subtlety
+    textColor: 0xFFFFFF, // Pure white for maximum contrast
     font: {
-        size: 16, // Um pouco maior para melhor legibilidade
+        size: 16, // Slightly larger for better readability
     },
-    padding: { x: 20, y: 10 }, // Aumentar um pouco o padding interno do nó
-    borderRadius: 12, // Cantos mais arredondados para um toque mais suave
-    dragHandleRadius: 6, // Um pouco menor e mais discreto
+    padding: { x: 20, y: 10 }, // Slightly increase internal node padding
+    borderRadius: 12, // More rounded corners for a softer touch
+    dragHandleRadius: 6, // Slightly smaller and more discreet
     zoom: {
-        speed: 0.2, // Velocidade do zoom para roda do mouse e pinch (ajustável)
-        min: 0.05,  // Permite mais zoom out (mais afastado)
-        max: 8,     // Permite mais zoom in (mais aproximado)
+        speed: 0.2, // Zoom speed for mouse wheel and pinch (adjustable)
+        min: 0.05,  // Allows more zoom out (further away)
+        max: 8,     // Allows more zoom in (closer)
     }
 };
 
 /**
- * Geometria para um retângulo com cantos arredondados.
- * @param {number} width - Largura do retângulo.
- * @param {number} height - Altura do retângulo.
- * @param {number} radius - Raio dos cantos.
+ * Geometry for a rectangle with rounded corners.
+ * @param {number} width - Width of the rectangle.
+ * @param {number} height - Height of the rectangle.
+ * @param {number} radius - Corner radius.
  * @returns {THREE.ShapeGeometry}
  */
 function createRoundedRectGeometry(width, height, radius) {
@@ -61,30 +61,32 @@ class MindMapViewer {
         this.container = container;
         this.data = data;
 
-        // --- Estado ---
+        // --- State ---
         this.nodeMap = new Map();
         this.linkObjects = [];
         this.dragHandles = [];
         this.selectedNode = null;
         this.offset = new THREE.Vector3();
         this.isDraggingNode = false;
+        // NEW: Stores the initial intersection point for displacement calculation
+        this.initialIntersectionPoint = new THREE.Vector3();
 
-        // --- Variáveis de Estado para Controle de Câmera Customizado ---
-        this.isPanning = false; // Indica se o usuário está arrastando a cena
-        this.lastPointerPosition = new THREE.Vector2(); // Última posição do ponteiro para cálculo do pan
+        // --- State Variables for Custom Camera Control ---
+        this.isPanning = false; // Indicates if the user is dragging the scene
+        this.lastPointerPosition = new THREE.Vector2(); // Last pointer position for pan calculation
 
-        // Variáveis para controle de toque (pinch-to-zoom)
+        // Variables for touch control (pinch-to-zoom)
         this._isPinching = false;
-        this.initialPinchDistance = 0; // Distância entre os dois toques no início do pinch
-        this.initialPinchZoom = 1; // Zoom da câmera no início do pinch
-        this.pinchCenterWorld = new THREE.Vector3(); // Ponto central do pinch no mundo
+        this.initialPinchDistance = 0; // Distance between the two touches at the start of pinch
+        this.initialPinchZoom = 1; // Camera zoom at the start of pinch
+        this.pinchCenterWorld = new THREE.Vector3(); // Pinch center point in world coordinates
 
-        // NOVO: Variáveis para diferenciar tap de drag em touch
-        this.initialTouchCoords = new THREE.Vector2(); // Armazena a posição inicial do toque
-        this.isConsideredClick = true; // Flag para determinar se a sequência de toque foi um clique
-        this.tapThreshold = 5; // Limiar de movimento em pixels para considerar um drag ao invés de um click/tap
+        // NEW: Variables to differentiate tap from drag on touch
+        this.initialTouchCoords = new THREE.Vector2(); // Stores the initial touch position
+        this.isConsideredClick = true; // Flag to determine if the touch sequence was a click
+        this.tapThreshold = 5; // Movement threshold in pixels to consider a drag instead of a click/tap
 
-        // Sidebar elements (assumindo que existam no seu HTML)
+        // Sidebar elements (assuming they exist in your HTML)
         this.sidebar = document.getElementById('sidebar');
         this.sidebarTitle = document.getElementById('sidebar-title');
         this.sidebarContent = document.getElementById('sidebar-content');
@@ -99,7 +101,7 @@ class MindMapViewer {
         this.animate();
     }
 
-    // --- MÉTODOS DE INICIALIZAÇÃO ---
+    // --- INITIALIZATION METHODS ---
 
     _initScene() {
         this.scene = new THREE.Scene();
@@ -110,8 +112,8 @@ class MindMapViewer {
             window.innerHeight / 2, window.innerHeight / -2,
             1, 1000
         );
-        this.camera.position.z = 150; // Posição padrão da câmera
-        this.camera.zoom = 1; // Zoom inicial da câmera
+        this.camera.position.z = 150; // Default camera position
+        this.camera.zoom = 1; // Initial camera zoom
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -130,140 +132,153 @@ class MindMapViewer {
         this.renderer.domElement.addEventListener('mousedown', this._onMouseDown.bind(this));
         this.renderer.domElement.addEventListener('mousemove', this._onMouseMove.bind(this));
         this.renderer.domElement.addEventListener('mouseup', this._onMouseUp.bind(this));
-        this.renderer.domElement.addEventListener('wheel', this._onMouseWheel.bind(this), { passive: false }); // Zoom da roda do mouse
+        this.renderer.domElement.addEventListener('wheel', this._onMouseWheel.bind(this), { passive: false }); // Mouse wheel zoom
 
-        // TOUCH EVENTS (PARA PAN E ZOOM DE PINÇA)
+        // TOUCH EVENTS (FOR PAN AND PINCH ZOOM)
         this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
 
-        // LISTENER DE CLIQUE NO NÓ (MANTIDO PARA DESKTOP, MAS TAPS MOBILE SÃO TRATADOS EM _onTouchEnd)
+        // NODE CLICK LISTENER (MAINTAINED FOR DESKTOP, BUT MOBILE TAPS ARE HANDLED IN _onTouchEnd)
         this.renderer.domElement.addEventListener('click', this._onNodeClick.bind(this));
 
 
-        // Listener do botão de fechar da sidebar
+        // Sidebar close button listener
         if (this.sidebarCloseButton) {
             this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
         }
     }
 
     _createVersionInfo() {
-        const versionElement = document.createElement('div');
-        versionElement.textContent = `Mind Map ${APP_VERSION}`;
-
-        Object.assign(versionElement.style, {
-            position: 'absolute',
-            bottom: '10px',
-            left: '10px',
-            color: 'rgba(255, 255, 255, 0.5)', // Cor branca suave para o texto da versão
-            backgroundColor: 'rgba(15, 17, 26, 0.5)', // Cor do fundo do botão para combinar com o background da cena
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            zIndex: '1000',
-            pointerEvents: 'none'
-        });
-
-        this.container.appendChild(versionElement);
+        // Ensure the version-info div exists in the HTML
+        const versionElement = document.getElementById('version-info');
+        if (versionElement) {
+            versionElement.textContent = `Mind Map ${APP_VERSION}`;
+            // No need to set styles here if they are already in CSS
+        } else {
+            console.warn("Element with id 'version-info' not found. Version info will not be displayed.");
+        }
     }
 
-    // --- LÓGICA DE CRIAÇÃO E ATUALIZAÇÃO ---
+
+    // --- CREATION AND UPDATE LOGIC ---
 
     /**
-     * Cria a malha (mesh) de um nó e retorna uma Promise que resolve quando estiver pronto.
-     * @param {object} d3Node - O nó de dados do D3.
+     * NEW: Creates the mesh of a node based on direction (left/right/center).
+     * @param {object} d3Node - The D3 data node.
+     * @param {number} direction - -1 for left, 1 for right, 0 for the root node.
      * @returns {Promise<THREE.Group>}
      */
-    _createNodeMesh(d3Node) {
+    _createNodeMesh(d3Node, direction) {
         return new Promise(resolve => {
             const nodeGroup = new THREE.Group();
-            nodeGroup.userData = { d3Node: d3Node, isNode: true };
+            // NEW: Stores the direction and d3 data in the group's userData.
+            nodeGroup.userData = { d3Node: d3Node, isNode: true, direction: direction };
 
             const nodeColor = CONFIG.nodeColors[d3Node.depth % CONFIG.nodeColors.length];
-
             const textMesh = new Text();
             textMesh.text = d3Node.data.name;
             textMesh.fontSize = CONFIG.font.size;
             textMesh.color = CONFIG.textColor;
-            textMesh.anchorX = 'left';
+            textMesh.position.z = 0.1; // Slightly in front of the rectangle
+
+            // NEW: Sets text alignment based on direction.
+            // Left: text aligned to the right. Right: text aligned to the left. Root: text centered.
+            textMesh.anchorX = direction === -1 ? 'right' : (direction === 1 ? 'left' : 'center');
             textMesh.anchorY = 'middle';
-            textMesh.position.z = 0.1; // Levemente à frente do retângulo
 
             textMesh.sync(() => {
                 const bounds = textMesh.textRenderInfo.bounds;
-                // Fallback se bounds não estiverem disponíveis imediatamente
                 const textWidth = bounds ? bounds.x[1] - bounds.x[0] : d3Node.data.name.length * (CONFIG.font.size * 0.6);
                 const textHeight = bounds ? bounds.y[1] - bounds.y[0] : CONFIG.font.size * 1.2;
 
                 const rectWidth = textWidth + CONFIG.padding.x * 2;
                 const rectHeight = textHeight + CONFIG.padding.y * 2;
 
+                // The rectangle geometry is now created with its center at (0,0), facilitating positioning.
                 const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
                 const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
                 const rectMesh = new THREE.Mesh(rectGeo, rectMat);
-                rectMesh.position.x = rectWidth / 2; // Centraliza o retângulo para que o texto comece no padding.x
-                nodeGroup.add(rectMesh);
+                nodeGroup.add(rectMesh); // The rectangle stays at the group's origin.
 
-                // Borda para destaque (opcional, mais sutil agora)
-                const borderGeo = createRoundedRectGeometry(rectWidth + 4, rectHeight + 4, CONFIG.borderRadius);
-                const borderMat = new THREE.MeshBasicMaterial({
-                    color: nodeColor, // Usar a mesma cor do nó para uma borda sutil
-                    transparent: true,
-                    opacity: 0.2 // Aumentar um pouco a opacidade para ser mais perceptível
-                });
-                const borderMesh = new THREE.Mesh(borderGeo, borderMat);
-                borderMesh.position.x = rectWidth / 2;
-                borderMesh.position.z = -0.05; // Levemente para trás do retângulo principal
-                nodeGroup.add(borderMesh);
-
-                textMesh.position.x = CONFIG.padding.x; // Posição do texto alinhada com o padding
+                // NEW: Text position is adjusted within the padding, depending on the direction.
+                if (direction === 1) { // Right side: text aligned left, so its left edge is at -rectWidth/2 + padding
+                    textMesh.position.x = -rectWidth / 2 + CONFIG.padding.x;
+                } else if (direction === -1) { // Left side: text aligned right, so its right edge is at rectWidth/2 - padding
+                    textMesh.position.x = rectWidth / 2 - CONFIG.padding.x;
+                } else { // Root/Center
+                    textMesh.position.x = 0;
+                }
 
                 nodeGroup.add(textMesh);
-                nodeGroup.userData.nodeWidth = rectWidth;
+                nodeGroup.userData.nodeWidth = rectWidth; // Total node width.
 
-                // Drag Handle
-                const handleGeo = new THREE.CircleGeometry(CONFIG.dragHandleRadius, 32);
-                const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.6 });
-                const handleMesh = new THREE.Mesh(handleGeo, handleMat);
-                handleMesh.position.set(rectWidth, 0, 0.2); // Posição à direita do nó
-                handleMesh.userData = { isDragHandle: true, nodeGroup };
+                // NEW: The Drag Handle is created only for non-root nodes and positioned on the correct side.
+                if (direction !== 0) {
+                    const handleGeo = new THREE.CircleGeometry(CONFIG.dragHandleRadius, 32);
+                    const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.6 });
+                    const handleMesh = new THREE.Mesh(handleGeo, handleMat);
+                    // Position on the outer edge of the node.
+                    handleMesh.position.set((rectWidth / 2) * direction, 0, 0.2);
+                    handleMesh.userData = { isDragHandle: true, nodeGroup };
 
-                nodeGroup.add(handleMesh);
-                this.dragHandles.push(handleMesh);
+                    nodeGroup.add(handleMesh);
+                    this.dragHandles.push(handleMesh);
+                }
 
+                this.nodeMap.set(d3Node, nodeGroup); // Maps the data node to the Three.js object
                 resolve(nodeGroup);
             });
         });
     }
 
+    /**
+     * NEW: Creates the connection line mesh based on the direction of the nodes.
+     * @param {object} linkData - D3 link object.
+     */
     _createLinkMesh(linkData) {
         const sourceNodeGroup = this.nodeMap.get(linkData.source);
         const targetNodeGroup = this.nodeMap.get(linkData.target);
 
         if (!sourceNodeGroup || !targetNodeGroup) return;
 
-        // Ponto de início: direita do nó fonte
-        const start = new THREE.Vector3(
-            sourceNodeGroup.position.x + sourceNodeGroup.userData.nodeWidth,
-            sourceNodeGroup.position.y,
-            0
-        );
-        // Ponto de término: esquerda do nó destino
-        const end = targetNodeGroup.position;
+        const sourceDir = sourceNodeGroup.userData.direction;
+        const targetDir = targetNodeGroup.userData.direction;
 
-        // Pontos de controle para uma curva suave (Bezier)
-        const controlPoint1 = new THREE.Vector3((start.x + end.x) / 2, start.y, 0);
-        const controlPoint2 = new THREE.Vector3((start.x + end.x) / 2, end.y, 0);
+        // Start point: edge of the parent node.
+        const start = sourceNodeGroup.position.clone();
+        if (sourceDir !== 0) { // If parent is not root, connection leaves from outer edge.
+            start.x += (sourceNodeGroup.userData.nodeWidth / 2) * sourceDir;
+        } else { // If it's the root, connection leaves from the edge corresponding to the child's direction.
+            start.x += (sourceNodeGroup.userData.nodeWidth / 2) * targetDir;
+        }
+
+        // End point: edge of the child node.
+        const end = targetNodeGroup.position.clone();
+        end.x -= (targetNodeGroup.userData.nodeWidth / 2) * targetDir; // Connection enters the inner edge.
+
+        // Control points for a smooth curve (Bezier).
+        // Adjusts the control point to create an S or C curve
+        let controlPoint1 = new THREE.Vector3();
+        let controlPoint2 = new THREE.Vector3();
+
+        if (sourceDir === 0 && targetDir !== 0) { // From root to a child (bilateral)
+            controlPoint1.set(start.x + (end.x - start.x) / 2, start.y, 0);
+            controlPoint2.set(end.x - (end.x - start.x) / 2, end.y, 0);
+        } else { // Between nodes on the same side
+            controlPoint1.set(start.x + 50 * sourceDir, start.y, 0); // Extends horizontally from parent
+            controlPoint2.set(end.x - 50 * targetDir, end.y, 0);  // Extends horizontally from child
+        }
+
 
         const curve = new THREE.CubicBezierCurve3(start, controlPoint1, controlPoint2, end);
-        const points = curve.getPoints(50); // Mais pontos para uma curva mais suave
+        const points = curve.getPoints(50);
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({
             color: CONFIG.linkColor,
-            linewidth: 3, // Aumenta a espessura da linha
+            linewidth: 3,
             transparent: true,
-            opacity: 0.4 // Reduz a opacidade para um visual mais suave
+            opacity: 0.4
         });
 
         const curveObject = new THREE.Line(geometry, material);
@@ -273,6 +288,9 @@ class MindMapViewer {
         this.mainGroup.add(curveObject);
     }
 
+    /**
+     * NEW: Updates connection lines when a node is dragged.
+     */
     updateLinks() {
         for (const linkObject of this.linkObjects) {
             const { linkData } = linkObject.userData;
@@ -280,15 +298,30 @@ class MindMapViewer {
             const targetNodeGroup = this.nodeMap.get(linkData.target);
 
             if (sourceNodeGroup && targetNodeGroup) {
-                const start = new THREE.Vector3(
-                    sourceNodeGroup.position.x + sourceNodeGroup.userData.nodeWidth,
-                    sourceNodeGroup.position.y,
-                    0
-                );
-                const end = targetNodeGroup.position;
+                const sourceDir = sourceNodeGroup.userData.direction;
+                const targetDir = targetNodeGroup.userData.direction;
 
-                const controlPoint1 = new THREE.Vector3((start.x + end.x) / 2, start.y, 0);
-                const controlPoint2 = new THREE.Vector3((start.x + end.x) / 2, end.y, 0);
+                const start = sourceNodeGroup.position.clone();
+                if (sourceDir !== 0) {
+                    start.x += (sourceNodeGroup.userData.nodeWidth / 2) * sourceDir;
+                } else {
+                    start.x += (sourceNodeGroup.userData.nodeWidth / 2) * targetDir;
+                }
+
+                const end = targetNodeGroup.position.clone();
+                end.x -= (targetNodeGroup.userData.nodeWidth / 2) * targetDir;
+
+                // Recalculate control points
+                let controlPoint1 = new THREE.Vector3();
+                let controlPoint2 = new THREE.Vector3();
+
+                if (sourceDir === 0 && targetDir !== 0) {
+                    controlPoint1.set(start.x + (end.x - start.x) / 2, start.y, 0);
+                    controlPoint2.set(end.x - (end.x - start.x) / 2, end.y, 0);
+                } else {
+                    controlPoint1.set(start.x + 50 * sourceDir, start.y, 0);
+                    controlPoint2.set(end.x - 50 * targetDir, end.y, 0);
+                }
 
                 const newCurve = new THREE.CubicBezierCurve3(start, controlPoint1, controlPoint2, end);
                 linkObject.geometry.setFromPoints(newCurve.getPoints(50));
@@ -297,10 +330,35 @@ class MindMapViewer {
         }
     }
 
-    // --- LÓGICA PRINCIPAL ---
+    /**
+     * NEW: Moves a node and all its child nodes (subtree).
+     * @param {THREE.Group} nodeGroup - The THREE.js group of the node to be moved.
+     * @param {THREE.Vector3} deltaPosition - The displacement vector.
+     */
+    _moveSubtree(nodeGroup, deltaPosition) {
+        // Move the parent node
+        nodeGroup.position.add(deltaPosition);
 
+        // Recursively move all children
+        const d3Node = nodeGroup.userData.d3Node;
+        if (d3Node && d3Node.children) {
+            d3Node.children.forEach(childD3Node => {
+                const childNodeGroup = this.nodeMap.get(childD3Node);
+                if (childNodeGroup) {
+                    this._moveSubtree(childNodeGroup, deltaPosition);
+                }
+            });
+        }
+    }
+
+
+    // --- MAIN LOGIC ---
+
+    /**
+     * NEW: Completely restructured drawing logic for the bilateral layout.
+     */
     async drawMindMap() {
-        // Limpa a cena antes de redesenhar
+        // Limpeza da cena (código existente)
         while (this.mainGroup.children.length) {
             this.mainGroup.remove(this.mainGroup.children[0]);
         }
@@ -309,43 +367,97 @@ class MindMapViewer {
         this.dragHandles = [];
 
         const root = hierarchy(this.data);
+        const d3Links = root.links(); // Links podem ser definidos aqui
+
+        // --- NOVA LÓGICA DE LAYOUT SIMÉTRICO ---
+
+        const originalChildren = root.children || [];
+        if (originalChildren.length > 0) {
+            const horizontalSpacing = 450;
+            const verticalSpacing = 50;
+            const treeLayout = tree().nodeSize([verticalSpacing, horizontalSpacing]);
+
+            // 1. Dividir os filhos do nó raiz
+            const leftCount = Math.ceil(originalChildren.length / 2);
+            const leftChildren = originalChildren.slice(0, leftCount);
+            const rightChildren = originalChildren.slice(leftCount);
+
+            // 2. Processar o lado esquerdo
+            if (leftChildren.length > 0) {
+                root.children = leftChildren; // Define temporariamente os filhos da esquerda
+                treeLayout(root); // Executa o layout SÓ para a esquerda
+                // Marca a direção em todos os descendentes da esquerda
+                root.descendants().forEach(node => {
+                    if (node.depth > 0) {
+                        node.userData = { ...node.userData, assignedDirection: -1 };
+                    }
+                });
+            }
+
+            // 3. Processar o lado direito
+            if (rightChildren.length > 0) {
+                root.children = rightChildren; // Define temporariamente os filhos da direita
+                treeLayout(root); // Executa o layout SÓ para a direita
+                // Marca a direção em todos os descendentes da direita
+                root.descendants().forEach(node => {
+                    if (node.depth > 0) {
+                        node.userData = { ...node.userData, assignedDirection: 1 };
+                    }
+                });
+            }
+
+            // 4. Restaura os filhos e define a direção do nó raiz
+            root.children = originalChildren;
+        }
+        root.userData = { ...root.userData, assignedDirection: 0 };
+
+        // Agora `root.descendants()` contém todos os nós com as coordenadas corretas e simétricas
         const d3Nodes = root.descendants();
-        const d3Links = root.links();
 
-        // Calcular a largura máxima do texto para espaçamento horizontal
-        const maxTextLength = d3Nodes.reduce((max, n) => Math.max(max, n.data.name.length), 0);
-        // Ajustar espaçamento baseado no tamanho da fonte e padding configurados
-        const horizontalNodeSpacing = CONFIG.padding.x * 2 + CONFIG.font.size * maxTextLength * 0.6; // Estimativa de largura do texto
-        const verticalNodeSpacing = CONFIG.padding.y * 2 + CONFIG.font.size * 1.5; // Estimativa de altura da linha
+        // --- FIM DA NOVA LÓGICA ---
 
-        // Ajuste do espaçamento entre os nós
-        const horizontalSpacing = horizontalNodeSpacing + 80; // Adiciona um valor fixo para espaço extra
-        const verticalSpacing = verticalNodeSpacing + 30; // Adiciona um valor fixo para espaço extra
+        // Criação dos meshes dos nós (código existente)
+        const nodeCreationPromises = d3Nodes.map(d3Node => {
+            const direction = d3Node.userData.assignedDirection;
+            return this._createNodeMesh(d3Node, direction);
+        });
+        await Promise.all(nodeCreationPromises);
 
-        const treeLayout = tree().nodeSize([verticalSpacing, horizontalSpacing]);
-        treeLayout(root);
+        // Posicionamento dos nós (código existente, agora funciona corretamente)
+        d3Nodes.forEach(d3Node => {
+            const nodeGroup = this.nodeMap.get(d3Node);
+            if (!nodeGroup) return;
 
-        const nodePromises = d3Nodes.map(d3Node => this._createNodeMesh(d3Node));
-        const nodeGroups = await Promise.all(nodePromises);
+            if (d3Node.depth === 0) {
+                nodeGroup.position.set(0, 0, 0);
+            } else {
+                const direction = nodeGroup.userData.direction;
+                // d3Node.y é a "profundidade" horizontal
+                // d3Node.x é a posição vertical, agora calculada simetricamente
+                const posX = d3Node.y * direction;
+                const posY = d3Node.x;
 
-        nodeGroups.forEach(nodeGroup => {
-            const d3Node = nodeGroup.userData.d3Node;
-            // Posição ajustada: d3.tree retorna y para profundidade e x para ordem.
-            // Invertemos para layout horizontal e centralizamos os nós verticalmente.
-            nodeGroup.position.set(d3Node.y, -d3Node.x, 0);
+                // Ajuste para alinhar a borda do nó, não o centro
+                const nodeWidth = nodeGroup.userData.nodeWidth || 0;
+                const finalNodeX = posX + (nodeWidth / 2) * direction;
+
+                nodeGroup.position.set(finalNodeX, posY, 0);
+            }
             this.mainGroup.add(nodeGroup);
-            this.nodeMap.set(d3Node, nodeGroup);
         });
 
+        // Criação das conexões (código existente)
         d3Links.forEach(link => this._createLinkMesh(link));
 
-        // Centralizar o mapa mental na cena
+        // Centralização do mapa (código existente)
         const box = new THREE.Box3().setFromObject(this.mainGroup);
         const center = box.getCenter(new THREE.Vector3());
         this.mainGroup.position.sub(center);
+
+        this.camera.updateProjectionMatrix();
     }
 
-    // --- EVENT HANDLERS (CONTROLES CUSTOMIZADOS) ---
+    // --- EVENT HANDLERS (CUSTOM CONTROLS) ---
 
     _onWindowResize() {
         this.camera.left = window.innerWidth / -2;
@@ -367,43 +479,43 @@ class MindMapViewer {
     }
 
     _onMouseWheel(event) {
-        event.preventDefault(); // Impede o scroll da página
+        event.preventDefault(); // Prevent page scroll
 
         if (this.isSidebarOpen) {
-            return; // Se a sidebar estiver aberta, ignore o evento de zoom
+            return; // If sidebar is open, ignore zoom event
         }
 
-        // 1. Posição do mouse em NDC (Normalized Device Coordinates)
+        // 1. Mouse position in NDC (Normalized Device Coordinates)
         this.mouse.copy(this._getPointerCoordinates(event));
 
-        // 2. Converter a posição do mouse NDC para Coordenadas do Mundo ANTES do zoom
+        // 2. Convert mouse NDC position to World Coordinates BEFORE zoom
         const worldPosBeforeZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0);
         worldPosBeforeZoom.unproject(this.camera);
 
-        // 3. Calcular o novo fator de zoom
+        // 3. Calculate the new zoom factor
         const zoomExponent = event.deltaY * -0.01 * CONFIG.zoom.speed;
         let newZoom = this.camera.zoom * Math.pow(2, zoomExponent);
 
-        // 4. Aplicar os limites de zoom
+        // 4. Apply zoom limits
         newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
 
-        // 5. Aplicar o novo zoom à câmera
+        // 5. Apply the new zoom to the camera
         this.camera.zoom = newZoom;
         this.camera.updateProjectionMatrix();
 
-        // 6. Converter a posição do mouse NDC para Coordenadas do Mundo DEPOIS do zoom
+        // 6. Convert mouse NDC position to World Coordinates AFTER zoom
         const worldPosAfterZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0);
         worldPosAfterZoom.unproject(this.camera);
 
-        // 7. Calcular o deslocamento (pan) necessário para manter o ponto sob o mouse fixo
+        // 7. Calculate the necessary displacement (pan) to keep the point under the mouse fixed
         const panDelta = new THREE.Vector3().subVectors(worldPosBeforeZoom, worldPosAfterZoom);
 
-        // 8. Aplicar o deslocamento à posição da câmera
+        // 8. Apply the displacement to the camera's position
         this.camera.position.add(panDelta);
     }
 
     _onMouseDown(event) {
-        if (this.isSidebarOpen || event.button !== 0) { // Verifica se é o botão esquerdo do mouse
+        if (this.isSidebarOpen || event.button !== 0) { // Check if it's the left mouse button
             return;
         }
 
@@ -417,19 +529,18 @@ class MindMapViewer {
                 this.selectedNode = handle.userData.nodeGroup;
                 this.isDraggingNode = true;
 
-                const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0); // Plano XY em Z=0
-                const intersectionPoint = new THREE.Vector3();
-                this.raycaster.ray.intersectPlane(plane, intersectionPoint);
+                const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0); // XY plane at Z=0
+                this.raycaster.ray.intersectPlane(plane, this.initialIntersectionPoint); // Store initial intersection point
 
-                // Calcula o offset do ponto de clique em relação ao centro do nó
-                this.offset.copy(intersectionPoint).sub(this.selectedNode.position);
-                this.isPanning = false; // Desativa pan da câmera se estiver arrastando um nó
+                // The offset is now from the initial intersection point to the node's position
+                this.offset.copy(this.initialIntersectionPoint).sub(this.selectedNode.position);
+                this.isPanning = false; // Deactivate camera pan if dragging a node
             }
         } else {
-            // Se nenhum handle foi clicado, inicie o pan da câmera
+            // If no handle was clicked, start camera pan
             this.isDraggingNode = false;
             this.isPanning = true;
-            this.lastPointerPosition.set(event.clientX, event.clientY); // Guarda a posição inicial do ponteiro na tela
+            this.lastPointerPosition.set(event.clientX, event.clientY); // Store initial pointer position on screen
         }
     }
 
@@ -439,37 +550,43 @@ class MindMapViewer {
         }
 
         if (this.isDraggingNode && this.selectedNode) {
-            // Lógica para arrastar o nó
+            // Logic to drag the node and its children
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
 
             const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-            const intersectionPoint = new THREE.Vector3();
-            this.raycaster.ray.intersectPlane(plane, intersectionPoint);
+            const currentIntersectionPoint = new THREE.Vector3();
+            this.raycaster.ray.intersectPlane(plane, currentIntersectionPoint);
 
-            this.selectedNode.position.copy(intersectionPoint).sub(this.offset);
+            // Calculate the delta movement
+            const delta = new THREE.Vector3().subVectors(currentIntersectionPoint, this.initialIntersectionPoint);
+
+            // Move the entire subtree by the delta
+            this._moveSubtree(this.selectedNode, delta);
+
+            // Update the initial intersection point for the next frame
+            this.initialIntersectionPoint.copy(currentIntersectionPoint);
+
             this.updateLinks();
         } else if (this.isPanning) {
-            // Lógica para pan da câmera
+            // Logic for camera pan
             const deltaX = event.clientX - this.lastPointerPosition.x;
             const deltaY = event.clientY - this.lastPointerPosition.y;
 
-            // A velocidade do pan deve ser escalada pelo inverso do zoom atual da câmera.
-            // Isso garante que um mesmo movimento do mouse na tela corresponda ao mesmo
-            // deslocamento visual, independentemente do nível de zoom.
+            // Pan speed should be scaled by the inverse of the current camera zoom.
             const panSpeed = 1 / this.camera.zoom;
 
             this.camera.position.x -= deltaX * panSpeed;
-            this.camera.position.y += deltaY * panSpeed; // Y do mundo é invertido em relação ao Y da tela
+            this.camera.position.y += deltaY * panSpeed; // World Y is inverted relative to screen Y
 
-            this.lastPointerPosition.set(event.clientX, event.clientY); // Atualiza a última posição
+            this.lastPointerPosition.set(event.clientX, event.clientY); // Update last position
         }
     }
 
     _onMouseUp() {
         this.selectedNode = null;
         this.isDraggingNode = false;
-        this.isPanning = false; // Finaliza o pan da câmera
+        this.isPanning = false; // End camera pan
     }
 
     _onTouchStart(event) {
@@ -477,14 +594,14 @@ class MindMapViewer {
             return;
         }
 
-        event.preventDefault(); // Previne o comportamento padrão (scroll, etc.)
+        event.preventDefault(); // Prevent default behavior (scroll, etc.)
 
-        this.isConsideredClick = true; // Assume que é um clique/tap inicialmente
+        this.isConsideredClick = true; // Assume it's a click/tap initially
 
         if (event.touches.length === 1) {
-            this.initialTouchCoords.set(event.touches[0].clientX, event.touches[0].clientY); // Guarda a posição inicial do toque para detecção de tap
+            this.initialTouchCoords.set(event.touches[0].clientX, event.touches[0].clientY); // Store initial touch position for tap detection
 
-            // Tenta arrastar nó (prioridade) ou pan da câmera
+            // Try to drag node (priority) or pan camera
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.dragHandles);
@@ -496,42 +613,34 @@ class MindMapViewer {
                     this.isDraggingNode = true;
 
                     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-                    const intersectionPoint = new THREE.Vector3();
-                    this.raycaster.ray.intersectPlane(plane, intersectionPoint);
+                    this.raycaster.ray.intersectPlane(plane, this.initialIntersectionPoint); // Store initial intersection point
 
-                    this.offset.copy(intersectionPoint).sub(this.selectedNode.position);
-                    this.isPanning = false; // Desativa pan se estiver arrastando nó
+                    this.offset.copy(this.initialIntersectionPoint).sub(this.selectedNode.position);
+                    this.isPanning = false; // Deactivate pan if dragging node
                 }
             } else {
-                // Se nenhum handle, inicia o pan da câmera
+                // If no handle, start camera pan
                 this.isDraggingNode = false;
                 this.isPanning = true;
                 this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
             }
         } else if (event.touches.length === 2) {
-            // Inicia o gesto de zoom de pinça
-            this.isDraggingNode = false; // Desativa arrasto de nó
-            this.isPanning = false; // Desativa pan de um dedo
+            // Start pinch-to-zoom gesture
+            this.isDraggingNode = false; // Deactivate node drag
+            this.isPanning = false; // Deactivate one-finger pan
             this._isPinching = true;
-            this.isConsideredClick = false; // Dois dedos significa que não é um clique
+            this.isConsideredClick = false; // Two fingers means it's not a click
 
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
 
-            // Calcula a distância inicial entre os dois toques
-            this.initialPinchDistance = Math.sqrt(
-                Math.pow(touch1.clientX - touch2.clientX, 2) +
-                Math.pow(touch1.clientY - touch2.clientY, 2)
-            );
+            this.initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+            this.initialPinchZoom = this.camera.zoom;
 
-            this.initialPinchZoom = this.camera.zoom; // Guarda o zoom atual para o cálculo relativo
-
-            // Calcula o centro do pinch em NDC para manter o zoom centrado
             this.mouse.set(
                 ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
                 -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
             );
-            // Converte o centro do pinch em NDC para coordenadas do mundo para a referência
             this.pinchCenterWorld.set(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
         }
     }
@@ -541,163 +650,120 @@ class MindMapViewer {
             return;
         }
 
-        event.preventDefault(); // Previne o comportamento padrão (scroll, etc.)
+        event.preventDefault();
 
-        // NOVO: Verifica se houve movimento significativo para desativar a detecção de "click"
         if (this.isConsideredClick && event.touches.length === 1) {
-            const currentX = event.touches[0].clientX;
-            const currentY = event.touches[0].clientY;
-            const deltaX = currentX - this.initialTouchCoords.x;
-            const deltaY = currentY - this.initialTouchCoords.y;
-            const moveDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const moveDistance = Math.hypot(
+                event.touches[0].clientX - this.initialTouchCoords.x,
+                event.touches[0].clientY - this.initialTouchCoords.y
+            );
 
             if (moveDistance > this.tapThreshold) {
-                this.isConsideredClick = false; // Moveu demais, não é um clique/tap
+                this.isConsideredClick = false;
             }
         }
 
         if (this.isDraggingNode && this.selectedNode) {
-            // Move o nó se estiver arrastando com um dedo
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
-
             const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-            const intersectionPoint = new THREE.Vector3();
-            this.raycaster.ray.intersectPlane(plane, intersectionPoint);
+            const currentIntersectionPoint = new THREE.Vector3();
+            this.raycaster.ray.intersectPlane(plane, currentIntersectionPoint);
 
-            this.selectedNode.position.copy(intersectionPoint).sub(this.offset);
+            const delta = new THREE.Vector3().subVectors(currentIntersectionPoint, this.initialIntersectionPoint);
+            this._moveSubtree(this.selectedNode, delta);
+            this.initialIntersectionPoint.copy(currentIntersectionPoint); // Update for next move
             this.updateLinks();
         } else if (this.isPanning && event.touches.length === 1) {
-            // Pan da câmera com um dedo
             const deltaX = event.touches[0].clientX - this.lastPointerPosition.x;
             const deltaY = event.touches[0].clientY - this.lastPointerPosition.y;
-
             const panSpeed = 1 / this.camera.zoom;
-
             this.camera.position.x -= deltaX * panSpeed;
             this.camera.position.y += deltaY * panSpeed;
-
             this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
         } else if (this._isPinching && event.touches.length === 2) {
-            // Zoom de pinça com dois dedos
-            this.isConsideredClick = false; // Pinching is never a click
-
+            this.isConsideredClick = false;
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
-
-            // Calcula a distância atual entre os dois toques
-            const currentPinchDistance = Math.sqrt(
-                Math.pow(touch1.clientX - touch2.clientX, 2) +
-                Math.pow(touch1.clientY - touch2.clientY, 2)
-            );
-
-            // Calcula o novo zoom com base na proporção da distância de pinça e o zoom inicial
+            const currentPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
             let newZoom = this.initialPinchZoom * (currentPinchDistance / this.initialPinchDistance);
-
-            // Aplica os limites de zoom
             newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
-
-            // Aplica o novo zoom à câmera
             this.camera.zoom = newZoom;
             this.camera.updateProjectionMatrix();
 
-            // Ajusta a posição da câmera para manter o centro do pinch fixo
-            // 1. Obtenha a posição atual do centro do pinch na tela NDC
             this.mouse.set(
                 ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
                 -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
             );
-
-            // 2. Converta o centro do pinch atual em NDC para o mundo (depois do zoom)
-            const currentPinchCenterWorld = new THREE.Vector3(this.mouse.x, this.mouse.y, 0);
-            currentPinchCenterWorld.unproject(this.camera);
-
-            // 3. Calcule o deslocamento necessário para manter o pinchCenterWorld fixo
+            const currentPinchCenterWorld = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
             const panDelta = new THREE.Vector3().subVectors(this.pinchCenterWorld, currentPinchCenterWorld);
-
             this.camera.position.add(panDelta);
         }
     }
 
     _onTouchEnd(event) {
-        // NOVO: Se foi considerado um clique/tap (sem movimento significativo ou multi-touch)
         if (this.isConsideredClick) {
-            // Reutiliza as coordenadas do toque inicial ou as últimas coordenadas do mouse
-            // para o raycaster. Para taps, a posição inicial é a mais precisa.
-            // Para garantir que o raycaster use a posição correta do touch,
-            // podemos recalcular a partir da posição do `touchend` se necessário,
-            // mas `this.mouse` já deve estar atualizado do `_onTouchStart`.
             this.raycaster.setFromCamera(this.mouse, this.camera);
-
             const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
-
             let clickedNode = null;
             for (const intersect of intersects) {
-                // Prioriza o grupo do nó (o pai) se for um elemento do nó e não o drag handle
-                if (intersect.object.parent && intersect.object.parent.userData.isNode && !intersect.object.userData.isDragHandle) {
-                    clickedNode = intersect.object.parent;
-                    break;
-                } else if (intersect.object.userData.isNode && !intersect.object.userData.isDragHandle) {
-                    // Caso o próprio objeto seja o nó (ex: o mesh do retângulo)
-                    clickedNode = intersect.object;
-                    break;
+                let parent = intersect.object.parent;
+                while (parent) {
+                    if (parent.userData.isNode) {
+                        clickedNode = parent;
+                        break;
+                    }
+                    parent = parent.parent;
                 }
+                if (clickedNode) break;
             }
 
-            if (clickedNode) {
+            if (clickedNode && !clickedNode.userData.isDragHandle) {
                 const d3NodeData = clickedNode.userData.d3Node.data;
-                this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível para este tópico.');
-            } else {
-                // Se o clique for fora de um nó e a sidebar estiver aberta, fecha-a.
-                if (this.isSidebarOpen) {
-                    this.closeSidebar();
-                }
+                this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível.');
+            } else if (this.isSidebarOpen) {
+                this.closeSidebar();
             }
         }
 
-        // Redefine todos os estados de interação de toque
         this.isDraggingNode = false;
         this.isPanning = false;
         this._isPinching = false;
-        this.isConsideredClick = true; // Reseta para a próxima interação
+        this.isConsideredClick = true;
     }
 
-    // Mantido para clicks de mouse em desktop (e não afetará o touch)
     _onNodeClick(event) {
-        // Se estiver arrastando um nó ou pan, não processa o clique para evitar ações acidentais.
-        // event.button !== 0 filtra cliques que não sejam com o botão esquerdo.
-        // event.touches && event.touches.length > 1 é uma verificação que é redundante aqui se
-        // este listener é para o evento 'click' do navegador (que não tem 'touches').
         if (this.isDraggingNode || this.isPanning || this._isPinching || event.button !== 0) {
             return;
         }
 
         this.mouse.copy(this._getPointerCoordinates(event));
         this.raycaster.setFromCamera(this.mouse, this.camera);
-
         const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
 
         let clickedNode = null;
         for (const intersect of intersects) {
-            // Prioriza o grupo do nó (o pai) se for um elemento do nó e não o drag handle
-            if (intersect.object.parent && intersect.object.parent.userData.isNode && !intersect.object.userData.isDragHandle) {
-                clickedNode = intersect.object.parent;
-                break;
-            } else if (intersect.object.userData.isNode && !intersect.object.userData.isDragHandle) {
-                // Caso o próprio objeto seja o nó (ex: o mesh do retângulo)
-                clickedNode = intersect.object;
-                break;
+            // Traverse up the hierarchy to find the node group, but stop if it's a drag handle.
+            let currentObject = intersect.object;
+            while (currentObject) {
+                if (currentObject.userData.isDragHandle) {
+                    clickedNode = null; // Ignore clicks on drag handle
+                    break;
+                }
+                if (currentObject.userData.isNode) {
+                    clickedNode = currentObject;
+                    break;
+                }
+                currentObject = currentObject.parent;
             }
+            if (clickedNode) break;
         }
 
         if (clickedNode) {
             const d3NodeData = clickedNode.userData.d3Node.data;
             this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível para este tópico.');
-        } else {
-            // Se o clique for fora de um nó e a sidebar estiver aberta, fecha-a.
-            if (this.isSidebarOpen) {
-                this.closeSidebar();
-            }
+        } else if (this.isSidebarOpen) {
+            this.closeSidebar();
         }
     }
 
@@ -708,8 +774,6 @@ class MindMapViewer {
             this.sidebarContent.textContent = content;
             this.sidebar.classList.add('open');
             this.isSidebarOpen = true;
-            // A lógica de controle de câmera customizada já verifica this.isSidebarOpen
-            // para desativar as interações quando a sidebar está aberta.
         }
     }
 
@@ -720,16 +784,15 @@ class MindMapViewer {
         }
     }
 
-    // --- LOOP DE ANIMAÇÃO ---
+    // --- ANIMATION LOOP ---
     animate() {
         requestAnimationFrame(this.animate.bind(this));
-        // A câmera é movida diretamente pelos eventos, sem necessidade de update de controles externos.
         this.renderer.render(this.scene, this.camera);
     }
 }
 
 
-// --- DADOS DO MAPA MENTAL ---
+// --- MIND MAP DATA ---
 const mindMapData = {
     "name": "Auditoria e Controle Interno",
     "explanation": "Uma visão geral sobre os conceitos fundamentais de auditoria, sua relação com o controle interno, os diferentes tipos de auditoria e as fases do processo de auditoria, com foco em pontos de atenção para concursos.",
@@ -893,13 +956,129 @@ const mindMapData = {
                     ]
                 }
             ]
-        }
+        },
+        {
+            "name": "3. O Processo de Auditoria",
+            "explanation": "Descreve as fases fundamentais do trabalho de auditoria (Planejamento, Execução, Relatório) e os principais instrumentos e documentos gerados, como papéis de trabalho e achados.",
+            "children": [
+                {
+                    "name": "Fases da Auditoria",
+                    "explanation": "O trabalho de auditoria é estruturado em três fases sequenciais e interdependentes.",
+                    "children": [
+                        {
+                            "name": "1. Planejamento",
+                            "explanation": "Fase crítica que define escopo, objetivos, materialidade e abordagem. Envolve conhecer a entidade e avaliar riscos e controles para definir os procedimentos."
+                        },
+                        {
+                            "name": "2. Execução",
+                            "explanation": "Fase de aplicação dos procedimentos definidos no planejamento, com coleta de evidências através de testes de controle e procedimentos substantivos."
+                        },
+                        {
+                            "name": "3. Relatório",
+                            "explanation": "Fase de comunicação dos resultados, conclusões e recomendações da auditoria para as partes interessadas, sendo o produto final do trabalho."
+                        }
+                    ]
+                },
+                {
+                    "name": "Instrumentos da Auditoria",
+                    "explanation": "Conjunto de documentos e ferramentas que formalizam e evidenciam o trabalho do auditor.",
+                    "children": [
+                        {
+                            "name": "Papéis de Trabalho",
+                            "explanation": "Conjunto de documentos e registros que constituem a evidência do trabalho realizado, suportando as conclusões do relatório."
+                        },
+                        {
+                            "name": "Achado de Auditoria",
+                            "explanation": "Resultado da comparação entre a 'situação encontrada' (condição) e o 'critério' (o que deveria ser). Um achado completo possui os '4 Cs'.",
+                            "children": [
+                                {
+                                    "name": "Os '4 Cs' do Achado",
+                                    "explanation": "Condição (o que é), Critério (o que deveria ser), Causa (razão da divergência) e Consequência/Efeito (impacto ou risco)."
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Matriz de Achados",
+                            "explanation": "Instrumento usado no planejamento para consolidar os achados, suas causas, efeitos e as propostas de recomendação."
+                        },
+                        {
+                            "name": "Relatório de Auditoria",
+                            "explanation": "Produto final e principal instrumento de comunicação dos resultados da auditoria."
+                        }
+                    ]
+                },
+                {
+                    "name": "Foco CEBRASPE (Pontos de Atenção)",
+                    "explanation": "Aspectos do processo de auditoria que são alvos frequentes de questões de concurso.",
+                    "children": [
+                        {
+                            "name": "Importância do Planejamento",
+                            "explanation": "O planejamento é a fase mais crítica, não a execução. Um planejamento inadequado, não baseado em riscos, compromete todo o trabalho."
+                        },
+                        {
+                            "name": "Atributos do Achado ('4 Cs')",
+                            "explanation": "A banca frequentemente testa o conhecimento sobre os '4 Cs', questionando a validade ou completude de um achado que não apresente todos os quatro atributos."
+                        },
+                        {
+                            "name": "Evidência de Auditoria",
+                            "explanation": "As conclusões devem ser baseadas em evidência 'suficiente e apropriada'. Suficiência refere-se à QUANTIDADE de evidência; Apropriação refere-se à QUALIDADE (relevância e fidedignidade)."
+                        }
+                    ]
+                }
+            ]
+        }, {
+            "name": "2. Tipos de Auditoria",
+            "explanation": "Classificação das auditorias governamentais (segundo ISSAI e TCU) em três tipos principais de acordo com seus objetivos: Financeira, de Conformidade e Operacional.",
+            "children": [
+                {
+                    "name": "Auditoria Financeira",
+                    "explanation": "Objetivo: Expressar opinião sobre a fidedignidade e correção das demonstrações financeiras. Foco na conformidade com o arcabouço de relatório financeiro aplicável. Exemplo em TI: verificar se ativos de hardware/software estão corretamente registrados."
+                },
+                {
+                    "name": "Auditoria de Conformidade (Regularidade)",
+                    "explanation": "Objetivo: Expressar opinião se as atividades e transações estão em conformidade com leis e normas. Foco na legalidade, legitimidade e regularidade. Exemplo em TI: verificar conformidade com a Lei nº 14.133/2021 ou LGPD."
+                },
+                {
+                    "name": "Auditoria Operacional (Desempenho)",
+                    "explanation": "Objetivo: Examinar a economicidade, eficiência, eficácia e efetividade ('4 Es') das operações. Foco na avaliação do desempenho da gestão e identificação de melhorias. Exemplo em TI: avaliar se um novo sistema atinge seus objetivos de forma eficiente.",
+                    "children": [
+                        {
+                            "name": "Os '4 Es'",
+                            "explanation": "Economia (minimizar custo dos insumos), Eficiência (relação produto/insumo), Eficácia (grau de alcance dos objetivos) e Efetividade (impacto final na sociedade)."
+                        }
+                    ]
+                },
+                {
+                    "name": "Foco CEBRASPE (Pontos de Atenção)",
+                    "explanation": "Diferenças cruciais entre os tipos de auditoria que são frequentemente exploradas em questões.",
+                    "children": [
+                        {
+                            "name": "Distinção dos Objetivos",
+                            "explanation": "Associações mandatórias: Financeira → Fidedignidade Contábil; Conformidade → Legalidade/Normas; Operacional → Desempenho e os '4 Es'. A banca pode confundir esses focos."
+                        },
+                        {
+                            "name": "Conhecimento dos '4 Es'",
+                            "explanation": "É fundamental conhecer o significado de cada 'E' da Auditoria Operacional (Economia, Eficiência, Eficácia, Efetividade), pois são conceitos distintos e frequentemente cobrados."
+                        }
+                    ]
+                }
+            ]
+        },
+
+
+
+
     ]
 }
 
 
-// --- INICIALIZAÇÃO ---
+// --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Por padrão, o container é o body. Se você tiver um container específico (ex: <div id="mindmap-container">), mude aqui.
-    new MindMapViewer(document.body, mindMapData);
+    // By default, the container is the body. If you have a specific container (e.g., <div id="mindmap-container">), change it here.
+    const mindmapContainer = document.getElementById('mindmap-container');
+    if (mindmapContainer) {
+        new MindMapViewer(mindmapContainer, mindMapData);
+    } else {
+        console.error("Mind map container not found. Please ensure an element with id 'mindmap-container' exists in your HTML.");
+    }
 });
