@@ -1,6 +1,8 @@
+// main.js
 import * as THREE from 'three';
 import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
+import { exportMindMapToPDF } from './pdfExport.js'; // Importa a função de exportação
 
 // NOVO: Versão do programa atualizada com correções de exportação e novo tema.
 const APP_VERSION = 'v1.2.1 - PDF Export Fix & Light Theme';
@@ -146,7 +148,10 @@ class MindMapViewer {
 
         const exportButton = document.getElementById('export-pdf-button');
         if (exportButton) {
-            exportButton.addEventListener('click', this.exportToPDF.bind(this));
+            // Chama a função exportMindMapToPDF do módulo separado
+            exportButton.addEventListener('click', () => {
+                exportMindMapToPDF(this.nodeMap, this.linkObjects, CONFIG, this.mainGroup.position);
+            });
         }
     }
 
@@ -158,7 +163,6 @@ class MindMapViewer {
             console.warn("Elemento com id 'version-info' não encontrado.");
         }
     }
-
 
     // --- LÓGICA DE CRIAÇÃO E ATUALIZAÇÃO ---
 
@@ -180,7 +184,10 @@ class MindMapViewer {
 
             textMesh.sync(() => {
                 const bounds = textMesh.textRenderInfo.bounds;
-                const textWidth = bounds ? bounds.x[1] - bounds.x[0] : d3Node.data.name.length * (CONFIG.font.size * 0.6);
+                // Ensure bounds are available. If not, there might be a timing or rendering issue with Troika.
+                // The fallback calculation for textWidth and textHeight might be the culprit.
+                // If `bounds` is consistently null, you'd need to debug why Troika isn't providing them.
+                const textWidth = bounds ? bounds.x[1] - bounds.x[0] : d3Node.data.name.length * (CONFIG.font.size * 0.5);
                 const textHeight = bounds ? bounds.y[1] - bounds.y[0] : CONFIG.font.size * 1.2;
 
                 const rectWidth = textWidth + CONFIG.padding.x * 2;
@@ -188,7 +195,6 @@ class MindMapViewer {
 
                 const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
                 const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
-                // Adiciona uma borda sutil aos nós para melhor definição no tema claro
                 const edges = new THREE.EdgesGeometry(rectGeo);
                 const lineMat = new THREE.LineBasicMaterial({ color: 0xCCCCCC, linewidth: 2 });
                 const wireframe = new THREE.LineSegments(edges, lineMat);
@@ -197,7 +203,6 @@ class MindMapViewer {
                 rectMesh.name = 'nodeRectMesh';
                 nodeGroup.add(rectMesh);
                 nodeGroup.add(wireframe);
-
 
                 if (direction === 1) {
                     textMesh.position.x = -rectWidth / 2 + CONFIG.padding.x;
@@ -261,9 +266,9 @@ class MindMapViewer {
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({
             color: CONFIG.linkColor,
-            linewidth: 2, // Linha um pouco mais fina
+            linewidth: 2,
             transparent: true,
-            opacity: 0.8 // Um pouco mais opaco para o tema claro
+            opacity: 0.8
         });
 
         const curveObject = new THREE.Line(geometry, material);
@@ -400,125 +405,6 @@ class MindMapViewer {
 
         this.camera.updateProjectionMatrix();
     }
-
-    // --- MÉTODO DE EXPORTAÇÃO CORRIGIDO ---
-
-    // --- MÉTODO DE EXPORTAÇÃO CORRIGIDO ---
-
-    exportToPDF() {
-        console.log("Iniciando exportação para PDF...");
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-            orientation: 'landscape',
-            unit: 'pt',
-            format: 'a4'
-        });
-
-        const box = new THREE.Box3().setFromObject(this.mainGroup);
-        const size = new THREE.Vector3();
-        box.getSize(size);
-
-        if (size.x === 0 || size.y === 0) {
-            console.error("Não é possível exportar um mapa vazio.");
-            return;
-        }
-
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const margin = 40;
-
-        const scaleX = (pageWidth - margin * 2) / size.x;
-        const scaleY = (pageHeight - margin * 2) / size.y;
-        const scale = Math.min(scaleX, scaleY);
-
-        const pdfCenterX = pageWidth / 2;
-        const pdfCenterY = pageHeight / 2;
-
-        const transform = (point) => {
-            const worldPoint = point.clone().add(this.mainGroup.position);
-            return {
-                x: (worldPoint.x * scale) + pdfCenterX,
-                y: (-worldPoint.y * scale) + pdfCenterY
-            };
-        };
-
-        // Desenha as conexões
-        doc.setLineWidth(0.5);
-        const linkColorHex = '#' + new THREE.Color(CONFIG.linkColor).getHexString();
-        doc.setDrawColor(linkColorHex);
-
-        this.linkObjects.forEach(linkObject => {
-            const curve = linkObject.userData.curve;
-            const start = transform(curve.v0);
-            const cp1 = transform(curve.v1);
-            const cp2 = transform(curve.v2);
-            const end = transform(curve.v3);
-
-            doc.path([
-                { op: 'm', c: [start.x, start.y] },
-                { op: 'c', c: [cp1.x, cp1.y, cp2.x, cp2.y, end.x, end.y] }
-            ]).stroke();
-        });
-
-        // Desenha os nós com texto
-        this.nodeMap.forEach(nodeGroup => {
-            const nodePos = transform(nodeGroup.position);
-
-            const rectMesh = nodeGroup.children.find(c => c.type === 'Mesh' && c.geometry.type === 'ShapeGeometry');
-            const textMesh = nodeGroup.children.find(c => c.isTroikaText || (c.material && c.material.isShaderMaterial));
-
-            if (!rectMesh) return;
-
-            const rectWidth = nodeGroup.userData.nodeWidth * scale;
-            const rectHeight = nodeGroup.userData.nodeHeight * scale;
-            const borderRadius = CONFIG.borderRadius * scale;
-
-            const rectX = nodePos.x - rectWidth / 2;
-            const rectY = nodePos.y - rectHeight / 2;
-
-            const nodeColorHex = '#' + rectMesh.material.color.getHexString();
-            doc.setFillColor(nodeColorHex);
-            doc.setLineWidth(0.3);
-            doc.setDrawColor("#CCCCCC");
-            doc.roundedRect(rectX, rectY, rectWidth, rectHeight, borderRadius, borderRadius, 'FD');
-
-            // Texto
-            const textColorHex = '#' + new THREE.Color(CONFIG.textColor).getHexString();
-            const fontSize = CONFIG.font.size * scale;
-
-            doc.setTextColor(textColorHex);
-            doc.setFontSize(fontSize);
-            doc.setFont("helvetica");
-
-            let textAlign = 'center';
-            let textX = nodePos.x;
-            const paddingX = CONFIG.padding.x * scale;
-
-            if (nodeGroup.userData.direction === 1) {
-                textAlign = 'left';
-                textX = rectX + paddingX;
-            } else if (nodeGroup.userData.direction === -1) {
-                textAlign = 'right';
-                textX = rectX + rectWidth - paddingX;
-            }
-
-            // Garante que o texto seja obtido mesmo se textMesh falhar
-            const textContent =
-                (textMesh && textMesh.text) ||
-                (nodeGroup.userData?.d3Node?.data?.name) ||
-                'Sem texto';
-
-            doc.text(textContent, textX, nodePos.y, {
-                align: textAlign,
-                baseline: 'middle'
-            });
-        });
-
-        doc.save('mapa-mental.pdf');
-        console.log("Exportação para PDF concluída. ✨");
-    }
-
 
     // --- MANIPULADORES DE EVENTOS ---
 
