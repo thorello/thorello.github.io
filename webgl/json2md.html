@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador e Renderizador de Markdown</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-light: #f8f9fa;
+            --background-dark: #ffffff;
+            --text-color: #343a40;
+            --border-color: #e9ecef;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: var(--background-light);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            /* Espaço entre os botões */
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 960px;
+            /* Align with container max-width */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 960px;
+            background-color: var(--background-dark);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 20px;
+            /* Removido o h1 daqui */
+        }
+
+        /* Os estilos para h1 agora são aplicados via #markdown-output h1 */
+        #markdown-output h1 {
+            color: var(--primary-color);
+            text-align: left;
+            margin-top: 0;
+            /* Ajuste para o primeiro título dentro do card */
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: var(--shadow);
+        }
+
+        button#export-pdf-btn {
+            background-color: var(--secondary-color);
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button#export-pdf-btn:hover {
+            background-color: #5a6268;
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #markdown-output {
+            border: 1px solid var(--border-color);
+            padding: 80px;
+            background-color: #fefefe;
+            border-radius: 8px;
+            min-height: 200px;
+            overflow-x: auto;
+        }
+
+        /* Estilos para o conteúdo Markdown renderizado (mantidos e ajustados) */
+        #markdown-output h2,
+        #markdown-output h3,
+        #markdown-output h4,
+        #markdown-output h5,
+        #markdown-output h6 {
+            color: var(--primary-color);
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-weight: 600;
+        }
+
+        #markdown-output p {
+            margin-bottom: 1em;
+
+        }
+
+        #markdown-output ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            margin-bottom: 1em;
+        }
+
+        #markdown-output ol {
+            list-style-type: decimal;
+            margin-left: 20px;
+            margin-bottom: 1em;
+        }
+
+        #markdown-output li {
+            margin-bottom: 0.5em;
+        }
+
+        #markdown-output strong {
+            font-weight: 600;
+        }
+
+        #markdown-output hr {
+            border: 0;
+            height: 1px;
+            background: var(--border-color);
+            margin: 2em 0;
+        }
+
+        /* Responsividade básica */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            #markdown-output h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            button {
+                font-size: 1em;
+                padding: 10px 20px;
+            }
+
+            .button-container {
+                margin-bottom: 20px;
+            }
+
+            #markdown-output {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            #markdown-output h1 {
+                font-size: 1.5em;
+            }
+        }
+
+        /* --- ESTILOS DE IMPRESSÃO OTIMIZADOS --- */
+        @media print {
+            body {
+                background-color: #fff;
+                /* Adiciona padding para criar margens no PDF */
+                padding: 2cm;
+                margin: 0;
+                font-size: 12pt;
+                /* Tamanho de fonte ideal para leitura de documentos */
+            }
+
+            .container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                margin: 0;
+                max-width: 100%;
+                width: 100%;
+            }
+
+            /* Oculta APENAS o container dos botões na impressão */
+            .button-container {
+                display: none;
+            }
+
+            /* Garante que o H1 seja exibido e estilizado para impressão */
+            #markdown-output h1 {
+                display: block;
+                /* Garante que o título seja visível */
+                color: #000;
+                /* Título em preto para impressão */
+                text-align: left;
+                /* Alinhamento padrão para documentos */
+                font-size: 24pt;
+                margin-bottom: 1.5cm;
+            }
+
+            #markdown-output {
+                border: none;
+                padding: 0;
+                min-height: unset;
+                overflow: visible;
+                /* Garante que todo o conteúdo seja impresso */
+            }
+
+            /* Ajusta o tamanho dos subtítulos para melhor hierarquia no PDF */
+            #markdown-output h2 {
+                font-size: 18pt;
+                color: #333;
+            }
+
+            #markdown-output h3 {
+                font-size: 14pt;
+                color: #333;
+            }
+
+            a:link:after,
+            a:visited:after {
+                content: "";
+                /* Remove a exibição da URL dos links no PDF */
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+    <div class="button-container">
+        <button onclick="generateAndDisplayMarkdown()">Gerar e Exibir Markdown</button>
+        <button id="export-pdf-btn">Exportar PDF</button>
+    </div>
+
+    <div class="container">
+        <div id="markdown-output">
+        </div>
+    </div>
+
+    <script>
+        const jsonData = {
+            "name": "Ataques a Redes",
+            "explanation": "Visão geral dos principais ataques a redes, incluindo Negação de Serviço, Força Bruta, Varredura de Portas, Decepção, Falsificação e Interceptação, com suas definições, variações, impactos e contramedidas.",
+            "children": [
+                {
+                    "name": "Negação de Serviço (DoS/DDoS)",
+                    "explanation": "Ataques que visam tornar um recurso de computação indisponível para usuários legítimos, sem roubar informações. Podem ser DoS (fonte única) ou DDoS (múltiplas fontes distribuídas geograficamente, usando botnets).",
+                    "children": [
+                        {
+                            "name": "Categorias de Ataques DoS/DDoS",
+                            "explanation": "Tipos de ataques de negação de serviço baseados na forma como consomem recursos do alvo.",
+                            "children": [
+                                {
+                                    "name": "Ataques de Volume",
+                                    "explanation": "Inundam a largura de banda da rede do alvo com tráfego massivo, como UDP Flood e ICMP Flood.",
+                                    "children": []
+                                },
+                                {
+                                    "name": "Ataques de Protocolo",
+                                    "explanation": "Consomem recursos de servidores ou equipamentos de rede explorando vulnerabilidades em protocolos, como SYN Flood, que deixa conexões TCP semiabertas.",
+                                    "children": []
+                                },
+                                {
+                                    "name": "Ataques à Camada de Aplicação",
+                                    "explanation": "Direcionados a aplicações específicas, enviando requisições que parecem legítimas para consumir intensivamente CPU e memória do servidor, como HTTP Flood.",
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Impacto Principal DoS/DDoS",
+                            "explanation": "Violação do princípio da Disponibilidade, impedindo que usuários legítimos acessem os serviços.",
+                            "children": []
+                        },
+                        {
+                            "name": "Contramedidas DoS/DDoS",
+                            "explanation": "Estratégias para mitigar ataques de negação de serviço, incluindo firewalls, Sistemas de Prevenção de Intrusão (IPS), limitação de taxa (rate limiting) e serviços especializados de mitigação anti-DDoS com scrubbing centers.",
+                            "children": []
+                        },
+                        {
+                            "name": "Foco CEBRASPE DoS/DDoS",
+                            "explanation": "Pontos importantes para exames, como a diferença entre DoS (uma fonte) e DDoS (múltiplas fontes), o objetivo primordial de esgotar recursos (não roubar dados) e o SYN Flood como ataque de protocolo clássico.",
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Força Bruta e Varredura de Portas",
+                    "explanation": "Ataques focados na descoberta de credenciais ou na identificação de vulnerabilidades em sistemas através do reconhecimento de portas abertas.",
+                    "children": [
+                        {
+                            "name": "Ataque de Força Bruta",
+                            "explanation": "Método criptoanalítico que tenta sistematicamente todas as combinações possíveis de senhas ou chaves até encontrar a correta.",
+                            "children": [
+                                {
+                                    "name": "Variações de Força Bruta",
+                                    "explanation": "O Ataque de Dicionário é uma forma otimizada que utiliza uma lista predefinida de palavras comuns e senhas vazadas.",
+                                    "children": []
+                                },
+                                {
+                                    "name": "Impacto Principal Força Bruta",
+                                    "explanation": "Violação da Confidencialidade e Autenticidade, permitindo acesso não autorizado a contas e sistemas.",
+                                    "children": []
+                                },
+                                {
+                                    "name": "Contramedidas Força Bruta",
+                                    "explanation": "Implementação de políticas de senha forte, bloqueio de conta após tentativas malsucedidas, uso de CAPTCHA e, principalmente, Autenticação Multifator (MFA).",
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Varredura de Portas (Port Scanning)",
+                            "explanation": "Técnica de reconhecimento para sondar um servidor ou host em busca de portas abertas, identificando serviços e aplicações em execução para encontrar potenciais vetores de ataque.",
+                            "children": [
+                                {
+                                    "name": "Técnicas Comuns Varredura",
+                                    "explanation": "Incluem TCP Connect Scan (conexão TCP completa, detectável) e TCP SYN Scan (envia SYN, não completa handshake, mais furtivo).",
+                                    "children": []
+                                },
+                                {
+                                    "name": "Ferramenta Padrão",
+                                    "explanation": "Nmap é a ferramenta mais conhecida para realizar varreduras de portas.",
+                                    "children": []
+                                },
+                                {
+                                    "name": "Contramedidas Varredura",
+                                    "explanation": "Configuração de firewalls para descartar pacotes em portas fechadas e uso de Sistemas de Detecção de Intrusão (IDS) para identificar padrões de varredura.",
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Foco CEBRASPE Força Bruta e Portas",
+                            "explanation": "Pontos importantes para exames, como a MFA como defesa robusta contra Força Bruta, a Varredura de Portas como fase de reconhecimento (não um ataque direto) e a furtividade do SYN Scan por não completar o handshake.",
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Decepção, Falsificação, Interceptação",
+                    "explanation": "Categoria de ataques que exploram a confiança e utilizam técnicas de engano, falsificação de identidade ou interceptação de comunicação para comprometer a segurança.",
+                    "children": [
+                        {
+                            "name": "Phishing",
+                            "explanation": "Ataque de engenharia social, geralmente por e-mail, que engana a vítima para revelar informações sensíveis (credenciais) ou executar código malicioso, usando mensagens e páginas falsas que se passam por entidades legítimas.",
+                            "children": [
+                                {
+                                    "name": "Spear Phishing",
+                                    "explanation": "Variante direcionada e personalizada para um indivíduo ou organização específica, aumentando a credibilidade e chance de sucesso.",
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Eavesdropping (Interceptação Passiva)",
+                            "explanation": "Ato de monitorar secretamente a comunicação entre duas partes em uma rede para obter informações. É um ataque passivo que viola a confidencialidade e ocorre frequentemente em redes Wi-Fi públicas.",
+                            "children": [
+                                {
+                                    "name": "Contramedida Eavesdropping",
+                                    "explanation": "Criptografia é a principal contramedida, tornando dados interceptados ilegíveis através de protocolos como TLS (HTTPS) e VPNs.",
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "DNS Spoofing",
+                            "explanation": "Ataque que introduz dados falsos no cache de um servidor DNS, fazendo-o retornar um endereço IP incorreto (malicioso) para um nome de domínio legítimo, redirecionando usuários para sites falsos.",
+                            "children": [
+                                {
+                                    "name": "Contramedida DNS Spoofing",
+                                    "explanation": "DNSSEC (Domain Name System Security Extensions) utiliza assinaturas digitais para garantir autenticidade e integridade das respostas DNS.",
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Foco CEBRASPE Decepção/Interc.",
+                            "explanation": "Pontos importantes para exames, como o Phishing como engenharia social, a criptografia como defesa eficaz contra Eavesdropping (firewall é incorreto) e a diferença entre DNS Spoofing (infraestrutura) e Phishing (link malicioso) no redirecionamento para sites falsos.",
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // Removido: document.querySelector('.container h1').textContent = jsonData.name;
+        // O título principal agora é gerado como parte do Markdown
+
+        function generateMarkdown(data, level = 0) {
+            let markdown = '';
+            const headingPrefix = '#'.repeat(level + 1);
+
+            if (level === 0) {
+                // Adiciona o título principal como H1 no Markdown
+                markdown += `# ${data.name}\n\n`;
+                markdown += `${data.explanation}\n\n`;
+                markdown += `---\n\n`;
+            } else if (level === 1) {
+                markdown += `${headingPrefix} ${data.name}\n\n`;
+                markdown += `${data.explanation}\n\n`;
+            } else if (level === 2) {
+                markdown += `${headingPrefix} ${data.name}\n\n`;
+                markdown += `${data.explanation}\n\n`;
+            } else if (level === 3) {
+                markdown += `* **${data.name}**: ${data.explanation}\n`;
+            } else {
+                markdown += `    * **${data.name}**: ${data.explanation}\n`;
+            }
+
+            if (data.children && data.children.length > 0) {
+                data.children.forEach(child => {
+                    markdown += generateMarkdown(child, level + 1);
+                });
+            }
+
+            if (level === 1 && data.children && data.children.length > 0) {
+                markdown += `---\n\n`;
+            }
+
+            return markdown;
+        }
+
+        function generateAndDisplayMarkdown() {
+            const markdownOutput = generateMarkdown(jsonData);
+            const outputDiv = document.getElementById('markdown-output');
+            outputDiv.innerHTML = marked.parse(markdownOutput);
+        }
+
+        document.getElementById('export-pdf-btn').addEventListener('click', () => {
+            if (document.getElementById('markdown-output').innerHTML.trim() === '') {
+                // Se o markdown não foi gerado, gera antes de imprimir
+                generateAndDisplayMarkdown();
+                // Pequeno atraso para o DOM ser atualizado antes de imprimir
+                setTimeout(window.print, 200);
+            } else {
+                window.print();
+            }
+        });
+
+    </script>
+</body>
+
+</html>
