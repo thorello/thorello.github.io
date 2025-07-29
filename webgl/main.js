@@ -160,11 +160,19 @@ class MindMapViewer {
             });
         }
 
-        // NOVO: Event listener para o botão de exportar JSON
+        // Event listener para o botão de exportar JSON
         const exportJsonButton = document.getElementById('export-json-button');
         if (exportJsonButton) {
             exportJsonButton.addEventListener('click', () => {
                 this.exportMindMapToJson();
+            });
+        }
+
+        // NOVO: Event listener para o input de upload de JSON
+        const jsonUploadInput = document.getElementById('jsonUpload');
+        if (jsonUploadInput) {
+            jsonUploadInput.addEventListener('change', (event) => {
+                this.handleJsonUpload(event);
             });
         }
     }
@@ -354,8 +362,33 @@ class MindMapViewer {
     // --- LÓGICA PRINCIPAL ---
 
     async drawMindMap() {
-        while (this.mainGroup.children.length) {
-            this.mainGroup.remove(this.mainGroup.children[0]);
+        // Remove todos os objetos existentes do mainGroup
+        while (this.mainGroup.children.length > 0) {
+            const object = this.mainGroup.children[0];
+            // Dispose de geometrias, materiais e texturas para evitar vazamentos de memória
+            if (object.geometry) object.geometry.dispose();
+            if (object.material) {
+                if (Array.isArray(object.material)) {
+                    object.material.forEach(material => material.dispose());
+                } else {
+                    object.material.dispose();
+                }
+            }
+            // Dispose dos filhos se for um grupo
+            if (object.children) {
+                // Percorre os filhos para dispor de seus recursos também
+                object.children.forEach(child => {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(material => material.dispose());
+                        } else {
+                            child.material.dispose();
+                        }
+                    }
+                });
+            }
+            this.mainGroup.remove(object);
         }
         this.nodeMap.clear();
         this.linkObjects = [];
@@ -825,7 +858,7 @@ class MindMapViewer {
         }
     }
 
-    // NOVO: Função para exportar os dados do mapa mental para JSON
+    // Função para exportar os dados do mapa mental para JSON
     exportMindMapToJson() {
         // Tenta obter os dados do localStorage
         const storedData = localStorage.getItem('mindMapData');
@@ -853,6 +886,46 @@ class MindMapViewer {
         }
     }
 
+    // NOVO: Função para lidar com o upload de arquivo JSON
+    handleJsonUpload(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const jsonContent = JSON.parse(e.target.result);
+
+                // --- NOVO: Mostra o JSON importado no console para depuração ---
+                console.log("JSON importado:", jsonContent);
+
+                // Validar a estrutura do JSON se necessário (ex: verificar se tem 'name' e 'children')
+                if (!jsonContent || typeof jsonContent.name !== 'string') {
+                    alert("O arquivo JSON não parece ser um mapa mental válido. Ele deve ter uma propriedade 'name' no nível raiz.");
+                    return;
+                }
+
+                // Atualizar os dados do mapa mental e redesenhar
+                this.data = jsonContent;
+                localStorage.setItem('mindMapData', JSON.stringify(jsonContent)); // Salva no localStorage para consistência
+                this.drawMindMap(); // Redesenha o mapa com os novos dados
+                alert("Mapa mental carregado com sucesso a partir do arquivo JSON!");
+            } catch (error) {
+                console.error('Erro ao ler ou parsear o arquivo JSON:', error);
+                alert('Erro ao carregar o arquivo JSON. Certifique-se de que é um JSON válido.');
+            }
+            // Limpa o valor do input file para permitir o upload do mesmo arquivo novamente
+            event.target.value = '';
+        };
+        reader.onerror = (e) => {
+            console.error("Erro ao ler o arquivo:", e);
+            alert("Erro ao ler o arquivo. Por favor, tente novamente.");
+        };
+        reader.readAsText(file);
+    }
+
 
     // --- LOOP DE ANIMAÇÃO ---
     animate() {
@@ -874,11 +947,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const storedData = localStorage.getItem('mindMapData');
 
     if (storedData) {
-        // Se encontrou dados, usa-os e depois limpa o storage
+        // Se encontrou dados, usa-os
         console.log("Dados do mapa mental encontrados no localStorage. Carregando...");
-        // Não removemos mais do storage aqui, pois o botão de exportar JSON precisará deles
         try {
             const data = JSON.parse(storedData);
+            // Salva os dados no localStorage novamente se eles vieram de lá
+            // para manter a consistência para futuras exportações ou recarregamentos.
+            // Isso evita que, se o usuário fechar e reabrir, ele perca os dados.
+            localStorage.setItem('mindMapData', JSON.stringify(data));
             new MindMapViewer(mindmapContainer, data);
         } catch (error) {
             console.error('Falha ao parsear os dados do mapa mental do localStorage:', error);

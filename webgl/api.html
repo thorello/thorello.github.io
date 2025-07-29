@@ -54,6 +54,8 @@
             /* Padding ao redor do container, dentro do body */
             box-sizing: border-box;
             /* Garante que padding não adicione largura */
+            position: relative;
+            /* Necessário para posicionar o botão de voltar */
         }
 
         /* Container Principal */
@@ -250,6 +252,39 @@
             gap: var(--spacing-sm);
         }
 
+        /* Botão Voltar */
+        .back-button {
+            position: absolute;
+            top: var(--spacing-lg);
+            /* Ajuste a distância do topo */
+            left: var(--spacing-lg);
+            /* Ajuste a distância da esquerda */
+            background-color: #6c757d;
+            /* Cor de botão secundária */
+            color: var(--white);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            text-decoration: none;
+            /* Remover sublinhado do link */
+            display: inline-flex;
+            /* Para alinhar o ícone e o texto se houver */
+            align-items: center;
+            gap: 5px;
+            /* Espaçamento entre ícone e texto */
+            z-index: 10;
+            /* Garante que o botão fique acima de outros elementos */
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
         /* Media Queries para Responsividade */
         @media (max-width: 768px) {
             body {
@@ -281,6 +316,13 @@
                 font-size: 0.9rem;
                 padding: 8px 12px;
             }
+
+            .back-button {
+                top: var(--spacing-md);
+                left: var(--spacing-md);
+                padding: var(--spacing-sm);
+                font-size: 0.9rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -299,11 +341,20 @@
             .file-upload-info {
                 font-size: 0.75rem;
             }
+
+            .back-button {
+                top: var(--spacing-sm);
+                left: var(--spacing-sm);
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
 
 <body>
+    <a href="index.html" class="back-button">
+        &#8592; Voltar
+    </a>
 
     <div class="container">
         <header>
@@ -360,257 +411,3 @@
             </button>
         </main>
     </div>
-
-    <script type="module">
-        // Importe promptBase do seu arquivo prompts.js
-        import { promptBase } from './prompts.js';
-
-        // 1. Seleciona os elementos da página
-        const analysisForm = document.getElementById('analysis-form');
-        const apiKeyInput = document.getElementById('apiKey');
-        const inputText = document.getElementById('inputText');
-        const urlInput = document.getElementById('urlInput');
-        const outputText = document.getElementById('outputText');
-        const submitButton = document.getElementById('submitButton');
-        const loadingIndicator = document.getElementById('loading');
-        const createMapButton = document.getElementById('createMapButton');
-        const fileUploadInput = document.getElementById('fileUpload');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
-
-        let fileContent = null; // Variável para armazenar o conteúdo do arquivo
-
-        // --- MELHORIA: LEMBRAR A CHAVE DA API ---
-        window.addEventListener('load', () => {
-            const savedApiKey = localStorage.getItem('geminiApiKey');
-            if (savedApiKey) {
-                apiKeyInput.value = savedApiKey;
-            }
-        });
-
-        // 2. Adiciona o "ouvinte" para o evento de submissão do formulário
-        analysisForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            const API_KEY = apiKeyInput.value.trim();
-            const urlToAnalyze = urlInput.value.trim();
-            let contentToAnalyze = fileContent || inputText.value.trim();
-
-            if (!API_KEY) {
-                alert('Por favor, insira sua chave de API para continuar.');
-                return;
-            }
-
-            // Lógica para determinar a fonte do conteúdo
-            if (urlToAnalyze) {
-                loadingIndicator.querySelector('p').textContent = 'Buscando conteúdo da URL...';
-                showLoading(true);
-                contentToAnalyze = await fetchContentFromUrl(urlToAnalyze);
-                if (!contentToAnalyze) {
-                    alert('Não foi possível carregar o conteúdo da URL. Verifique se a URL está correta e se a página permite CORS.');
-                    showLoading(false);
-                    return;
-                }
-            } else if (!contentToAnalyze) {
-                alert('Por favor, insira um texto para analisar, uma URL ou faça upload de um arquivo.');
-                return;
-            }
-
-            localStorage.setItem('geminiApiKey', API_KEY);
-
-            showLoading(true);
-            loadingIndicator.querySelector('p').textContent = 'Analisando... Por favor, aguarde. Isso pode levar alguns segundos.';
-            outputText.value = '';
-            createMapButton.disabled = true;
-
-            const fullPrompt = promptBase + "\n" + contentToAnalyze;
-
-            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: fullPrompt }] }]
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Erro na API: ${errorData.error.message || response.statusText}`);
-                }
-
-                const data = await response.json();
-                let resultText = data.candidates[0].content.parts[0].text;
-
-                const firstBrace = resultText.indexOf('{');
-                const lastBrace = resultText.lastIndexOf('}');
-
-                if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-                    resultText = resultText.substring(firstBrace, lastBrace + 1);
-                } else {
-                    resultText = resultText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
-                }
-
-                try {
-                    const parsedJson = JSON.parse(resultText);
-                    outputText.value = JSON.stringify(parsedJson, null, 2);
-                    createMapButton.disabled = false;
-                } catch (e) {
-                    outputText.value = `Erro ao analisar JSON. Verifique a saída bruta:\n\n${resultText}\n\nDetalhes do erro: ${e.message}`;
-                    createMapButton.disabled = true;
-                }
-            } catch (error) {
-                console.error('Erro ao chamar a API do Gemini:', error);
-                outputText.value = `Ocorreu um erro ao processar sua solicitação:\n\n${error.message}`;
-                createMapButton.disabled = true;
-            } finally {
-                showLoading(false);
-            }
-        });
-
-        // Função para mostrar/esconder o loading
-        function showLoading(isLoading) {
-            submitButton.disabled = isLoading;
-            submitButton.textContent = isLoading ? 'Analisando...' : 'Analisar e Gerar JSON';
-            loadingIndicator.style.display = isLoading ? 'block' : 'none';
-        }
-
-        // --- LÓGICA PARA O BOTÃO "CRIAR MAPA MENTAL" ---
-        createMapButton.addEventListener('click', () => {
-            const jsonContent = outputText.value;
-            if (!jsonContent) {
-                alert("Não há conteúdo JSON para criar o mapa mental.");
-                return;
-            }
-
-            try {
-                JSON.parse(jsonContent);
-
-                localStorage.setItem('mindMapData', jsonContent);
-
-                window.location.href = 'index.html';
-
-            } catch (error) {
-                alert("O conteúdo na área de resultado não é um JSON válido. Não é possível criar o mapa.");
-            }
-        });
-
-        // --- Lógica para o upload de arquivos ---
-        fileUploadInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) {
-                fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
-                inputText.value = '';
-                inputText.disabled = false;
-                urlInput.disabled = false;
-                fileContent = null;
-                return;
-            }
-
-            fileNameDisplay.textContent = file.name;
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-
-            inputText.disabled = true;
-            urlInput.disabled = true;
-            urlInput.value = '';
-
-            if (fileExtension === 'txt' || fileExtension === 'md') {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    fileContent = e.target.result;
-                    inputText.value = `Conteúdo de '${file.name}' carregado. Clique em "Analisar" para processar.`;
-                };
-                reader.onerror = (e) => {
-                    console.error("Erro ao ler o arquivo:", e);
-                    alert("Erro ao ler o arquivo. Por favor, tente novamente.");
-                    fileNameDisplay.textContent = 'Erro na leitura do arquivo';
-                    inputText.disabled = false;
-                    urlInput.disabled = false;
-                    inputText.value = '';
-                    fileContent = null;
-                };
-                reader.readAsText(file);
-            } else {
-                alert(`O tipo de arquivo ".${fileExtension}" não pode ser lido diretamente pelo navegador nesta aplicação. Por favor, copie o texto e cole no campo acima ou use um arquivo .txt ou .md.`);
-                fileNameDisplay.textContent = 'Formato não suportado para leitura direta';
-                inputText.disabled = false;
-                urlInput.disabled = false;
-                inputText.value = '';
-                fileUploadInput.value = '';
-                fileContent = null;
-            }
-        });
-
-        // Habilitar/Desabilitar campos com base na entrada do usuário
-        inputText.addEventListener('input', () => {
-            if (inputText.value.trim() !== '') {
-                urlInput.disabled = true;
-                fileUploadInput.disabled = true;
-                fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
-                fileUploadInput.value = '';
-                fileContent = null;
-            } else if (!urlInput.value.trim() && !fileContent) {
-                urlInput.disabled = false;
-                fileUploadInput.disabled = false;
-            }
-        });
-
-        urlInput.addEventListener('input', () => {
-            if (urlInput.value.trim() !== '') {
-                inputText.disabled = true;
-                fileUploadInput.disabled = true;
-                fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
-                fileUploadInput.value = '';
-                fileContent = null;
-            } else if (!inputText.value.trim() && !fileContent) {
-                inputText.disabled = false;
-                fileUploadInput.disabled = false;
-            }
-        });
-
-        inputText.addEventListener('change', () => {
-            if (inputText.value.trim() === '') {
-                urlInput.disabled = false;
-                fileUploadInput.disabled = false;
-            }
-        });
-
-        urlInput.addEventListener('change', () => {
-            if (urlInput.value.trim() === '') {
-                inputText.disabled = false;
-                fileUploadInput.disabled = false;
-            }
-        });
-
-        // --- NOVA FUNÇÃO: FETCH DO CONTEÚDO DA URL ---
-        async function fetchContentFromUrl(url) {
-            try {
-                const proxyUrl = 'https://api.allorigins.win/get?url=';
-                const response = await fetch(proxyUrl + encodeURIComponent(url));
-
-                if (!response.ok) {
-                    console.error(`Erro ao buscar a URL: ${response.status} ${response.statusText}`);
-                    return null;
-                }
-
-                const data = await response.json();
-                const htmlContent = data.contents;
-
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlContent, 'text/html');
-
-                doc.querySelectorAll('script, style, noscript, svg, button, img').forEach(el => el.remove());
-
-                return doc.body.textContent.replace(/\s+/g, ' ').trim();
-
-            } catch (error) {
-                console.error('Erro ao buscar ou parsear o conteúdo da URL:', error);
-                return null;
-            }
-        }
-    </script>
-
-</body>
-
-</html>

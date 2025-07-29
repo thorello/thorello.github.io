@@ -166,13 +166,20 @@
             pointer-events: none;
         }
 
-        /* NOVO: Estilos para o botão de exportar PDF - Adaptação para o novo tema */
-        #export-pdf-button,
-        #export-json-button {
+        /* Estilos para os botões de ação */
+        .action-buttons {
             position: absolute;
             top: 10px;
             right: 10px;
             z-index: 100;
+            display: flex;
+            gap: 10px;
+            /* Espaçamento entre os botões */
+        }
+
+        .action-buttons button,
+        .action-buttons label {
+            /* Aplicar estilos também ao label para o upload */
             background-color: #3498db;
             /* Azul suave */
             border: none;
@@ -184,18 +191,20 @@
             cursor: pointer;
             transition: background-color 0.3s, box-shadow 0.3s;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: inline-flex;
+            /* Para alinhar o texto e o ícone se houver */
+            align-items: center;
+            justify-content: center;
         }
 
-        #export-pdf-button:hover,
-        #export-json-button:hover {
+        .action-buttons button:hover,
+        .action-buttons label:hover {
             background-color: #2980b9;
             /* Azul mais escuro no hover */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         #export-json-button {
-            right: 140px;
-            /* Ajustar posição para ficar ao lado do botão de exportar PDF */
             background-color: #28a745;
             /* Cor verde para exportar JSON */
         }
@@ -203,6 +212,21 @@
         #export-json-button:hover {
             background-color: #218838;
             /* Verde mais escuro no hover */
+        }
+
+        #import-json-button {
+            background-color: #f39c12;
+            /* Cor laranja para importar JSON */
+        }
+
+        #import-json-button:hover {
+            background-color: #e67e22;
+            /* Laranja mais escuro no hover */
+        }
+
+        /* Esconder o input file real */
+        #jsonUpload {
+            display: none;
         }
 
         /* NOVO: Estilos para o botão de Voltar - Topo esquerdo */
@@ -269,18 +293,20 @@
                 font-size: 12px;
             }
 
-            #export-pdf-button,
-            #export-json-button {
-                padding: 6px 10px;
-                font-size: 12px;
+            .action-buttons {
+                flex-direction: column;
+                /* Empilha os botões em telas pequenas */
+                gap: 5px;
                 top: 5px;
                 right: 5px;
-                /* Adjust for smaller screens */
             }
 
-            #export-json-button {
-                right: 100px;
-                /* Adjust for smaller screens */
+            .action-buttons button,
+            .action-buttons label {
+                padding: 6px 10px;
+                font-size: 12px;
+                width: 100%;
+                /* Ocupa a largura total quando empilhado */
             }
         }
     </style>
@@ -293,9 +319,13 @@
         <p id="sidebar-content"></p>
     </div>
 
-    <button id="export-pdf-button">Exportar PDF</button>
-    <button id="export-json-button">Exportar JSON</button>
-    <button id="back-button" onclick="window.location.href='api.html'">Voltar</button>
+    <div class="action-buttons">
+        <label for="jsonUpload" id="import-json-button">Importar JSON</label>
+        <input type="file" id="jsonUpload" accept=".json">
+        <button id="export-json-button">Exportar JSON</button>
+        <button id="export-pdf-button">Exportar PDF</button>
+    </div>
+    <button id="back-button" onclick="window.location.href='api.html'">IA</button>
 
     <div id="mindmap-container"></div>
 
