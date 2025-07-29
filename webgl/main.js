@@ -175,6 +175,14 @@ class MindMapViewer {
                 this.handleJsonUpload(event);
             });
         }
+
+        // NOVO: Event listener para o botão "Criar Markdown"
+        const createMarkdownButton = document.getElementById('create-markdown-button');
+        if (createMarkdownButton) {
+            createMarkdownButton.addEventListener('click', () => {
+                this.exportJsonToMarkdownPage();
+            });
+        }
     }
 
     _createVersionInfo() {
@@ -924,6 +932,23 @@ class MindMapViewer {
             alert("Erro ao ler o arquivo. Por favor, tente novamente.");
         };
         reader.readAsText(file);
+    }
+
+    // NOVO: Função para exportar JSON para a página de Markdown
+    exportJsonToMarkdownPage() {
+        const storedData = localStorage.getItem('mindMapData');
+        if (storedData) {
+            try {
+                // Armazena os dados no sessionStorage para serem acessíveis pela json2md.html
+                sessionStorage.setItem('markdownData', storedData);
+                window.location.href = 'json2md.html'; // Redireciona para a página de Markdown
+            } catch (error) {
+                console.error('Erro ao preparar dados para Markdown:', error);
+                alert('Ocorreu um erro ao preparar os dados para exportação Markdown.');
+            }
+        } else {
+            alert('Nenhum dado do mapa mental encontrado para criar Markdown.');
+        }
     }
 
 

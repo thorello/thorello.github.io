@@ -254,7 +254,7 @@
 
 <body>
     <div class="button-container">
-        <button onclick="generateAndDisplayMarkdown()">Gerar e Exibir Markdown</button>
+        <!-- <button onclick="generateAndDisplayMarkdown()">Gerar e Exibir Markdown</button> -->
         <button id="export-pdf-btn">Exportar PDF</button>
     </div>
 
@@ -264,7 +264,7 @@
     </div>
 
     <script>
-        const jsonData = {
+        let jsonData = {
             "name": "Ataques a Redes",
             "explanation": "Visão geral dos principais ataques a redes, incluindo Negação de Serviço, Força Bruta, Varredura de Portas, Decepção, Falsificação e Interceptação, com suas definições, variações, impactos e contramedidas.",
             "children": [
@@ -410,8 +410,17 @@
             ]
         };
 
-        // Removido: document.querySelector('.container h1').textContent = jsonData.name;
-        // O título principal agora é gerado como parte do Markdown
+        // NOVO: Tenta carregar os dados do sessionStorage primeiro
+        const storedMarkdownData = sessionStorage.getItem('markdownData');
+        if (storedMarkdownData) {
+            try {
+                jsonData = JSON.parse(storedMarkdownData);
+                // Opcional: Limpar sessionStorage depois de usar para não persistir dados
+                sessionStorage.removeItem('markdownData');
+            } catch (error) {
+                console.error('Erro ao parsear dados do sessionStorage:', error);
+            }
+        }
 
         function generateMarkdown(data, level = 0) {
             let markdown = '';
@@ -464,6 +473,9 @@
             }
         });
 
+        // Chama a função para gerar e exibir o Markdown quando a página carrega
+        // Isso garante que o conteúdo seja exibido automaticamente se houver dados do sessionStorage
+        document.addEventListener('DOMContentLoaded', generateAndDisplayMarkdown);
     </script>
 </body>
 

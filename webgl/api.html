@@ -57,40 +57,80 @@
         }
 
         #backToHomeButton {
-            /* Mudei o ID para refletir o ID do seu botão em api.html */
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 20px;
+            /* Aumentei um pouco a distância do topo */
+            left: 20px;
+            /* Aumentei um pouco a distância da esquerda */
             z-index: 100;
-            background-color: #6c757d;
-            /* Um cinza neutro para ser discreto */
-            border: none;
-            color: #ffffff;
-            padding: 8px 16px;
+            background-color: transparent;
+            /* Fundo transparente para um visual mais limpo */
+            border: 1px solid var(--medium-gray);
+            /* Borda sutil */
+            color: var(--label-color);
+            /* Cor do texto e ícone cinza */
+            padding: 10px 15px;
+            /* Ajuste do padding */
             font-family: 'Inter', sans-serif;
-            /* Use a fonte já importada no api.html */
-            font-size: 14px;
-            border-radius: 5px;
+            font-size: 1rem;
+            /* Tamanho da fonte ligeiramente maior */
+            border-radius: 8px;
+            /* Cantos mais arredondados */
             cursor: pointer;
-            transition: background-color 0.3s, box-shadow 0.3s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            max-width: 100px;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            /* Sombra mais suave */
+            display: flex;
+            /* Para alinhar o ícone e o texto */
+            align-items: center;
+            /* Centralizar verticalmente */
+            gap: 8px;
+            /* Espaço entre o ícone e o texto */
+            max-width: fit-content;
+            /* Ajusta a largura ao conteúdo */
         }
 
         #backToHomeButton:hover {
-            background-color: #5a6268;
-            /* Cinza um pouco mais escuro no hover */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            background-color: var(--light-gray);
+            /* Fundo sutil ao passar o mouse */
+            border-color: var(--primary-blue);
+            /* Borda azul ao passar o mouse */
+            color: var(--primary-blue);
+            /* Texto e ícone azuis ao passar o mouse */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
 
-        /* ... restante dos seus estilos existentes ... */
+        #backToHomeButton i {
+            font-size: 1.1rem;
+            /* Ajuste o tamanho do ícone */
+        }
 
-        /* Seções Específicas (Adicione o ajuste para media queries se necessário) */
+        /* Ajuste para telas menores */
         @media (max-width: 768px) {
             #backToHomeButton {
-                padding: 6px 12px;
-                /* Ajuste para telas menores */
-                font-size: 12px;
+                top: 15px;
+                left: 15px;
+                padding: 8px 12px;
+                font-size: 0.9rem;
+                gap: 6px;
+            }
+
+            #backToHomeButton i {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #backToHomeButton {
+                top: 10px;
+                left: 10px;
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                gap: 5px;
+            }
+
+            #backToHomeButton i {
+                font-size: 0.9rem;
             }
         }
 
