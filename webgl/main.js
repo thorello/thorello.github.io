@@ -4,6 +4,26 @@ import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
 import { exportMindMapToPDF } from './pdfExport.js'; // Importa a função de exportação
 
+document.addEventListener('DOMContentLoaded', () => {
+    const menuContainer = document.getElementById('action-menu-container');
+    const toggleButton = document.getElementById('menu-toggle-button');
+
+    // Abre/fecha o menu ao clicar no botão de toggle
+    toggleButton.addEventListener('click', (event) => {
+        event.stopPropagation(); // Impede que o clique feche o menu imediatamente
+        menuContainer.classList.toggle('open');
+    });
+
+    // Fecha o menu se clicar em qualquer lugar fora dele
+    document.addEventListener('click', (event) => {
+        if (!menuContainer.contains(event.target)) {
+            menuContainer.classList.remove('open');
+        }
+    });
+
+    // O resto do seu script (main.js) continua aqui
+});
+
 // NOVO: Versão do programa atualizada com correções de exportação e novo tema.
 const APP_VERSION = 'v2.0.0';
 

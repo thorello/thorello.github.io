@@ -167,14 +167,105 @@
         }
 
         /* Estilos para os botões de ação */
-        .action-buttons {
+        /* Remova ou comente este bloco CSS antigo */
+        /*
+.action-buttons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100;
+    display: flex;
+    gap: 10px;
+}
+*/
+
+        /* NOVO: Estilos para o contêiner do menu de ações */
+        #action-menu-container {
             position: absolute;
             top: 10px;
             right: 10px;
             z-index: 100;
+        }
+
+        /* NOVO: Estilo para o botão principal que abre o menu */
+        #menu-toggle-button {
+            background-color: #3498db;
+            /* Azul suave */
+            border: none;
+            color: #ffffff;
+            padding: 8px 16px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        #menu-toggle-button:hover {
+            background-color: #2980b9;
+            /* Azul mais escuro no hover */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* NOVO: Estilos para o conteúdo do menu (os botões) */
+        #menu-content {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            /* Empilha os botões verticalmente */
+            gap: 8px;
             /* Espaçamento entre os botões */
+            position: absolute;
+            top: calc(100% + 5px);
+            /* Posiciona abaixo do botão de toggle */
+            right: 0;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            transform-origin: top right;
+            transform: scale(0.95);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+            min-width: 160px;
+            /* Garante uma largura mínima */
+        }
+
+        /* NOVO: Estilo para mostrar o menu quando o contêiner tiver a classe 'open' */
+        #action-menu-container.open #menu-content {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        /* Ajuste nos seletores dos botões para funcionar dentro do novo menu */
+        #menu-content button,
+        #menu-content label {
+            /* Aplicar estilos também ao label para o upload */
+            background-color: #3498db;
+            border: none;
+            color: #ffffff;
+            padding: 8px 16px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            /* Mantido para alinhamento */
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            /* Faz os botões ocuparem todo o espaço do menu */
+            box-sizing: border-box;
+        }
+
+        #menu-content button:hover,
+        #menu-content label:hover {
+            background-color: #2980b9;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         .action-buttons button,
@@ -330,14 +421,18 @@
         <p id="sidebar-content"></p>
     </div>
 
-    <div class="action-buttons">
-        <label for="jsonUpload" id="import-json-button">Importar JSON</label>
-        <input type="file" id="jsonUpload" accept=".json">
-        <button id="export-json-button">Exportar JSON</button>
-        <button id="export-pdf-button">Exportar PDF</button>
-        <button id="create-markdown-button">Criar Markdown</button>
+    <div id="action-menu-container">
+        <button id="menu-toggle-button">Ações ☰</button>
+        <div id="menu-content">
+            <label for="jsonUpload" id="import-json-button">Importar JSON</label>
+            <input type="file" id="jsonUpload" accept=".json">
+            <button id="export-json-button">Exportar JSON</button>
+            <button id="export-pdf-button">Exportar PDF</button>
+            <button id="create-markdown-button">Criar Markdown</button>
+            <button id="create-markdown-button" onclick="window.location.href='api.html'">IA</button>
+        </div>
     </div>
-    <button id="back-button" onclick="window.location.href='api.html'">IA</button>
+
 
     <div id="mindmap-container"></div>
 
