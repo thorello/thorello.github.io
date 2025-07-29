@@ -1,8 +1,9 @@
-// main.js
 import * as THREE from 'three';
 import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
-import { exportMindMapToPDF } from './pdfExport.js'; // Importa a função de exportação
+import { exportMindMapToPDF } from './pdfExport.js'; // Already imported
+import { exportMindMapToJson } from './jsonExport.js'; // NEW: Import export function
+import { importMindMapFromJson } from './jsonImport.js'; // NEW: Import import function
 
 document.addEventListener('DOMContentLoaded', () => {
     const menuContainer = document.getElementById('action-menu-container');
@@ -193,7 +194,8 @@ class MindMapViewer {
         const exportJsonButton = document.getElementById('export-json-button');
         if (exportJsonButton) {
             exportJsonButton.addEventListener('click', () => {
-                this.exportMindMapToJson();
+                // Chama a função de exportação do novo módulo
+                exportMindMapToJson();
             });
         }
 
@@ -201,7 +203,11 @@ class MindMapViewer {
         const jsonUploadInput = document.getElementById('jsonUpload');
         if (jsonUploadInput) {
             jsonUploadInput.addEventListener('change', (event) => {
-                this.handleJsonUpload(event);
+                // Chama a função de importação do novo módulo, passando o contexto 'this' e o evento
+                importMindMapFromJson(event, (importedData) => {
+                    this.data = importedData;
+                    this.drawMindMap();
+                });
             });
         }
 
@@ -872,74 +878,6 @@ class MindMapViewer {
         }
     }
 
-    // Função para exportar os dados do mapa mental para JSON
-    exportMindMapToJson() {
-        // Tenta obter os dados do localStorage
-        const storedData = localStorage.getItem('mindMapData');
-        if (storedData) {
-            try {
-                const parsedData = JSON.parse(storedData);
-                const jsonString = JSON.stringify(parsedData, null, 2); // Formata com 2 espaços de indentação
-
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'mindmap_data.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url); // Limpa o URL do objeto
-            } catch (error) {
-                console.error('Erro ao parsear ou exportar JSON:', error);
-                alert('Ocorreu um erro ao exportar o JSON. Verifique o console para mais detalhes.');
-            }
-        } else {
-            alert('Nenhum dado do mapa mental encontrado para exportar.');
-        }
-    }
-
-    // NOVO: Função para lidar com o upload de arquivo JSON
-    handleJsonUpload(event) {
-        const file = event.target.files[0];
-        if (!file) {
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const jsonContent = JSON.parse(e.target.result);
-
-                // --- NOVO: Mostra o JSON importado no console para depuração ---
-                console.log("JSON importado:", jsonContent);
-
-                // Validar a estrutura do JSON se necessário (ex: verificar se tem 'name' e 'children')
-                if (!jsonContent || typeof jsonContent.name !== 'string') {
-                    alert("O arquivo JSON não parece ser um mapa mental válido. Ele deve ter uma propriedade 'name' no nível raiz.");
-                    return;
-                }
-
-                // Atualizar os dados do mapa mental e redesenhar
-                this.data = jsonContent;
-                localStorage.setItem('mindMapData', JSON.stringify(jsonContent)); // Salva no localStorage para consistência
-                this.drawMindMap(); // Redesenha o mapa com os novos dados
-                alert("Mapa mental carregado com sucesso a partir do arquivo JSON!");
-            } catch (error) {
-                console.error('Erro ao ler ou parsear o arquivo JSON:', error);
-                alert('Erro ao carregar o arquivo JSON. Certifique-se de que é um JSON válido.');
-            }
-            // Limpa o valor do input file para permitir o upload do mesmo arquivo novamente
-            event.target.value = '';
-        };
-        reader.onerror = (e) => {
-            console.error("Erro ao ler o arquivo:", e);
-            alert("Erro ao ler o arquivo. Por favor, tente novamente.");
-        };
-        reader.readAsText(file);
-    }
-
     // NOVO: Função para exportar JSON para a página de Markdown
     exportJsonToMarkdownPage() {
         const storedData = localStorage.getItem('mindMapData');
@@ -956,7 +894,6 @@ class MindMapViewer {
             alert('Nenhum dado do mapa mental encontrado para criar Markdown.');
         }
     }
-
 
     // --- LOOP DE ANIMAÇÃO ---
     animate() {
