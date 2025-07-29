@@ -24,8 +24,8 @@ const CONFIG = {
     font: {
         size: 16, // Um pouco maior para melhor legibilidade
     },
-    padding: { x: 20, y: 10 }, // Aumenta ligeiramente o preenchimento interno do nó
-    borderRadius: 12, // Cantos mais arredondados para um toque suave
+    padding: { x: 30, y: 10 }, // Aumenta ligeiramente o preenchimento interno do nó
+    borderRadius: 6, // Cantos mais arredondados para um toque suave
     dragHandleRadius: 6, // Um pouco menor e mais discreto
     zoom: {
         speed: 0.2, // Velocidade de zoom para roda do mouse e pinça (ajustável)
@@ -200,7 +200,7 @@ class MindMapViewer {
                 const textWidth = bounds ? bounds.x[1] - bounds.x[0] : d3Node.data.name.length * (CONFIG.font.size * 0.5);
                 const textHeight = bounds ? bounds.y[1] - bounds.y[0] : CONFIG.font.size * 1.2;
 
-                const rectWidth = textWidth + CONFIG.padding.x * 2;
+                const rectWidth = textWidth + CONFIG.padding.x * 2 * 1.2;
                 const rectHeight = textHeight + CONFIG.padding.y * 2;
 
                 const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);

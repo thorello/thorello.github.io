@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Conteúdo com Gemini</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1877f2;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #dddfe2;
+            margin-bottom: 15px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #166fe5;
+        }
+
+        button:disabled {
+            background-color: #9e9e9e;
+            cursor: not-allowed;
+        }
+
+        .output-container {
+            margin-top: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #606770;
+        }
+
+        #loading {
+            text-align: center;
+            display: none;
+            margin: 20px 0;
+            font-size: 16px;
+            color: #606770;
+        }
+
+        .api-key-container {
+            background-color: #f0f2f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Analisador e Estruturador de Conteúdo JSON</h1>
+
+        <form id="analysis-form">
+
+            <div class="api-key-container">
+                <label for="apiKey">Sua Chave de API do Google AI Studio:</label>
+                <input type="password" id="apiKey" placeholder="Cole sua chave de API aqui" required>
+            </div>
+
+            <label for="inputText">Cole o conteúdo a ser analisado abaixo:</label>
+            <textarea id="inputText" rows="15"
+                placeholder="Insira o texto que você deseja que o Gemini analise e estruture..."></textarea>
+
+            <button type="submit" id="submitButton">Analisar e Gerar JSON</button>
+        </form>
+
+        <div id="loading">
+            <p>Analisando... Por favor, aguarde. Isso pode levar alguns segundos.</p>
+        </div>
+
+        <div class="output-container">
+            <label for="outputText">Resultado da Análise (JSON):</label>
+            <textarea id="outputText" rows="20" readonly
+                placeholder="A estrutura JSON gerada pela API aparecerá aqui..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        // --- LÓGICA JAVASCRIPT ATUALIZADA ---
+
+        // 1. Seleciona os elementos da página, incluindo o novo campo da API Key
+        const analysisForm = document.getElementById('analysis-form');
+        const apiKeyInput = document.getElementById('apiKey'); // NOVO
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const submitButton = document.getElementById('submitButton');
+        const loadingIndicator = document.getElementById('loading');
+
+        // --- MELHORIA: LEMBRAR A CHAVE DA API ---
+        // Quando a página carrega, verifica se existe uma chave salva no navegador
+        window.addEventListener('load', () => {
+            const savedApiKey = localStorage.getItem('geminiApiKey');
+            if (savedApiKey) {
+                apiKeyInput.value = savedApiKey;
+            }
+        });
+
+        // 2. Adiciona o "ouvinte" para o evento de submissão do formulário
+        analysisForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            // Pega a chave da API diretamente do campo de input
+            const API_KEY = apiKeyInput.value.trim(); // NOVO
+            const userText = inputText.value.trim();
+
+            if (!API_KEY) {
+                alert('Por favor, insira sua chave de API para continuar.');
+                return;
+            }
+            if (!userText) {
+                alert('Por favor, insira um texto para analisar.');
+                return;
+            }
+
+            // --- MELHORIA: SALVAR A CHAVE NO NAVEGADOR ---
+            localStorage.setItem('geminiApiKey', API_KEY);
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Analisando...';
+            loadingIndicator.style.display = 'block';
+            outputText.value = '';
+
+            const promptBase = `Por favor, analise o conteúdo do arquivo anexo. Crie uma estrutura JSON hierárquica que resuma densa, completa e objetivamente todo o conteúdo do arquivo.
+
+O nome do nó raiz ("name") deve ser atribuído por você, de forma coerente com o nome do arquivo e com o conteúdo.
+
+Cada "name" (título do tópico) em todos os níveis da hierarquia não pode ter mais de 35 caracteres. A "explanation" (explicação do tópico) deve ser densa, completa e objetiva.
+
+Podem haver quantos nós filhos ("children") e sub-nós forem necessários para cobrir todos os detalhes do conteúdo.
+
+**Importante:** A resposta deve conter *apenas* a estrutura JSON. Não inclua citações como , introduções ou qualquer texto adicional antes ou depois do JSON. Não inclua citações de hiperlinks da fonte.
+
+A estrutura JSON final deve seguir exatamente este formato:
+
+\`\`\`json
+{
+  "name": "Root Node Name",
+  "explanation": "Explanation for the root node.",
+  "children": []
+}
+\`\`\`
+
+---
+CONTEÚDO PARA ANÁLISE:
+`;
+            const fullPrompt = promptBase + "\n" + userText;
+
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: fullPrompt }] }]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Erro na API: ${errorData.error.message}`);
+                }
+
+                const data = await response.json();
+                let resultText = data.candidates[0].content.parts[0].text;
+                resultText = resultText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
+
+                try {
+                    const parsedJson = JSON.parse(resultText);
+                    outputText.value = JSON.stringify(parsedJson, null, 2);
+                } catch (e) {
+                    outputText.value = resultText;
+                }
+            } catch (error) {
+                console.error('Erro ao chamar a API do Gemini:', error);
+                outputText.value = `Ocorreu um erro ao processar sua solicitação:\n\n${error.message}`;
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Analisar e Gerar JSON';
+                loadingIndicator.style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,143 +1,228 @@
 {
-    "name": "Ataques a Redes",
-    "explanation": "Visão geral dos principais ataques a redes, incluindo Negação de Serviço, Força Bruta, Varredura de Portas, Decepção, Falsificação e Interceptação, com suas definições, variações, impactos e contramedidas.",
+    "name": "Sistema Controle Acesso Raspberry",
+    "explanation": "Um sistema de controle de acesso para Raspberry Pi que gerencia portas, portões e catracas. Ele se integra com leitores RFID (Wiegand, Abatrack), um leitor biométrico e um aplicativo de QR Code. O sistema se comunica com um servidor central via API REST, suporta configuração remota, e possui um banco de dados SQLite local para operação offline e cache de crachás.",
     "children": [
         {
-            "name": "Negação de Serviço (DoS/DDoS)",
-            "explanation": "Ataques que visam tornar um recurso de computação indisponível para usuários legítimos, sem roubar informações. Podem ser DoS (fonte única) ou DDoS (múltiplas fontes distribuídas geograficamente, usando botnets).",
+            "name": "Orquestração (main.py)",
+            "explanation": "Ponto de entrada do sistema. Orquestra a inicialização de todos os componentes de hardware e software, iniciando cada módulo principal como uma thread separada, baseado no 'config.ini'.",
             "children": [
                 {
-                    "name": "Categorias de Ataques DoS/DDoS",
-                    "explanation": "Tipos de ataques de negação de serviço baseados na forma como consomem recursos do alvo.",
-                    "children": [
-                        {
-                            "name": "Ataques de Volume",
-                            "explanation": "Inundam a largura de banda da rede do alvo com tráfego massivo, como UDP Flood e ICMP Flood.",
-                            "children": []
-                        },
-                        {
-                            "name": "Ataques de Protocolo",
-                            "explanation": "Consomem recursos de servidores ou equipamentos de rede explorando vulnerabilidades em protocolos, como SYN Flood, que deixa conexões TCP semiabertas.",
-                            "children": []
-                        },
-                        {
-                            "name": "Ataques à Camada de Aplicação",
-                            "explanation": "Direcionados a aplicações específicas, enviando requisições que parecem legítimas para consumir intensivamente CPU e memória do servidor, como HTTP Flood.",
-                            "children": []
-                        }
-                    ]
+                    "name": "Função inicializacao_pinos",
+                    "explanation": "Configura todos os pinos GPIO necessários como entrada ou saída e define seus estados iniciais seguros, como travar solenoides e apagar LEDs."
                 },
                 {
-                    "name": "Impacto Principal DoS/DDoS",
-                    "explanation": "Violação do princípio da Disponibilidade, impedindo que usuários legítimos acessem os serviços.",
-                    "children": []
+                    "name": "Função modificaHostname",
+                    "explanation": "Verifica se o hostname do dispositivo corresponde aos últimos 4 dígitos de seu número de série. Se não, atualiza o hostname e reinicia o sistema."
                 },
                 {
-                    "name": "Contramedidas DoS/DDoS",
-                    "explanation": "Estratégias para mitigar ataques de negação de serviço, incluindo firewalls, Sistemas de Prevenção de Intrusão (IPS), limitação de taxa (rate limiting) e serviços especializados de mitigação anti-DDoS com scrubbing centers.",
-                    "children": []
+                    "name": "Função principal",
+                    "explanation": "Inicia e gerencia as threads para os módulos de Display, Biometria, Leitor RFID, Banco de Dados, Controle de Roleta/Porta e Socket de QR Code."
                 },
                 {
-                    "name": "Foco CEBRASPE DoS/DDoS",
-                    "explanation": "Pontos importantes para exames, como a diferença entre DoS (uma fonte) e DDoS (múltiplas fontes), o objetivo primordial de esgotar recursos (não roubar dados) e o SYN Flood como ataque de protocolo clássico.",
-                    "children": []
+                    "name": "Variáveis Globais (Global.py)",
+                    "explanation": "Define variáveis globais para compartilhar estados entre as diferentes threads, como 'ENTRADA_LIBERADA', 'FINALIZOU_GIRO', 'ULTIMO_CARTAO' e 'EH_BIOMETRIA'."
                 }
             ]
         },
         {
-            "name": "Força Bruta e Varredura de Portas",
-            "explanation": "Ataques focados na descoberta de credenciais ou na identificação de vulnerabilidades em sistemas através do reconhecimento de portas abertas.",
+            "name": "Config (Config.py)",
+            "explanation": "Classe que lê e fornece acesso aos parâmetros do arquivo 'config.ini', além de obter informações do sistema como S/N e gateway de rede.",
             "children": [
                 {
-                    "name": "Ataque de Força Bruta",
-                    "explanation": "Método criptoanalítico que tenta sistematicamente todas as combinações possíveis de senhas ou chaves até encontrar a correta.",
-                    "children": [
-                        {
-                            "name": "Variações de Força Bruta",
-                            "explanation": "O Ataque de Dicionário é uma forma otimizada que utiliza uma lista predefinida de palavras comuns e senhas vazadas.",
-                            "children": []
-                        },
-                        {
-                            "name": "Impacto Principal Força Bruta",
-                            "explanation": "Violação da Confidencialidade e Autenticidade, permitindo acesso não autorizado a contas e sistemas.",
-                            "children": []
-                        },
-                        {
-                            "name": "Contramedidas Força Bruta",
-                            "explanation": "Implementação de políticas de senha forte, bloqueio de conta após tentativas malsucedidas, uso de CAPTCHA e, principalmente, Autenticação Multifator (MFA).",
-                            "children": []
-                        }
-                    ]
+                    "name": "Método __init__",
+                    "explanation": "No construtor, lê 'config.ini', obtém S/N do Raspberry Pi e prefixo do gateway via comandos de shell, e carrega todos os parâmetros em atributos da classe."
                 },
                 {
-                    "name": "Varredura de Portas (Port Scanning)",
-                    "explanation": "Técnica de reconhecimento para sondar um servidor ou host em busca de portas abertas, identificando serviços e aplicações em execução para encontrar potenciais vetores de ataque.",
-                    "children": [
-                        {
-                            "name": "Técnicas Comuns Varredura",
-                            "explanation": "Incluem TCP Connect Scan (conexão TCP completa, detectável) e TCP SYN Scan (envia SYN, não completa handshake, mais furtivo).",
-                            "children": []
-                        },
-                        {
-                            "name": "Ferramenta Padrão",
-                            "explanation": "Nmap é a ferramenta mais conhecida para realizar varreduras de portas.",
-                            "children": []
-                        },
-                        {
-                            "name": "Contramedidas Varredura",
-                            "explanation": "Configuração de firewalls para descartar pacotes em portas fechadas e uso de Sistemas de Detecção de Intrusão (IDS) para identificar padrões de varredura.",
-                            "children": []
-                        }
-                    ]
+                    "name": "Métodos de Verificação",
+                    "explanation": "Fornece funções booleanas como 'is_porta()', 'is_catraca()', e 'has_biometria()' para que a lógica da aplicação se adapte ao tipo de equipamento configurado."
                 },
                 {
-                    "name": "Foco CEBRASPE Força Bruta e Portas",
-                    "explanation": "Pontos importantes para exames, como a MFA como defesa robusta contra Força Bruta, a Varredura de Portas como fase de reconhecimento (não um ataque direto) e a furtividade do SYN Scan por não completar o handshake.",
-                    "children": []
+                    "name": "Método gravar_em_configini",
+                    "explanation": "Permite que outros módulos atualizem programaticamente os valores no arquivo 'config.ini' usando a biblioteca configparser."
                 }
             ]
         },
         {
-            "name": "Decepção, Falsificação, Interceptação",
-            "explanation": "Categoria de ataques que exploram a confiança e utilizam técnicas de engano, falsificação de identidade ou interceptação de comunicação para comprometer a segurança.",
+            "name": "Banco (banco.py)",
+            "explanation": "Classe que gerencia um banco de dados SQLite para cache de crachás autorizados e para armazenar registros de acesso durante a operação offline.",
             "children": [
                 {
-                    "name": "Phishing",
-                    "explanation": "Ataque de engenharia social, geralmente por e-mail, que engana a vítima para revelar informações sensíveis (credenciais) ou executar código malicioso, usando mensagens e páginas falsas que se passam por entidades legítimas.",
+                    "name": "Método consulta_cracha_cache",
+                    "explanation": "Verifica se um crachá (convertido para formatos W, S, A, P) existe na tabela local 'cracha' e se sua data de validade é vigente."
+                },
+                {
+                    "name": "Threads de Sincronização",
+                    "explanation": "Os métodos 'inicia_atualizacao' e 'inicia_envio_registros_offline' iniciam threads para tarefas de fundo.",
                     "children": [
                         {
-                            "name": "Spear Phishing",
-                            "explanation": "Variante direcionada e personalizada para um indivíduo ou organização específica, aumentando a credibilidade e chance de sucesso.",
-                            "children": []
+                            "name": "Thread atualiza_crachas_autorizados",
+                            "explanation": "Roda uma vez por dia, chama a API 'crachasAutorizados', apaga a tabela local 'cracha' e a repopula com os novos dados recebidos."
+                        },
+                        {
+                            "name": "Thread envia_registros_offline",
+                            "explanation": "Roda a cada hora, busca por registros com situação 'N', os envia para a API 'registrosOffline' e, em caso de sucesso, atualiza a situação para 'S'."
                         }
                     ]
                 },
                 {
-                    "name": "Eavesdropping (Interceptação Passiva)",
-                    "explanation": "Ato de monitorar secretamente a comunicação entre duas partes em uma rede para obter informações. É um ataque passivo que viola a confidencialidade e ocorre frequentemente em redes Wi-Fi públicas.",
+                    "name": "Método insere_registro",
+                    "explanation": "Salva um evento de acesso na tabela 'registro' com o status 'N' (Não enviado), para ser sincronizado posteriormente pela thread de envio."
+                }
+            ]
+        },
+        {
+            "name": "RFID (RFID.py)",
+            "explanation": "Classe base abstrata e suas implementações concretas (RFID_Rasp.py, RFID_Rasp_Abatrack.py) para leitura e processamento de cartões.",
+            "children": [
+                {
+                    "name": "Lógica Comum (Classe Abstrata)",
+                    "explanation": "Define a lógica principal de validação, incluindo anti-repetição, chamada à API REST, fallback para modo offline e atualização do display.",
                     "children": [
                         {
-                            "name": "Contramedida Eavesdropping",
-                            "explanation": "Criptografia é a principal contramedida, tornando dados interceptados ilegíveis através de protocolos como TLS (HTTPS) e VPNs.",
-                            "children": []
+                            "name": "Método chama_ws_cracha",
+                            "explanation": "Inicia a validação em uma nova thread, tratando da lógica anti-repetição do mesmo cartão e definindo variáveis globais."
+                        },
+                        {
+                            "name": "Método processar_retorno_rest",
+                            "explanation": "Interpreta a resposta da API, chamando 'ControlePinos' para liberar ou negar o acesso."
+                        },
+                        {
+                            "name": "Método processa_offline",
+                            "explanation": "Em caso de falha de rede, consulta o cache do Banco de dados e, se o cartão for válido, libera o acesso e registra a transação localmente."
                         }
                     ]
                 },
                 {
-                    "name": "DNS Spoofing",
-                    "explanation": "Ataque que introduz dados falsos no cache de um servidor DNS, fazendo-o retornar um endereço IP incorreto (malicioso) para um nome de domínio legítimo, redirecionando usuários para sites falsos.",
-                    "children": [
-                        {
-                            "name": "Contramedida DNS Spoofing",
-                            "explanation": "DNSSEC (Domain Name System Security Extensions) utiliza assinaturas digitais para garantir autenticidade e integridade das respostas DNS.",
-                            "children": []
-                        }
-                    ]
+                    "name": "Implementação Wiegand",
+                    "explanation": "A classe RFID_Rasp decodifica sinais Wiegand. Usa interrupções nos pinos D0 (bit '1') e D1 (bit '0') para construir a sequência de 26 bits."
                 },
                 {
-                    "name": "Foco CEBRASPE Decepção/Interc.",
-                    "explanation": "Pontos importantes para exames, como o Phishing como engenharia social, a criptografia como defesa eficaz contra Eavesdropping (firewall é incorreto) e a diferença entre DNS Spoofing (infraestrutura) e Phishing (link malicioso) no redirecionamento para sites falsos.",
-                    "children": []
+                    "name": "Implementação Abatrack",
+                    "explanation": "A classe RFID_Rasp_Abatrack decodifica Abatrack. Usa D0 como clock e lê o dado em D1. Inverte a string de bits resultante antes da conversão."
+                }
+            ]
+        },
+        {
+            "name": "Biometria (biometria.py)",
+            "explanation": "Classe que gerencia a captura e validação de impressões digitais através de um script externo e da API REST.",
+            "children": [
+                {
+                    "name": "Método run (Loop Principal)",
+                    "explanation": "Em uma thread, executa o script 'biometria.sh' em loop. Se o script for bem-sucedido, lê o arquivo de imagem gerado."
+                },
+                {
+                    "name": "Método chamaWsBiometria",
+                    "explanation": "Codifica a imagem em Base64 e a envia via POST para o endpoint 'controleAcessoBiometria' para validação, tratando de erros de comunicação e reiniciando a interface de rede se necessário."
+                },
+                {
+                    "name": "Método processarRetornoRest",
+                    "explanation": "Se a API retornar 'Ok', libera o acesso via 'ControlePinos', define variáveis globais e, para portas, gera um registro de movimento."
+                }
+            ]
+        },
+        {
+            "name": "ControlePinos (ControlePinos.py)",
+            "explanation": "Classe que abstrai o acionamento de hardware, como LEDs e travas, gerenciando a duração dos acionamentos via threads.",
+            "children": [
+                {
+                    "name": "Métodos de Liberação",
+                    "explanation": "Funções como 'libera_entrada' e 'libera_saida' que iniciam threads para controlar a liberação temporizada de travas e LEDs."
+                },
+                {
+                    "name": "Métodos de Controle de Tempo",
+                    "explanation": "As threads, como 'controla_tempo_entrada_liberada', ativam o hardware e aguardam em um loop até que o tempo expire ou um sensor de giro ('FINALIZOU_GIRO') seja ativado."
+                },
+                {
+                    "name": "Métodos de Bloqueio/Negação",
+                    "explanation": "Funções como 'nega_entrada' e 'bloqueia_roleta' que acionam o LED de acesso negado ou travam fisicamente o hardware."
+                }
+            ]
+        },
+        {
+            "name": "Roleta (roleta.py)",
+            "explanation": "Classe que implementa uma máquina de estados para monitorar sensores de rotação da catraca e garantir que a passagem seja autorizada.",
+            "children": [
+                {
+                    "name": "Callback de Interrupção",
+                    "explanation": "Função principal que implementa a máquina de estados. É acionada por qualquer mudança nos sensores de giro.",
+                    "children": [
+                        {
+                            "name": "Lógica de Estados de Giro",
+                            "explanation": "Transita por estados ('parado', 'comeco_giro', 'giro_1', 'giro_2') para rastrear o progresso e a direção de um giro."
+                        },
+                        {
+                            "name": "Mecanismo de Bloqueio",
+                            "explanation": "Se uma tentativa de giro ocorre sem autorização ('ENTRADA_LIBERADA' é False), aciona a trava da roleta e entra em estado 'bloqueado'."
+                        },
+                        {
+                            "name": "Registro de Movimento Pós-Giro",
+                            "explanation": "Após um giro completo, chama a API 'geraMovimento' para registrar o evento, com lógica de nova tentativa e fallback para registro offline."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Display (display.py)",
+            "explanation": "Classe que controla um display LCD 16x2 para exibir o status do sistema e mensagens ao usuário.",
+            "children": [
+                {
+                    "name": "Método clock",
+                    "explanation": "Verifica continuamente o status da rede (cabo, ping, API) e atualiza o display com o estado correspondente: 'OFFLINE', 'CONECTANDO', 'ERRO COMUN. REST', etc."
+                },
+                {
+                    "name": "Método mostrar_msg_gateway_predio_ip",
+                    "explanation": "Ao conectar na rede, obtém dados da rede, atualiza o 'config.ini' com dados específicos do prédio e exibe essas informações no display."
+                },
+                {
+                    "name": "Método addAguarda",
+                    "explanation": "Exibe uma mensagem 'Aguarde...' animada durante o processamento de uma validação."
+                }
+            ]
+        },
+        {
+            "name": "Socket_Qrcode (SocketQrCode.py)",
+            "explanation": "Classe que abre uma porta TCP (5000) para receber comandos de acesso via QR Code de um aplicativo externo.",
+            "children": [
+                {
+                    "name": "Método run (Loop Principal)",
+                    "explanation": "Inicia um servidor de socket na porta 5000, aguarda conexões e lê os dados recebidos."
+                },
+                {
+                    "name": "Processamento de JSON",
+                    "explanation": "Interpreta a mensagem recebida como um objeto JSON. Se o status for 'Ok', libera o acesso usando 'ControlePinos' com base no 'sentidoLiberado'. Caso contrário, nega."
+                }
+            ]
+        },
+        {
+            "name": "Configuração por Rede e Remota",
+            "explanation": "Classes e scripts que permitem a configuração do dispositivo baseada na rede e por comandos remotos do backend. Envolve múltiplos arquivos.",
+            "children": [
+                {
+                    "name": "ConfigUnicaPorPredio.py",
+                    "explanation": "Classe que verifica o gateway da rede e, usando um dicionário (DicionarioGateway...), aplica configurações de API específicas do prédio, reiniciando o serviço se necessário."
+                },
+                {
+                    "name": "ConfiguradorCatracaNoSCA.py",
+                    "explanation": "Classe que envia periodicamente os dados de configuração do coletor (IP, S/N, timeouts) para a API do Sistema de Controle de Acesso (SCA)."
+                },
+                {
+                    "name": "GerenciadorConfiguracoes...",
+                    "explanation": "Script que aceita parâmetros de configuração via linha de comando, permitindo que o backend altere as configurações do dispositivo. Valida o S/N antes de aplicar as mudanças."
+                }
+            ]
+        },
+        {
+            "name": "Porta (Porta.py)",
+            "explanation": "Classe que controla a lógica para portas e portões, acionando a trava por um tempo determinado quando um sensor de abertura é ativado.",
+            "children": [
+                {
+                    "name": "Callback de Interrupção",
+                    "explanation": "Quando o sensor da porta é ativado, inicia uma thread para executar 'controla_tempo_porta_aberta'."
+                },
+                {
+                    "name": "Método controla_tempo_porta_aberta",
+                    "explanation": "Aciona o relé do ímã da porta (destrava), aguarda pelo tempo definido em 'config.ini' e, em seguida, desativa o relé (trava)."
                 }
             ]
         }
