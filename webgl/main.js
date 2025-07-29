@@ -152,11 +152,19 @@ class MindMapViewer {
             this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
         }
 
-        const exportButton = document.getElementById('export-pdf-button');
-        if (exportButton) {
+        const exportPdfButton = document.getElementById('export-pdf-button');
+        if (exportPdfButton) {
             // Chama a função exportMindMapToPDF do módulo separado
-            exportButton.addEventListener('click', () => {
+            exportPdfButton.addEventListener('click', () => {
                 exportMindMapToPDF(this.nodeMap, this.linkObjects, CONFIG, this.mainGroup.position);
+            });
+        }
+
+        // NOVO: Event listener para o botão de exportar JSON
+        const exportJsonButton = document.getElementById('export-json-button');
+        if (exportJsonButton) {
+            exportJsonButton.addEventListener('click', () => {
+                this.exportMindMapToJson();
             });
         }
     }
@@ -817,6 +825,35 @@ class MindMapViewer {
         }
     }
 
+    // NOVO: Função para exportar os dados do mapa mental para JSON
+    exportMindMapToJson() {
+        // Tenta obter os dados do localStorage
+        const storedData = localStorage.getItem('mindMapData');
+        if (storedData) {
+            try {
+                const parsedData = JSON.parse(storedData);
+                const jsonString = JSON.stringify(parsedData, null, 2); // Formata com 2 espaços de indentação
+
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'mindmap_data.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url); // Limpa o URL do objeto
+            } catch (error) {
+                console.error('Erro ao parsear ou exportar JSON:', error);
+                alert('Ocorreu um erro ao exportar o JSON. Verifique o console para mais detalhes.');
+            }
+        } else {
+            alert('Nenhum dado do mapa mental encontrado para exportar.');
+        }
+    }
+
+
     // --- LOOP DE ANIMAÇÃO ---
     animate() {
         requestAnimationFrame(this.animate.bind(this));
@@ -839,7 +876,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storedData) {
         // Se encontrou dados, usa-os e depois limpa o storage
         console.log("Dados do mapa mental encontrados no localStorage. Carregando...");
-        localStorage.removeItem('mindMapData'); // Limpa para não usar novamente
+        // Não removemos mais do storage aqui, pois o botão de exportar JSON precisará deles
         try {
             const data = JSON.parse(storedData);
             new MindMapViewer(mindmapContainer, data);
@@ -864,6 +901,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(data => {
+                // Ao carregar o mapa padrão, também o salva no localStorage para futuras exportações
+                localStorage.setItem('mindMapData', JSON.stringify(data));
                 new MindMapViewer(mindmapContainer, data);
             })
             .catch(error => {
