@@ -1,0 +1,94 @@
+{
+    "name": "Criptografia: Fundamentos e Aplicações",
+    "explanation": "A criptografia é a ciência de proteger informações por meio de códigos secretos, sendo essencial para a confidencialidade na segurança da informação.",
+    "children": [
+        {
+            "name": "Criptografia: Conceitos Básicos",
+            "explanation": "Definições e princípios fundamentais da criptografia, incluindo termos como texto claro, texto cifrado, cifragem, decifragem, algoritmo criptográfico e chave criptográfica, além do Princípio de Kerckhoffs.",
+            "children": [
+                {
+                    "name": "Terminologia Criptográfica",
+                    "explanation": "Texto claro é a mensagem original legível; texto cifrado é a mensagem codificada e ilegível. Cifragem converte texto claro em cifrado, enquanto decifragem reverte o processo. Algoritmo criptográfico é o conjunto de regras matemáticas e a chave criptográfica é um parâmetro secreto que controla o algoritmo.",
+                    "children": [
+                        {
+                            "name": "Princípio de Kerckhoffs",
+                            "explanation": "A segurança de sistemas criptográficos modernos reside na confidencialidade da chave, não do algoritmo, que deve ser público e analisado."
+                        }
+                    ]
+                },
+                {
+                    "name": "Objetivos da Criptografia",
+                    "explanation": "O objetivo primário da criptografia é a confidencialidade. Não garante isoladamente integridade, autenticidade ou não repúdio (requer combinação com outras técnicas), e não se relaciona com a disponibilidade.",
+                    "children": [
+                        {
+                            "name": "Cripto vs Esteganografia",
+                            "explanation": "Criptografia oculta o conteúdo da mensagem; esteganografia oculta a existência da mensagem (ex: dentro de um arquivo de imagem)."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Tipos de Criptografia",
+            "explanation": "A criptografia moderna é dividida em simétrica (chave secreta) e assimétrica (par de chaves pública/privada), baseadas no gerenciamento de chaves.",
+            "children": [
+                {
+                    "name": "Criptografia Simétrica",
+                    "explanation": "Utiliza uma única chave secreta para cifrar e decifrar. É rápida e eficiente para grandes volumes de dados. Seu principal desafio é a distribuição segura da chave. Exemplos incluem AES (padrão atual), DES e 3DES para cifras de bloco, e RC4 para cifras de fluxo.",
+                    "children": [
+                        {
+                            "name": "Vantagem Simétrica",
+                            "explanation": "Sua principal vantagem é a alta velocidade e eficiência computacional, ideal para criptografar grandes volumes de dados."
+                        },
+                        {
+                            "name": "Desvantagem Simétrica",
+                            "explanation": "O principal problema é a distribuição segura e o gerenciamento de chaves. Em uma rede com N usuários, são necessárias N*(N-1)/2 chaves para comunicação segura."
+                        },
+                        {
+                            "name": "Algoritmos Simétricos",
+                            "explanation": "AES é o padrão atual (chaves de 128, 192, 256 bits), substituindo o DES, que é considerado inseguro. Cifras de bloco operam em dados de tamanho fixo (ex: AES, DES), enquanto cifras de fluxo operam continuamente (ex: RC4)."
+                        }
+                    ]
+                },
+                {
+                    "name": "Criptografia Assimétrica",
+                    "explanation": "Também conhecida como criptografia de chave pública, usa um par de chaves (pública e privada) matematicamente relacionadas. Resolve o problema de distribuição de chaves da criptografia simétrica. É computacionalmente intensiva e mais lenta. Algoritmos comuns incluem RSA, ElGamal e ECC.",
+                    "children": [
+                        {
+                            "name": "Funcionamento Assimétrico",
+                            "explanation": "A chave pública pode ser distribuída livremente, enquanto a privada deve ser mantida em segredo. O que é cifrado com uma chave só pode ser decifrado com sua chave par correspondente."
+                        },
+                        {
+                            "name": "Aplicação Confidencialidade",
+                            "explanation": "Para confidencialidade, a mensagem é cifrada com a chave PÚBLICA do destinatário; somente ele pode decifrar com sua chave PRIVADA."
+                        },
+                        {
+                            "name": "Aplicação Assinatura Digital",
+                            "explanation": "Para assinatura digital, o remetente cifra um hash do documento com sua própria chave PRIVADA. Qualquer um pode verificar com a chave PÚBLICA do remetente, garantindo autenticidade, integridade e não repúdio, mas não confidencialidade do conteúdo."
+                        },
+                        {
+                            "name": "Velocidade Assimétrica",
+                            "explanation": "É significativamente mais lenta que a criptografia simétrica, tornando-a inadequada para cifrar grandes volumes de dados."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Proteção Dados em Trânsito/Repouso",
+            "explanation": "A criptografia protege dados em transmissão (em trânsito) e armazenados (em repouso).",
+            "children": [
+                {
+                    "name": "Dados em Trânsito",
+                    "explanation": "Protege comunicação em redes inseguras (ex: Internet) usando uma abordagem híbrida: criptografia assimétrica para troca segura de chaves de sessão simétricas, e então criptografia simétrica para a comunicação de dados subsequente, mais rápida e eficiente (ex: TLS/HTTPS).",
+                    "children": [
+                        {
+                            "name": "Abordagem Híbrida",
+                            "explanation": "Usa assimétrica para o estabelecimento seguro da chave de sessão simétrica, e simétrica para cifrar os dados da comunicação devido à sua velocidade."
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
