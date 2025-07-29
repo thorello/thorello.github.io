@@ -43,6 +43,7 @@ const CONFIG = {
     textColor: 0x111827, // Preto para o texto
     font: {
         size: 16, // Um pouco maior para melhor legibilidade
+        characterWidth: 0.5, // ESTIMATIVA: Largura média de um caractere em relação ao font size (ajuste conforme necessário)
     },
     padding: { x: 30, y: 10 }, // Aumenta ligeiramente o preenchimento interno do nó
     borderRadius: 6, // Cantos mais arredondados para um toque suave
@@ -53,9 +54,17 @@ const CONFIG = {
         max: 8,     // Permite mais zoom in (mais perto)
     },
     horizontalNodePadding: 0, // Base padding between nodes horizontally
-    verticalNodeSpacing: 50, // Vertical spacing between parent and child nodes
-    depth1HorizontalOffset: 80 // Offset fixo para nós na profundidade 1
+    verticalNodeSpacing: 80, // Vertical spacing between parent and child nodes
+    depth1HorizontalOffset: 80, // Offset fixo para nós na profundidade 1
+    // NOVAS PROPRIEDADES PARA TAMANHO FIXO DO NÓ
+    FIXED_NODE_CHARACTER_LIMIT: 35,
+    FIXED_NODE_HEIGHT_MULTIPLIER: 2.5, // Multiplicador para altura com base no font size (ajuste para 1 ou 2 linhas de texto)
 };
+
+// Calcule a largura e altura fixas do nó com base nas configurações
+CONFIG.FIXED_NODE_WIDTH = (CONFIG.font.size * CONFIG.font.characterWidth * CONFIG.FIXED_NODE_CHARACTER_LIMIT) + (CONFIG.padding.x * 2);
+CONFIG.FIXED_NODE_HEIGHT = (CONFIG.font.size * CONFIG.FIXED_NODE_HEIGHT_MULTIPLIER) + (CONFIG.padding.y * 2);
+
 
 /**
  * Geometria para um retângulo com cantos arredondados.
@@ -226,7 +235,7 @@ class MindMapViewer {
             const rootNodeColor = 0x3498db; // Cor do botão Exportar PDF
             const rootTextColor = 0xFFFFFF; // Branco para o texto do nó raiz
 
-            const nodeColor = isRootNode ? rootNodeColor : CONFIG.nodeColors[d3Node.depth % CONFIG.nodeColors.length];
+            const nodeColor = isRootNode ? rootNodeColor : CONFIG.nodeColors.length > 0 ? CONFIG.nodeColors.length > d3Node.depth ? CONFIG.nodeColors.slice().reverse()[d3Node.depth] : CONFIG.nodeColors.slice().reverse()[0] : 0xFFFFFF;
             const textColor = isRootNode ? rootTextColor : CONFIG.textColor;
 
             const textMesh = new Text();
@@ -234,18 +243,17 @@ class MindMapViewer {
             textMesh.fontSize = CONFIG.font.size;
             textMesh.color = textColor; // Usa a cor do texto definida acima
             textMesh.position.z = 0.1;
-            textMesh.anchorX = direction === -1 ? 'right' : (direction === 1 ? 'left' : 'center');
+            textMesh.anchorX = 'center'; // MODIFICADO PARA CENTRALIZAR
             textMesh.anchorY = 'middle';
+            // Adiciona quebra de linha para o texto se ele for maior que 35 caracteres
+            textMesh.maxWidth = CONFIG.FIXED_NODE_WIDTH - (CONFIG.padding.x * 2);
+
 
             textMesh.name = 'nodeTextMesh'
 
             textMesh.sync(() => {
-                const bounds = textMesh.textRenderInfo.bounds;
-                const textWidth = bounds ? bounds.x[1] - bounds.x[0] : d3Node.data.name.length * (CONFIG.font.size * 0.5);
-                const textHeight = bounds ? bounds.y[1] - bounds.y[0] : CONFIG.font.size * 1.2;
-
-                const rectWidth = textWidth + CONFIG.padding.x * 2 * 1.2;
-                const rectHeight = textHeight + CONFIG.padding.y * 2;
+                const rectWidth = CONFIG.FIXED_NODE_WIDTH;
+                const rectHeight = CONFIG.FIXED_NODE_HEIGHT;
 
                 const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
                 const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor }); // Usa a cor do nó definida acima
@@ -262,13 +270,7 @@ class MindMapViewer {
                     nodeGroup.add(wireframe);
                 }
 
-                if (direction === 1) {
-                    textMesh.position.x = -rectWidth / 2 + CONFIG.padding.x;
-                } else if (direction === -1) {
-                    textMesh.position.x = rectWidth / 2 - CONFIG.padding.x;
-                } else {
-                    textMesh.position.x = 0;
-                }
+                textMesh.position.x = 0; // Garante que a posição X seja zero após centralizar
 
                 nodeGroup.add(textMesh);
                 nodeGroup.userData.nodeWidth = rectWidth;
@@ -280,8 +282,8 @@ class MindMapViewer {
                     const handleMesh = new THREE.Mesh(handleGeo, handleMat);
                     handleMesh.position.set((rectWidth / 2) * direction, 0, 0.2);
                     handleMesh.userData = { isDragHandle: true, nodeGroup };
-                    nodeGroup.add(handleMesh);
                     this.dragHandles.push(handleMesh);
+                    nodeGroup.add(handleMesh);
                 }
 
                 this.nodeMap.set(d3Node, nodeGroup);
@@ -490,33 +492,18 @@ class MindMapViewer {
         });
         await Promise.all(nodeCreationPromises);
 
-        const maxNodeWidths = {}; // { depth: { -1: maxWidthLeft, 1: maxWidthRight } }
-
-        d3Nodes.forEach(d3Node => {
-            const depth = d3Node.depth;
-            const direction = d3Node.userData.assignedDirection;
-
-            if (depth > 0) {
-                if (!maxNodeWidths[depth]) {
-                    maxNodeWidths[depth] = { [-1]: 0, [1]: 0 };
-                }
-                const nodeGroup = this.nodeMap.get(d3Node);
-                if (nodeGroup && nodeGroup.userData.nodeWidth) {
-                    if (direction === -1) {
-                        maxNodeWidths[depth][-1] = Math.max(maxNodeWidths[depth][-1], nodeGroup.userData.nodeWidth);
-                    } else if (direction === 1) {
-                        maxNodeWidths[depth][1] = Math.max(maxNodeWidths[depth][1], nodeGroup.userData.nodeWidth);
-                    }
-                }
-            }
-        });
+        // A lógica de maxNodeWidths não é mais estritamente necessária para o posicionamento,
+        // já que a largura é fixa. No entanto, se houver outras partes do código que a utilizem
+        // para algo além do posicionamento horizontal, pode ser mantida ou adaptada.
+        // Para este problema, podemos simplificar a parte de `maxNodeWidths`
+        // e usar diretamente `CONFIG.FIXED_NODE_WIDTH`.
 
         d3Nodes.forEach(d3Node => {
             const nodeGroup = this.nodeMap.get(d3Node);
             if (!nodeGroup) return;
 
             const direction = nodeGroup.userData.direction;
-            const nodeWidth = nodeGroup.userData.nodeWidth || 0;
+            const nodeWidth = CONFIG.FIXED_NODE_WIDTH; // Usar a largura fixa
 
             let finalNodeX = 0;
             let finalNodeY = 0;
@@ -528,23 +515,22 @@ class MindMapViewer {
                 finalNodeY = d3Node.userData.d3X; // d3.tree uses x for vertical and y for horizontal
 
                 let previousDepthX = 0;
-                let previousDepthMaxWidth = 0;
+                let previousNodeWidthForSpacing = 0; // Usará a largura fixa para o espaçamento
 
                 if (d3Node.parent) {
                     const parentNodeGroup = this.nodeMap.get(d3Node.parent);
                     if (parentNodeGroup) {
                         previousDepthX = parentNodeGroup.position.x;
                     }
-                    if (maxNodeWidths[d3Node.depth - 1]) {
-                        previousDepthMaxWidth = maxNodeWidths[d3Node.depth - 1][direction] || 0;
-                    }
+                    // Usar a largura fixa do nó pai para cálculo de espaçamento
+                    previousNodeWidthForSpacing = CONFIG.FIXED_NODE_WIDTH;
                 }
 
                 // Lógica de cálculo de espaçamento condicional à profundidade
                 if (d3Node.depth === 1) {
                     // Para profundidade 1, use um offset fixo em relação à raiz
                     const rootNodeGroup = this.nodeMap.get(this.d3RootNode); // Usa this.d3RootNode
-                    const rootWidth = rootNodeGroup ? rootNodeGroup.userData.nodeWidth : 0;
+                    const rootWidth = rootNodeGroup ? CONFIG.FIXED_NODE_WIDTH : 0; // Usar largura fixa da raiz
 
                     // Conecte-se à borda da raiz e adicione um offset fixo e metade da largura do nó atual.
                     finalNodeX = (rootWidth / 2) * direction + CONFIG.depth1HorizontalOffset * direction + (nodeWidth / 2) * direction;
@@ -555,7 +541,7 @@ class MindMapViewer {
                         const parentNode = d3Node.parent;
                         const parentGroup = this.nodeMap.get(parentNode);
                         if (parentGroup) {
-                            const parentWidth = parentGroup.userData.nodeWidth || 0;
+                            const parentWidth = CONFIG.FIXED_NODE_WIDTH; // Usar largura fixa do pai
                             const parentDir = parentGroup.userData.direction;
 
                             let connectionPointX = parentGroup.position.x;
@@ -565,7 +551,7 @@ class MindMapViewer {
                                 connectionPointX += (parentWidth / 2) * direction;
                             }
 
-                            let spacingNeeded = (nodeWidth / 2) + (previousDepthMaxWidth / 2) - CONFIG.horizontalNodePadding;
+                            let spacingNeeded = (nodeWidth / 2) + (previousNodeWidthForSpacing / 2) + CONFIG.horizontalNodePadding; // Adicionado padding horizontal
                             finalNodeX = connectionPointX + (spacingNeeded * direction);
                         }
                     }
@@ -772,7 +758,7 @@ class MindMapViewer {
                 this.isPanning = true;
                 this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
             }
-        } else if (event.touches.length === 2) {
+        } /** If there are two touches, handle pinch-to-zoom */ else if (event.touches.length === 2) {
             this.isDraggingNode = false;
             this.isPanning = false;
             this._isPinching = true;
