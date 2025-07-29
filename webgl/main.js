@@ -88,6 +88,8 @@ class MindMapViewer {
 
         // Adiciona a propriedade para armazenar a instância do nó raiz D3
         this.d3RootNode = null;
+        // NOVO: Armazena o nó D3 que está atualmente selecionado (para a sidebar)
+        this.currentSelectedD3Node = null;
 
         // --- Variáveis de Estado para Controle de Câmera Personalizado ---
         this.isPanning = false;
@@ -109,6 +111,8 @@ class MindMapViewer {
         this.sidebarTitle = document.getElementById('sidebar-title');
         this.sidebarContent = document.getElementById('sidebar-content');
         this.sidebarCloseButton = document.getElementById('sidebar-close');
+        // NOVO: Botão de adicionar nó filho
+        this.addNodeButton = document.getElementById('add-node-button');
         this.isSidebarOpen = false;
 
         this._initScene();
@@ -162,6 +166,11 @@ class MindMapViewer {
         if (this.sidebarCloseButton) {
             this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
         }
+        // NOVO: Event listener para o botão de adicionar nó
+        if (this.addNodeButton) {
+            this.addNodeButton.addEventListener('click', this.addChildNode.bind(this));
+        }
+
 
         const exportPdfButton = document.getElementById('export-pdf-button');
         if (exportPdfButton) {
@@ -708,8 +717,9 @@ class MindMapViewer {
                 if (clickedNode) break;
             }
             if (clickedNode) {
-                const d3NodeData = clickedNode.userData.d3Node.data;
-                this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível.');
+                const d3Node = clickedNode.userData.d3Node; // Obtenha o objeto d3Node
+                this.currentSelectedD3Node = d3Node; // Armazena o nó D3 selecionado
+                this.openSidebar(d3Node.data.name, d3Node.data.explanation || 'Nenhuma explicação disponível.');
             } else if (this.isSidebarOpen) {
                 this.closeSidebar();
             }
@@ -830,8 +840,9 @@ class MindMapViewer {
                 if (clickedNode) break;
             }
             if (clickedNode && !clickedNode.userData.isDragHandle) {
-                const d3NodeData = clickedNode.userData.d3Node.data;
-                this.openSidebar(d3NodeData.name, d3NodeData.explanation || 'Nenhuma explicação disponível.');
+                const d3Node = clickedNode.userData.d3Node; // Obtenha o objeto d3Node
+                this.currentSelectedD3Node = d3Node; // Armazena o nó D3 selecionado
+                this.openSidebar(d3Node.data.name, d3Node.data.explanation || 'Nenhuma explicação disponível.');
             } else if (this.isSidebarOpen) {
                 this.closeSidebar();
             }
@@ -849,6 +860,10 @@ class MindMapViewer {
             this.sidebarContent.textContent = content;
             this.sidebar.classList.add('open');
             this.isSidebarOpen = true;
+            // Mostra o botão de adicionar nó quando a sidebar é aberta
+            if (this.addNodeButton) {
+                this.addNodeButton.style.display = 'block';
+            }
         }
     }
 
@@ -856,7 +871,44 @@ class MindMapViewer {
         if (this.sidebar) {
             this.sidebar.classList.remove('open');
             this.isSidebarOpen = false;
+            this.currentSelectedD3Node = null; // Limpa o nó selecionado ao fechar
+            // Esconde o botão de adicionar nó quando a sidebar é fechada
+            if (this.addNodeButton) {
+                this.addNodeButton.style.display = 'none';
+            }
         }
+    }
+
+    // NOVO: Função para adicionar um nó filho
+    addChildNode() {
+        if (!this.currentSelectedD3Node) {
+            alert('Por favor, selecione um nó para adicionar um filho.');
+            return;
+        }
+
+        const newChildName = prompt('Digite o nome do novo nó filho:');
+        if (newChildName === null || newChildName.trim() === '') {
+            return; // Usuário cancelou ou inseriu nome vazio
+        }
+
+        const newChildData = {
+            name: newChildName,
+            explanation: 'Nova explicação para ' + newChildName,
+            children: []
+        };
+
+        // Adiciona o novo nó aos dados do nó pai
+        if (!this.currentSelectedD3Node.data.children) {
+            this.currentSelectedD3Node.data.children = [];
+        }
+        this.currentSelectedD3Node.data.children.push(newChildData);
+
+        // Atualiza os dados no localStorage
+        localStorage.setItem('mindMapData', JSON.stringify(this.data));
+
+        // Redesenha o mapa mental para incluir o novo nó
+        this.drawMindMap();
+        this.closeSidebar(); // Fecha a sidebar após adicionar o nó
     }
 
     // NOVO: Função para exportar JSON para a página de Markdown

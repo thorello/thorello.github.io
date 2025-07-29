@@ -325,6 +325,29 @@
             /* Roxo mais escuro no hover */
         }
 
+        /* NOVO: Estilo para o botão de adicionar nó filho na sidebar */
+        #add-node-button {
+            background-color: #28a745;
+            /* Verde */
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            /* Espaçamento do conteúdo */
+            width: 100%;
+            display: none;
+            /* Inicia escondido */
+        }
+
+        #add-node-button:hover {
+            background-color: #218838;
+            /* Verde escuro no hover */
+        }
+
 
         /* Esconder o input file real */
         #jsonUpload {
@@ -419,6 +442,7 @@
         <button id="sidebar-close">&times;</button>
         <h2 id="sidebar-title"></h2>
         <p id="sidebar-content"></p>
+        <button id="add-node-button">+</button>
     </div>
 
     <div id="action-menu-container">
