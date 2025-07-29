@@ -191,6 +191,31 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
+        /* NOVO: Estilos para o botão de Voltar - Topo esquerdo */
+        #back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            background-color: #6c757d;
+            /* Um cinza neutro */
+            border: none;
+            color: #ffffff;
+            padding: 8px 16px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        #back-button:hover {
+            background-color: #5a6268;
+            /* Um cinza um pouco mais escuro no hover */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
 
         /* Responsive rules for mobile devices */
         @media (max-width: 768px) {
@@ -223,6 +248,12 @@
                 padding: 0;
                 /* Remover padding no mobile */
             }
+
+            #back-button {
+                padding: 6px 12px;
+                /* Ajuste para telas menores */
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -235,6 +266,7 @@
     </div>
 
     <button id="export-pdf-button">Exportar PDF</button>
+    <button id="back-button" onclick="window.location.href='api.html'">Voltar</button>
 
     <div id="mindmap-container"></div>
 

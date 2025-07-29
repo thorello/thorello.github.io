@@ -5,96 +5,300 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Análise de Conteúdo com Gemini</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Variáveis CSS para Cores e Espaçamento */
+        :root {
+            --primary-blue: #1877f2;
+            --darker-blue: #166fe5;
+            --light-gray: #f0f2f5;
+            --medium-gray: #dddfe2;
+            --dark-gray-text: #1c1e21;
+            --label-color: #606770;
+            --white: #ffffff;
+            --success-green: #28a745;
+
+            --spacing-sm: 10px;
+            --spacing-md: 15px;
+            --spacing-lg: 20px;
+            --spacing-xl: 30px;
+        }
+
+        /* Reset Básico e Fontes */
+        html {
+            /* Definimos 100% de altura para o html */
+            height: 100%;
+            /* A rolagem horizontal é sempre oculta */
+            overflow-x: hidden;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
-            color: #1c1e21;
+            margin: 0;
+            padding: 0;
+            /* Definimos 100% de altura para o body também */
+            min-height: 100vh;
+            /* Garante que o body tenha pelo menos a altura da viewport */
+            /* CORREÇÃO CHAVE: Permite rolagem vertical apenas no body se o conteúdo exceder */
+            overflow-y: auto;
+
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray-text);
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+            /* Alinha o container ao topo */
+            padding: var(--spacing-lg);
+            /* Padding ao redor do container, dentro do body */
+            box-sizing: border-box;
+            /* Garante que padding não adicione largura */
         }
 
+        /* Container Principal */
         .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: var(--white);
+            padding: var(--spacing-xl);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 900px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #1877f2;
-            margin-bottom: 25px;
-            font-size: 24px;
-        }
-
-        input,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #dddfe2;
-            margin-bottom: 15px;
-            font-size: 16px;
+            max-width: 960px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            /* CORREÇÃO AQUI: Removemos min-height ou height fixos no container */
+            /* Permitindo que ele se adapte ao conteúdo e o body role */
+            /* Apenas um min-height muito pequeno para que ele não suma */
+            min-height: 50vh;
+            /* Um valor que garanta alguma visibilidade inicial, mas permita o crescimento */
             box-sizing: border-box;
         }
 
+        /* Título */
+        h1 {
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: var(--spacing-md);
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        /* Elementos de Formulário Base */
+        input[type="password"],
+        input[type="url"],
         textarea {
+            width: 100%;
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            border: 1px solid var(--medium-gray);
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.2);
+        }
+
+        /* Textarea de Entrada e Saída */
+        textarea#inputText {
+            min-height: 120px;
             resize: vertical;
         }
 
+        .output-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            margin-top: var(--spacing-md);
+        }
+
+        textarea#outputText {
+            flex-grow: 1;
+            min-height: 200px;
+            resize: vertical;
+            background-color: var(--light-gray);
+            border: 1px solid var(--medium-gray);
+            padding: var(--spacing-md);
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            /* CORREÇÃO AQUI: Permite rolagem interna para o textarea de saída */
+            overflow: auto;
+        }
+
+        /* Botões */
         button {
             width: 100%;
-            padding: 15px;
-            background-color: #1877f2;
-            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background-color: var(--primary-blue);
+            color: var(--white);
             border: none;
             border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            flex-shrink: 0;
         }
 
         button:hover {
-            background-color: #166fe5;
+            background-color: var(--darker-blue);
+            transform: translateY(-2px);
         }
 
         button:disabled {
-            background-color: #9e9e9e;
+            background-color: #a0c3f7;
             cursor: not-allowed;
+            transform: none;
         }
 
-        .output-container {
-            margin-top: 25px;
+        #createMapButton {
+            background-color: var(--success-green);
         }
 
+        #createMapButton:hover {
+            background-color: #218838;
+        }
+
+        /* Labels */
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #606770;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+            color: var(--label-color);
+            font-size: 0.95rem;
         }
 
+        /* Indicador de Loading */
         #loading {
             text-align: center;
             display: none;
-            margin: 20px 0;
-            font-size: 16px;
-            color: #606770;
+            margin: var(--spacing-lg) 0;
+            font-size: 1rem;
+            color: var(--label-color);
         }
 
-        .api-key-container {
-            background-color: #f0f2f5;
-            padding: 15px;
+        /* Seções Específicas */
+        .api-key-container,
+        .file-upload-container,
+        .url-input-container {
+            background-color: var(--light-gray);
+            padding: var(--spacing-md);
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .api-key-container input,
+        .url-input-container input {
+            margin-bottom: 0;
+        }
+
+        /* Upload de Arquivos */
+        .file-upload-container {
+            margin-top: 0;
+        }
+
+        .file-upload-container input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-container label.upload-button {
+            background-color: #007bff;
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-block;
+            font-size: 1rem;
+            font-weight: normal;
+            transition: background-color 0.3s;
+            width: auto;
+            margin-right: var(--spacing-sm);
+        }
+
+        .file-upload-container label.upload-button:hover {
+            background-color: #0056b3;
+        }
+
+        .file-name {
+            font-style: italic;
+            color: #555;
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-upload-info {
+            font-size: 0.85rem;
+            color: #777;
+            margin-top: var(--spacing-sm);
+        }
+
+        /* Adicionado para centralizar e alinhar o botão de upload e o nome do arquivo */
+        .file-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        /* Media Queries para Responsividade */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--spacing-md);
+            }
+
+            .container {
+                padding: var(--spacing-lg);
+                min-height: auto;
+                /* Permitir que o container se ajuste mais livremente */
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            button {
+                font-size: 1rem;
+                padding: 12px;
+            }
+
+            input,
+            textarea {
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+
+            .file-upload-container label.upload-button {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: var(--spacing-md);
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            label {
+                font-size: 0.9rem;
+            }
+
+            .file-upload-info {
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
@@ -102,46 +306,80 @@
 <body>
 
     <div class="container">
-        <h1>Analisador e Estruturador de Conteúdo JSON</h1>
+        <header>
+            <h1>Analisador e Estruturador de Conteúdo JSON</h1>
+        </header>
 
-        <form id="analysis-form">
+        <main>
+            <form id="analysis-form">
 
-            <div class="api-key-container">
-                <label for="apiKey">Sua Chave de API do Google AI Studio:</label>
-                <input type="password" id="apiKey" placeholder="Cole sua chave de API aqui" required>
+                <section class="api-key-container">
+                    <label for="apiKey">Sua Chave de API do Google AI Studio:</label>
+                    <input type="password" id="apiKey" placeholder="Cole sua chave de API aqui" required>
+                </section>
+
+                <section>
+                    <label for="inputText">Cole o conteúdo a ser analisado, insira uma URL ou faça upload de um
+                        arquivo:</label>
+                    <textarea id="inputText"
+                        placeholder="Insira o texto que você deseja que o Gemini analise e estruture..."></textarea>
+                </section>
+
+                <section class="url-input-container">
+                    <input type="url" id="urlInput"
+                        placeholder="Ou insira a URL de uma página para análise profunda...">
+                </section>
+
+                <section class="file-upload-container">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileUpload" accept=".pdf,.txt,.doc,.docx,.md">
+                        <label for="fileUpload" class="upload-button">Escolher Arquivo</label>
+                        <span id="fileNameDisplay" class="file-name">Nenhum arquivo selecionado</span>
+                    </div>
+                    <p class="file-upload-info">Formatos suportados para leitura direta: .txt, .md. Outros formatos
+                        (.pdf, .doc, .docx) não podem ser lidos diretamente pelo navegador nesta aplicação. Você pode
+                        copiar o
+                        conteúdo e colar no campo de texto.</p>
+                </section>
+
+                <button type="submit" id="submitButton">Analisar e Gerar JSON</button>
+            </form>
+
+            <div id="loading">
+                <p>Analisando... Por favor, aguarde. Isso pode levar alguns segundos.</p>
             </div>
 
-            <label for="inputText">Cole o conteúdo a ser analisado abaixo:</label>
-            <textarea id="inputText" rows="15"
-                placeholder="Insira o texto que você deseja que o Gemini analise e estruture..."></textarea>
+            <section class="output-container">
+                <label for="outputText">Resultado da Análise (JSON):</label>
+                <textarea id="outputText" placeholder="A estrutura JSON gerada pela API aparecerá aqui..."></textarea>
+            </section>
+            <br>
 
-            <button type="submit" id="submitButton">Analisar e Gerar JSON</button>
-        </form>
-
-        <div id="loading">
-            <p>Analisando... Por favor, aguarde. Isso pode levar alguns segundos.</p>
-        </div>
-
-        <div class="output-container">
-            <label for="outputText">Resultado da Análise (JSON):</label>
-            <textarea id="outputText" rows="20" readonly
-                placeholder="A estrutura JSON gerada pela API aparecerá aqui..."></textarea>
-        </div>
+            <button type="button" id="createMapButton">
+                Criar Mapa Mental
+            </button>
+        </main>
     </div>
 
-    <script>
-        // --- LÓGICA JAVASCRIPT ATUALIZADA ---
+    <script type="module">
+        // Importe promptBase do seu arquivo prompts.js
+        import { promptBase } from './prompts.js';
 
-        // 1. Seleciona os elementos da página, incluindo o novo campo da API Key
+        // 1. Seleciona os elementos da página
         const analysisForm = document.getElementById('analysis-form');
-        const apiKeyInput = document.getElementById('apiKey'); // NOVO
+        const apiKeyInput = document.getElementById('apiKey');
         const inputText = document.getElementById('inputText');
+        const urlInput = document.getElementById('urlInput');
         const outputText = document.getElementById('outputText');
         const submitButton = document.getElementById('submitButton');
         const loadingIndicator = document.getElementById('loading');
+        const createMapButton = document.getElementById('createMapButton');
+        const fileUploadInput = document.getElementById('fileUpload');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+
+        let fileContent = null; // Variável para armazenar o conteúdo do arquivo
 
         // --- MELHORIA: LEMBRAR A CHAVE DA API ---
-        // Quando a página carrega, verifica se existe uma chave salva no navegador
         window.addEventListener('load', () => {
             const savedApiKey = localStorage.getItem('geminiApiKey');
             if (savedApiKey) {
@@ -153,51 +391,38 @@
         analysisForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
-            // Pega a chave da API diretamente do campo de input
-            const API_KEY = apiKeyInput.value.trim(); // NOVO
-            const userText = inputText.value.trim();
+            const API_KEY = apiKeyInput.value.trim();
+            const urlToAnalyze = urlInput.value.trim();
+            let contentToAnalyze = fileContent || inputText.value.trim();
 
             if (!API_KEY) {
                 alert('Por favor, insira sua chave de API para continuar.');
                 return;
             }
-            if (!userText) {
-                alert('Por favor, insira um texto para analisar.');
+
+            // Lógica para determinar a fonte do conteúdo
+            if (urlToAnalyze) {
+                loadingIndicator.querySelector('p').textContent = 'Buscando conteúdo da URL...';
+                showLoading(true);
+                contentToAnalyze = await fetchContentFromUrl(urlToAnalyze);
+                if (!contentToAnalyze) {
+                    alert('Não foi possível carregar o conteúdo da URL. Verifique se a URL está correta e se a página permite CORS.');
+                    showLoading(false);
+                    return;
+                }
+            } else if (!contentToAnalyze) {
+                alert('Por favor, insira um texto para analisar, uma URL ou faça upload de um arquivo.');
                 return;
             }
 
-            // --- MELHORIA: SALVAR A CHAVE NO NAVEGADOR ---
             localStorage.setItem('geminiApiKey', API_KEY);
 
-            submitButton.disabled = true;
-            submitButton.textContent = 'Analisando...';
-            loadingIndicator.style.display = 'block';
+            showLoading(true);
+            loadingIndicator.querySelector('p').textContent = 'Analisando... Por favor, aguarde. Isso pode levar alguns segundos.';
             outputText.value = '';
+            createMapButton.disabled = true;
 
-            const promptBase = `Por favor, analise o conteúdo do arquivo anexo. Crie uma estrutura JSON hierárquica que resuma densa, completa e objetivamente todo o conteúdo do arquivo.
-
-O nome do nó raiz ("name") deve ser atribuído por você, de forma coerente com o nome do arquivo e com o conteúdo.
-
-Cada "name" (título do tópico) em todos os níveis da hierarquia não pode ter mais de 35 caracteres. A "explanation" (explicação do tópico) deve ser densa, completa e objetiva.
-
-Podem haver quantos nós filhos ("children") e sub-nós forem necessários para cobrir todos os detalhes do conteúdo.
-
-**Importante:** A resposta deve conter *apenas* a estrutura JSON. Não inclua citações como , introduções ou qualquer texto adicional antes ou depois do JSON. Não inclua citações de hiperlinks da fonte.
-
-A estrutura JSON final deve seguir exatamente este formato:
-
-\`\`\`json
-{
-  "name": "Root Node Name",
-  "explanation": "Explanation for the root node.",
-  "children": []
-}
-\`\`\`
-
----
-CONTEÚDO PARA ANÁLISE:
-`;
-            const fullPrompt = promptBase + "\n" + userText;
+            const fullPrompt = promptBase + "\n" + contentToAnalyze;
 
             const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
 
@@ -212,28 +437,178 @@ CONTEÚDO PARA ANÁLISE:
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(`Erro na API: ${errorData.error.message}`);
+                    throw new Error(`Erro na API: ${errorData.error.message || response.statusText}`);
                 }
 
                 const data = await response.json();
                 let resultText = data.candidates[0].content.parts[0].text;
-                resultText = resultText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
+
+                const firstBrace = resultText.indexOf('{');
+                const lastBrace = resultText.lastIndexOf('}');
+
+                if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                    resultText = resultText.substring(firstBrace, lastBrace + 1);
+                } else {
+                    resultText = resultText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
+                }
 
                 try {
                     const parsedJson = JSON.parse(resultText);
                     outputText.value = JSON.stringify(parsedJson, null, 2);
+                    createMapButton.disabled = false;
                 } catch (e) {
-                    outputText.value = resultText;
+                    outputText.value = `Erro ao analisar JSON. Verifique a saída bruta:\n\n${resultText}\n\nDetalhes do erro: ${e.message}`;
+                    createMapButton.disabled = true;
                 }
             } catch (error) {
                 console.error('Erro ao chamar a API do Gemini:', error);
                 outputText.value = `Ocorreu um erro ao processar sua solicitação:\n\n${error.message}`;
+                createMapButton.disabled = true;
             } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Analisar e Gerar JSON';
-                loadingIndicator.style.display = 'none';
+                showLoading(false);
             }
         });
+
+        // Função para mostrar/esconder o loading
+        function showLoading(isLoading) {
+            submitButton.disabled = isLoading;
+            submitButton.textContent = isLoading ? 'Analisando...' : 'Analisar e Gerar JSON';
+            loadingIndicator.style.display = isLoading ? 'block' : 'none';
+        }
+
+        // --- LÓGICA PARA O BOTÃO "CRIAR MAPA MENTAL" ---
+        createMapButton.addEventListener('click', () => {
+            const jsonContent = outputText.value;
+            if (!jsonContent) {
+                alert("Não há conteúdo JSON para criar o mapa mental.");
+                return;
+            }
+
+            try {
+                JSON.parse(jsonContent);
+
+                localStorage.setItem('mindMapData', jsonContent);
+
+                window.location.href = 'index.html';
+
+            } catch (error) {
+                alert("O conteúdo na área de resultado não é um JSON válido. Não é possível criar o mapa.");
+            }
+        });
+
+        // --- Lógica para o upload de arquivos ---
+        fileUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
+                inputText.value = '';
+                inputText.disabled = false;
+                urlInput.disabled = false;
+                fileContent = null;
+                return;
+            }
+
+            fileNameDisplay.textContent = file.name;
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+
+            inputText.disabled = true;
+            urlInput.disabled = true;
+            urlInput.value = '';
+
+            if (fileExtension === 'txt' || fileExtension === 'md') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    fileContent = e.target.result;
+                    inputText.value = `Conteúdo de '${file.name}' carregado. Clique em "Analisar" para processar.`;
+                };
+                reader.onerror = (e) => {
+                    console.error("Erro ao ler o arquivo:", e);
+                    alert("Erro ao ler o arquivo. Por favor, tente novamente.");
+                    fileNameDisplay.textContent = 'Erro na leitura do arquivo';
+                    inputText.disabled = false;
+                    urlInput.disabled = false;
+                    inputText.value = '';
+                    fileContent = null;
+                };
+                reader.readAsText(file);
+            } else {
+                alert(`O tipo de arquivo ".${fileExtension}" não pode ser lido diretamente pelo navegador nesta aplicação. Por favor, copie o texto e cole no campo acima ou use um arquivo .txt ou .md.`);
+                fileNameDisplay.textContent = 'Formato não suportado para leitura direta';
+                inputText.disabled = false;
+                urlInput.disabled = false;
+                inputText.value = '';
+                fileUploadInput.value = '';
+                fileContent = null;
+            }
+        });
+
+        // Habilitar/Desabilitar campos com base na entrada do usuário
+        inputText.addEventListener('input', () => {
+            if (inputText.value.trim() !== '') {
+                urlInput.disabled = true;
+                fileUploadInput.disabled = true;
+                fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
+                fileUploadInput.value = '';
+                fileContent = null;
+            } else if (!urlInput.value.trim() && !fileContent) {
+                urlInput.disabled = false;
+                fileUploadInput.disabled = false;
+            }
+        });
+
+        urlInput.addEventListener('input', () => {
+            if (urlInput.value.trim() !== '') {
+                inputText.disabled = true;
+                fileUploadInput.disabled = true;
+                fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
+                fileUploadInput.value = '';
+                fileContent = null;
+            } else if (!inputText.value.trim() && !fileContent) {
+                inputText.disabled = false;
+                fileUploadInput.disabled = false;
+            }
+        });
+
+        inputText.addEventListener('change', () => {
+            if (inputText.value.trim() === '') {
+                urlInput.disabled = false;
+                fileUploadInput.disabled = false;
+            }
+        });
+
+        urlInput.addEventListener('change', () => {
+            if (urlInput.value.trim() === '') {
+                inputText.disabled = false;
+                fileUploadInput.disabled = false;
+            }
+        });
+
+        // --- NOVA FUNÇÃO: FETCH DO CONTEÚDO DA URL ---
+        async function fetchContentFromUrl(url) {
+            try {
+                const proxyUrl = 'https://api.allorigins.win/get?url=';
+                const response = await fetch(proxyUrl + encodeURIComponent(url));
+
+                if (!response.ok) {
+                    console.error(`Erro ao buscar a URL: ${response.status} ${response.statusText}`);
+                    return null;
+                }
+
+                const data = await response.json();
+                const htmlContent = data.contents;
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+
+                doc.querySelectorAll('script, style, noscript, svg, button, img').forEach(el => el.remove());
+
+                return doc.body.textContent.replace(/\s+/g, ' ').trim();
+
+            } catch (error) {
+                console.error('Erro ao buscar ou parsear o conteúdo da URL:', error);
+                return null;
+            }
+        }
     </script>
 
 </body>

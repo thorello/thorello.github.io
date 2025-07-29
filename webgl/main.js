@@ -32,7 +32,7 @@ const CONFIG = {
         min: 0.05,  // Permite mais zoom out (mais longe)
         max: 8,     // Permite mais zoom in (mais perto)
     },
-    horizontalNodePadding: 70, // Base padding between nodes horizontally
+    horizontalNodePadding: 0, // Base padding between nodes horizontally
     verticalNodeSpacing: 50, // Vertical spacing between parent and child nodes
     depth1HorizontalOffset: 80 // Offset fixo para nós na profundidade 1
 };
@@ -825,7 +825,7 @@ class MindMapViewer {
 }
 
 
-// --- INICIALIZAÇÃO ---
+// --- INICIALIZAÇÃO (MODIFICADA) ---
 document.addEventListener('DOMContentLoaded', () => {
     const mindmapContainer = document.getElementById('mindmap-container');
     if (!mindmapContainer) {
@@ -833,20 +833,42 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Fetch the mind map data from the JSON file
-    fetch('mindmap.json') // Adjust the path if your file is in a different directory
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
+    // Tenta carregar os dados do localStorage primeiro
+    const storedData = localStorage.getItem('mindMapData');
+
+    if (storedData) {
+        // Se encontrou dados, usa-os e depois limpa o storage
+        console.log("Dados do mapa mental encontrados no localStorage. Carregando...");
+        localStorage.removeItem('mindMapData'); // Limpa para não usar novamente
+        try {
+            const data = JSON.parse(storedData);
             new MindMapViewer(mindmapContainer, data);
-        })
-        .catch(error => {
-            console.error('Error loading mind map data:', error);
-            // Optionally display an error message to the user
-            mindmapContainer.innerHTML = '<p style="color: red;">Error loading mind map data. Please try again later.</p>';
-        });
+        } catch (error) {
+            console.error('Falha ao parsear os dados do mapa mental do localStorage:', error);
+            mindmapContainer.innerHTML = '<p style="color: red;">Erro ao carregar dados da página anterior. Carregando mapa padrão.</p>';
+            loadDefaultMindMap(); // Carrega o mapa padrão como fallback
+        }
+    } else {
+        // Se não encontrou dados, carrega o arquivo padrão
+        console.log("Nenhum dado no localStorage. Carregando mapa mental padrão de 'mindmap.json'.");
+        loadDefaultMindMap();
+    }
+
+    // Função para carregar o mapa mental padrão
+    function loadDefaultMindMap() {
+        fetch('mindmap.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                new MindMapViewer(mindmapContainer, data);
+            })
+            .catch(error => {
+                console.error('Erro ao carregar os dados do mapa mental padrão:', error);
+                mindmapContainer.innerHTML = '<p style="color: red;">Erro ao carregar o mapa mental. Por favor, tente novamente mais tarde.</p>';
+            });
+    }
 });
