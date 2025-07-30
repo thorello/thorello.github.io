@@ -76,6 +76,8 @@ class MindMapViewer {
     constructor(container, data) {
         this.container = container;
         this.data = data;
+        this.addNodeButton = document.getElementById('add-node-button');
+        this.aiNewMapButtonContainer = document.getElementById('ai-new-map-button-container');
 
         // --- Estado ---
         this.nodeMap = new Map();
@@ -907,6 +909,15 @@ class MindMapViewer {
 
         if (this.addNodeButton) {
             this.addNodeButton.style.display = 'block';
+        }
+
+        // NEW: Conditionally show/hide 'Novo Mapa Mental com IA' button
+        if (this.aiNewMapButtonContainer) {
+            if (this.currentSelectedD3Node && this.currentSelectedD3Node.depth === 0) {
+                this.aiNewMapButtonContainer.style.display = 'block';
+            } else {
+                this.aiNewMapButtonContainer.style.display = 'none';
+            }
         }
     }
 
