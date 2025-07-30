@@ -408,6 +408,18 @@ class MindMapViewer {
         }
     }
 
+    // NOVO: Método auxiliar para encontrar um d3Node correspondente aos dados de um nó
+    _findD3NodeByData(targetData) {
+        let foundNode = null;
+        this.d3RootNode.each(d3Node => {
+            if (d3Node.data === targetData) {
+                foundNode = d3Node;
+                return false; // Para a iteração
+            }
+        });
+        return foundNode;
+    }
+
     // --- LÓGICA PRINCIPAL ---
 
     async drawMindMap() {
@@ -448,6 +460,7 @@ class MindMapViewer {
         const d3Links = this.d3RootNode.links();
         const d3Nodes = this.d3RootNode.descendants();
 
+        // Aplicar o layout D3 para nós sem posições persistidas ou como fallback
         const originalChildren = this.d3RootNode.children || [];
         if (originalChildren.length > 0) {
             const leftCount = Math.ceil(originalChildren.length / 2);
@@ -515,41 +528,50 @@ class MindMapViewer {
             const nodeGroup = this.nodeMap.get(d3Node);
             if (!nodeGroup) return;
 
-            const direction = nodeGroup.userData.direction;
-            const nodeWidth = CONFIG.FIXED_NODE_WIDTH;
-
-            let finalNodeX = 0;
-            let finalNodeY = 0;
-
-            if (d3Node.depth === 0) {
-                finalNodeX = 0;
-                finalNodeY = 0;
+            // NOVO: Usar posições persistidas se existirem
+            if (d3Node.data.persistedX !== undefined && d3Node.data.persistedY !== undefined) {
+                nodeGroup.position.set(d3Node.data.persistedX, d3Node.data.persistedY, 0);
             } else {
-                finalNodeY = d3Node.userData.d3X;
+                // Lógica de posicionamento existente do D3
+                const direction = nodeGroup.userData.direction;
+                const nodeWidth = CONFIG.FIXED_NODE_WIDTH;
 
-                let previousNodeWidthForSpacing = CONFIG.FIXED_NODE_WIDTH;
+                let finalNodeX = 0;
+                let finalNodeY = 0;
 
-                if (d3Node.depth === 1) {
-                    const rootNodeGroup = this.nodeMap.get(this.d3RootNode);
-                    const rootWidth = rootNodeGroup ? CONFIG.FIXED_NODE_WIDTH : 0;
-                    finalNodeX = (rootWidth / 2) * direction + CONFIG.depth1HorizontalOffset * direction + (nodeWidth / 2) * direction;
-                } else if (d3Node.depth >= 2 && d3Node.parent) {
-                    const parentGroup = this.nodeMap.get(d3Node.parent);
-                    if (parentGroup) {
-                        const parentWidth = CONFIG.FIXED_NODE_WIDTH;
-                        const parentDir = parentGroup.userData.direction;
-                        let connectionPointX = parentGroup.position.x;
-                        if (parentDir !== 0) {
-                            connectionPointX += (parentWidth / 2) * parentDir;
-                        } else {
-                            connectionPointX += (parentWidth / 2) * direction;
+                if (d3Node.depth === 0) {
+                    finalNodeX = 0;
+                    finalNodeY = 0;
+                } else {
+                    finalNodeY = d3Node.userData.d3X; // O D3 X é o Y no seu sistema Three.js
+
+                    let previousNodeWidthForSpacing = CONFIG.FIXED_NODE_WIDTH;
+
+                    if (d3Node.depth === 1) {
+                        const rootNodeGroup = this.nodeMap.get(this.d3RootNode);
+                        const rootWidth = rootNodeGroup ? CONFIG.FIXED_NODE_WIDTH : 0;
+                        finalNodeX = (rootWidth / 2) * direction + CONFIG.depth1HorizontalOffset * direction + (nodeWidth / 2) * direction;
+                    } else if (d3Node.depth >= 2 && d3Node.parent) {
+                        const parentGroup = this.nodeMap.get(d3Node.parent);
+                        if (parentGroup) {
+                            const parentWidth = CONFIG.FIXED_NODE_WIDTH;
+                            const parentDir = parentGroup.userData.direction;
+                            let connectionPointX = parentGroup.position.x;
+                            if (parentDir !== 0) {
+                                connectionPointX += (parentWidth / 2) * parentDir;
+                            } else {
+                                connectionPointX += (parentWidth / 2) * direction;
+                            }
+                            let spacingNeeded = (nodeWidth / 2) + (previousNodeWidthForSpacing / 2) + CONFIG.horizontalNodePadding;
+                            finalNodeX = connectionPointX + (spacingNeeded * direction);
                         }
-                        let spacingNeeded = (nodeWidth / 2) + (previousNodeWidthForSpacing / 2) + CONFIG.horizontalNodePadding;
-                        finalNodeX = connectionPointX + (spacingNeeded * direction);
                     }
+                    // Salvar a posição inicial calculada pelo D3 se ainda não houver uma persistida
+                    d3Node.data.persistedX = finalNodeX;
+                    d3Node.data.persistedY = finalNodeY;
                 }
+                nodeGroup.position.set(finalNodeX, finalNodeY, 0);
             }
-            nodeGroup.position.set(finalNodeX, finalNodeY, 0);
             this.mainGroup.add(nodeGroup);
         });
 
@@ -560,6 +582,10 @@ class MindMapViewer {
         this.mainGroup.position.sub(center);
 
         this.camera.updateProjectionMatrix();
+
+        // Salvar os dados após o draw, garantindo que as posições calculadas
+        // (ou as persistidas) estejam no localStorage.
+        localStorage.setItem('mindMapData', JSON.stringify(this.data));
     }
 
     /**
@@ -711,6 +737,14 @@ class MindMapViewer {
                 }
             }
         }
+        if (this.isDraggingNode && this.selectedNode) { // Salvar a posição do nó arrastado
+            const d3Node = this.selectedNode.userData.d3Node;
+            if (d3Node) {
+                d3Node.data.persistedX = this.selectedNode.position.x;
+                d3Node.data.persistedY = this.selectedNode.position.y;
+                localStorage.setItem('mindMapData', JSON.stringify(this.data)); // Salva os dados atualizados
+            }
+        }
         this.selectedNode = null;
         this.isDraggingNode = false;
         this.isPanning = false;
@@ -833,6 +867,14 @@ class MindMapViewer {
                 this.closeSidebar();
             }
         }
+        if (this.isDraggingNode && this.selectedNode) { // Salvar a posição do nó arrastado
+            const d3Node = this.selectedNode.userData.d3Node;
+            if (d3Node) {
+                d3Node.data.persistedX = this.selectedNode.position.x;
+                d3Node.data.persistedY = this.selectedNode.position.y;
+                localStorage.setItem('mindMapData', JSON.stringify(this.data)); // Salva os dados atualizados
+            }
+        }
         this.isDraggingNode = false;
         this.isPanning = false;
         this._isPinching = false;
@@ -915,8 +957,6 @@ class MindMapViewer {
             this.sidebarContent.textContent = newValue || 'Nenhuma explicação disponível.';
         }
 
-        localStorage.setItem('mindMapData', JSON.stringify(this.data));
-
         // Espera o mapa ser completamente redesenhado
         await this.drawMindMap();
 
@@ -960,8 +1000,6 @@ class MindMapViewer {
             this.currentSelectedD3Node.data.children = [];
         }
         this.currentSelectedD3Node.data.children.push(newChildData);
-
-        localStorage.setItem('mindMapData', JSON.stringify(this.data));
 
         this.drawMindMap().then(() => {
             let nodeGroupToFocus = null;
