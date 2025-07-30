@@ -26,6 +26,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, { passive: true });
 
+        // --- Nova lógica para fechar o menu ao clicar em um item ---
+        // Seleciona todos os botões e rótulos dentro do #menu-content
+        const menuItems = menuContainer.querySelectorAll('#menu-content button, #menu-content label');
+
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                menuContainer.classList.remove('open');
+            });
+        });
+
     } else {
         console.warn("Menu elements (action-menu-container or menu-toggle-button) not found. Menu functionality may be limited.");
     }

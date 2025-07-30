@@ -1,5 +1,105 @@
 {
-    "name": "Clique aqui",
-    "definition": "Crie um novo nó ou adicione um mapa via IA",
-    "children": []
+    "name": "Clique aqui para começar seu novo mapa mental",
+    "definition": "Este é o ponto de partida do seu mapa mental. Aqui você pode editar este nó ou usar a Inteligência Artificial para gerar um novo mapa a partir de um texto ou URL. Você pode navegar, editar nós existentes e adicionar novos, seja manualmente ou com a ajuda da IA. Explore o menu 'Ações' no canto superior direito para salvar, importar e exportar seu mapa.",
+    "children": [
+        {
+            "name": "Como Navegar no Mapa",
+            "definition": "Explore seu mapa mental com facilidade usando os controles de navegação.",
+            "children": [
+                {
+                    "name": "Zoom",
+                    "definition": "Use a roda do mouse para aproximar ou afastar. Em dispositivos touch, faça o movimento de 'pinça' (pinching) com dois dedos para controlar o zoom.",
+                    "children": []
+                },
+                {
+                    "name": "Mover (Pan)",
+                    "definition": "Clique e arraste a tela com o mouse para mover o mapa. Em dispositivos touch, use um dedo para arrastar a tela e mover o mapa.",
+                    "children": []
+                },
+                {
+                    "name": "Arrastar Nós",
+                    "definition": "Para reorganizar seu mapa, clique no pequeno círculo cinza ao lado de um nó e arraste-o para a nova posição. Todo o sub-mapa conectado a ele se moverá junto. Suas posições serão salvas automaticamente.",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "Como Editar Nós",
+            "definition": "Personalize o conteúdo de cada nó do seu mapa mental.",
+            "children": [
+                {
+                    "name": "Abrir o Pop-up de Edição",
+                    "definition": "Clique em qualquer nó do mapa para abrir a janela de detalhes e edição. Ela mostrará o 'Nome' (título) e a 'Explicação' (conteúdo) do nó.",
+                    "children": []
+                },
+                {
+                    "name": "Editar Nome ou Explicação",
+                    "definition": "Dentro do pop-up, clique no ícone de lápis ao lado do 'Nome' ou da 'Explicação' para ativar o modo de edição. Digite suas alterações e clique em 'Salvar' para aplicá-las. Se mudar de ideia, clique em 'Cancelar'.",
+                    "children": []
+                },
+                {
+                    "name": "Adicionar um Novo Filho (Manual)",
+                    "definition": "Com um nó selecionado e o pop-up aberto, clique no botão 'Adicionar Filho'. Será pedido um nome para o novo nó. Ele será adicionado como filho do nó selecionado e você poderá editá-lo em seguida.",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "Utilizando a Inteligência Artificial (IA)",
+            "definition": "Expanda seu mapa mental ou crie um novo usando o poder da IA.",
+            "children": [
+                {
+                    "name": "Novo Mapa Mental com IA",
+                    "definition": "No pop-up do nó principal (este nó), clique em 'Novo Mapa Mental com IA'. Você será direcionado a uma página onde pode colar sua Chave de API do Google AI Studio (Gemini) e inserir um texto ou URL. A IA analisará o conteúdo e criará um novo mapa mental para você.",
+                    "children": []
+                },
+                {
+                    "name": "Adicionar Filhos com IA",
+                    "definition": "Para um nó secundário (qualquer nó que não seja o principal), abra o pop-up de edição e clique em 'Adicionar nodes com IA'. A IA vai analisar o conteúdo do nó selecionado e sugerir novos nós filhos relevantes, expandindo seu mapa automaticamente.",
+                    "children": []
+                },
+                {
+                    "name": "Chave de API do Google AI Studio (Gemini)",
+                    "definition": "Para usar as funcionalidades de IA, você precisará de uma chave de API do Google AI Studio. Guarde-a em local seguro e insira-a na página de 'Novo Mapa Mental com IA' quando for solicitado. A chave será salva no seu navegador para uso futuro.",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "Menu de Ações (Canto Superior Direito)",
+            "definition": "Acesse diversas opções para gerenciar seu mapa mental.",
+            "children": [
+                {
+                    "name": "Importar Mapa",
+                    "definition": "Carrega um mapa mental de um arquivo JSON salvo no seu computador. Clique e selecione o arquivo.",
+                    "children": []
+                },
+                {
+                    "name": "Salvar Mapa",
+                    "definition": "Salva o mapa mental atual como um arquivo JSON no seu computador, permitindo que você o importe mais tarde.",
+                    "children": []
+                },
+                {
+                    "name": "Exportar PDF",
+                    "definition": "Cria um documento PDF do seu mapa mental atual, útil para impressão ou compartilhamento.",
+                    "children": []
+                },
+                {
+                    "name": "Criar Relatório (Markdown)",
+                    "definition": "Transforma o conteúdo do seu mapa mental em um formato de texto estruturado (Markdown), que pode ser facilmente copiado para documentos ou notas.",
+                    "children": []
+                },
+                {
+                    "name": "Recalcular Mapa",
+                    "definition": "Organiza automaticamente todos os nós do mapa mental, desconsiderando as posições que você arrastou manualmente. Útil para uma organização limpa.",
+                    "children": []
+                },
+                {
+                    "name": "Novo Mapa",
+                    "definition": "Inicia um mapa mental completamente novo, limpando o mapa atual.",
+                    "children": []
+                }
+            ]
+        }
+    ]
 }
