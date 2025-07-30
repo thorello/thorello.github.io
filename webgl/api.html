@@ -2,12 +2,26 @@
 <html lang="pt-br">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Análise de Conteúdo com Gemini</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    </script>
     <style>
         /* Variáveis CSS para Cores e Espaçamento */
         :root {
@@ -54,62 +68,55 @@
             /* Padding ao redor do container, dentro do body */
             box-sizing: border-box;
             /* Garante que padding não adicione largura */
+            padding-top: 70px;
+            /* Adiciona padding para o botão fixo não cobrir o conteúdo */
         }
 
         #backToHomeButton {
-            position: absolute;
+            position: fixed;
+            /* Alterado de absolute para fixed */
             top: 20px;
-            /* Aumentei um pouco a distância do topo */
-            left: 20px;
-            /* Aumentei um pouco a distância da esquerda */
+            left: 50%;
+            /* Centraliza horizontalmente */
+            transform: translateX(-50%);
+            /* Ajuste para centralização perfeita */
             z-index: 100;
             background-color: transparent;
-            /* Fundo transparente para um visual mais limpo */
             border: 1px solid var(--medium-gray);
-            /* Borda sutil */
             color: var(--label-color);
-            /* Cor do texto e ícone cinza */
             padding: 10px 15px;
-            /* Ajuste do padding */
             font-family: 'Inter', sans-serif;
             font-size: 1rem;
-            /* Tamanho da fonte ligeiramente maior */
             border-radius: 8px;
-            /* Cantos mais arredondados */
             cursor: pointer;
             transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            /* Sombra mais suave */
             display: flex;
-            /* Para alinhar o ícone e o texto */
             align-items: center;
-            /* Centralizar verticalmente */
             gap: 8px;
-            /* Espaço entre o ícone e o texto */
             max-width: fit-content;
-            /* Ajusta a largura ao conteúdo */
         }
 
         #backToHomeButton:hover {
             background-color: var(--light-gray);
-            /* Fundo sutil ao passar o mouse */
             border-color: var(--primary-blue);
-            /* Borda azul ao passar o mouse */
             color: var(--primary-blue);
-            /* Texto e ícone azuis ao passar o mouse */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
 
         #backToHomeButton i {
             font-size: 1.1rem;
-            /* Ajuste o tamanho do ícone */
         }
 
         /* Ajuste para telas menores */
         @media (max-width: 768px) {
+            body {
+                padding-top: 60px;
+                /* Ajusta o padding para telas menores */
+            }
+
             #backToHomeButton {
                 top: 15px;
-                left: 15px;
                 padding: 8px 12px;
                 font-size: 0.9rem;
                 gap: 6px;
@@ -121,9 +128,13 @@
         }
 
         @media (max-width: 480px) {
+            body {
+                padding-top: 50px;
+                /* Ajusta o padding para telas menores */
+            }
+
             #backToHomeButton {
                 top: 10px;
-                left: 10px;
                 padding: 6px 10px;
                 font-size: 0.85rem;
                 gap: 5px;
@@ -140,16 +151,12 @@
             padding: var(--spacing-xl);
             border-radius: 12px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            width: 100%;
+            width: 500px;
             max-width: 960px;
             display: flex;
             flex-direction: column;
             gap: var(--spacing-lg);
-            /* CORREÇÃO AQUI: Removemos min-height ou height fixos no container */
-            /* Permitindo que ele se adapte ao conteúdo e o body role */
-            /* Apenas um min-height muito pequeno para que ele não suma */
             min-height: 50vh;
-            /* Um valor que garanta alguma visibilidade inicial, mas permita o crescimento */
             box-sizing: border-box;
         }
 
@@ -164,7 +171,6 @@
 
         /* Elementos de Formulário Base */
         input[type="password"],
-        input[type="url"],
         textarea {
             width: 100%;
             padding: var(--spacing-md);
@@ -205,7 +211,6 @@
 
         button:hover {
             background-color: var(--darker-blue);
-            transform: translateY(-2px);
         }
 
         button:disabled {
@@ -221,6 +226,54 @@
         #createMapButton:hover {
             background-color: #218838;
         }
+
+        /* Estilo para o botão de colar */
+        .input-group {
+            position: relative;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .input-group textarea {
+            padding-right: 45px;
+        }
+
+        .paste-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: transparent;
+            /* Alterado para transparente */
+            color: var(--label-color);
+            /* Alterado para uma cor mais discreta */
+            border: 1px solid var(--medium-gray);
+            /* Adicionado uma borda sutil */
+            border-radius: 5px;
+            padding: 8px 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            /* Transição para todas as propriedades relevantes */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .paste-button:hover {
+            background-color: var(--medium-gray);
+            /* Fundo sutil ao passar o mouse */
+            color: var(--primary-blue);
+            /* Cor do ícone ao passar o mouse */
+            border-color: var(--primary-blue);
+            /* Borda ao passar o mouse */
+        }
+
+        .paste-button i {
+            font-size: 1.2rem;
+        }
+
 
         /* Labels */
         label {
@@ -241,9 +294,7 @@
         }
 
         /* Seções Específicas */
-        .api-key-container,
-        .file-upload-container,
-        .url-input-container {
+        .api-key-container {
             background-color: var(--light-gray);
             padding: var(--spacing-md);
             border-radius: 8px;
@@ -253,70 +304,21 @@
             gap: var(--spacing-sm);
         }
 
-        .api-key-container input,
-        .url-input-container input {
+        .api-key-container input {
             margin-bottom: 0;
-        }
-
-        /* Upload de Arquivos */
-        .file-upload-container {
-            margin-top: 0;
-        }
-
-        .file-upload-container input[type="file"] {
-            display: none;
-        }
-
-        .file-upload-container label.upload-button {
-            background-color: #007bff;
-            color: white;
-            padding: var(--spacing-sm) var(--spacing-md);
-            border-radius: 8px;
-            cursor: pointer;
-            display: inline-block;
-            font-size: 1rem;
-            font-weight: normal;
-            transition: background-color 0.3s;
-            width: auto;
-            margin-right: var(--spacing-sm);
-        }
-
-        .file-upload-container label.upload-button:hover {
-            background-color: #0056b3;
-        }
-
-        .file-name {
-            font-style: italic;
-            color: #555;
-            flex-grow: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .file-upload-info {
-            font-size: 0.85rem;
-            color: #777;
-            margin-top: var(--spacing-sm);
-        }
-
-        /* Adicionado para centralizar e alinhar o botão de upload e o nome do arquivo */
-        .file-input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
         }
 
         /* Media Queries para Responsividade */
         @media (max-width: 768px) {
             body {
                 padding: var(--spacing-md);
+                padding-top: 60px;
+                /* Ajusta o padding superior */
             }
 
             .container {
                 padding: var(--spacing-lg);
                 min-height: auto;
-                /* Permitir que o container se ajuste mais livremente */
             }
 
             h1 {
@@ -334,13 +336,25 @@
                 padding: 10px;
             }
 
-            .file-upload-container label.upload-button {
+            .paste-button {
+                width: 35px;
+                height: 35px;
+                padding: 6px 8px;
                 font-size: 0.9rem;
-                padding: 8px 12px;
+            }
+
+            .paste-button i {
+                font-size: 1.1rem;
             }
         }
 
         @media (max-width: 480px) {
+            body {
+                padding: var(--spacing-md);
+                padding-top: 50px;
+                /* Ajusta o padding superior */
+            }
+
             .container {
                 padding: var(--spacing-md);
             }
@@ -353,8 +367,15 @@
                 font-size: 0.9rem;
             }
 
-            .file-upload-info {
-                font-size: 0.75rem;
+            .paste-button {
+                width: 30px;
+                height: 30px;
+                padding: 5px 7px;
+                font-size: 0.8rem;
+            }
+
+            .paste-button i {
+                font-size: 1rem;
             }
         }
     </style>
@@ -365,7 +386,7 @@
 
     <div class="container">
         <header>
-            <h1>Analisador e Estruturador de Conteúdo JSON</h1>
+            <h1>Criar Mapa Mental com IA</h1>
         </header>
 
         <main>
@@ -377,30 +398,18 @@
                 </section>
 
                 <section>
-                    <label for="inputText">Cole o conteúdo a ser analisado, insira uma URL ou faça upload de um
-                        arquivo:</label>
-                    <textarea id="inputText"
-                        placeholder="Insira o texto que você deseja que o Gemini analise e estruture..."></textarea>
-                </section>
-
-                <section class="url-input-container">
-                    <input type="url" id="urlInput"
-                        placeholder="Ou insira a URL de uma página para análise profunda...">
-                </section>
-
-                <section class="file-upload-container">
-                    <div class="file-input-wrapper">
-                        <input type="file" id="fileUpload" accept=".pdf,.txt,.doc,.docx,.md">
-                        <label for="fileUpload" class="upload-button">Escolher Arquivo</label>
-                        <span id="fileNameDisplay" class="file-name">Nenhum arquivo selecionado</span>
+                    <label for="inputText">Cole ou escreva o conteúdo a ser analisado ou insira uma URL:</label>
+                    <div class="input-group">
+                        <textarea id="inputText"
+                            placeholder="Insira o texto ou a URL que você deseja que o Gemini analise e estruture..."></textarea>
+                        <button type="button" id="pasteButton" class="paste-button"
+                            title="Colar da área de transferência">
+                            <i class="fas fa-paste"></i>
+                        </button>
                     </div>
-                    <p class="file-upload-info">Formatos suportados para leitura direta: .txt, .md. Outros formatos
-                        (.pdf, .doc, .docx) não podem ser lidos diretamente pelo navegador nesta aplicação. Você pode
-                        copiar o
-                        conteúdo e colar no campo de texto.</p>
                 </section>
 
-                <button type="submit" id="submitButton">Analisar e Gerar JSON</button>
+                <button type="submit" id="submitButton">Processar</button>
             </form>
 
             <div id="loading">
@@ -423,15 +432,11 @@
         const analysisForm = document.getElementById('analysis-form');
         const apiKeyInput = document.getElementById('apiKey');
         const inputText = document.getElementById('inputText');
-        const urlInput = document.getElementById('urlInput');
-        // const outputText = document.getElementById('outputText'); // REMOVIDO
         const submitButton = document.getElementById('submitButton');
         const loadingIndicator = document.getElementById('loading');
         const createMapButton = document.getElementById('createMapButton');
-        const fileUploadInput = document.getElementById('fileUpload');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const pasteButton = document.getElementById('pasteButton'); // Novo: botão de colar
 
-        let fileContent = null; // Variável para armazenar o conteúdo do arquivo
         let generatedJsonData = null; // Variável para armazenar o JSON gerado
 
         // --- MELHORIA: LEMBRAR A CHAVE DA API ---
@@ -448,13 +453,24 @@
             window.location.href = 'index.html';
         });
 
+        // Novo: Lógica para colar do clipboard
+        pasteButton.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                inputText.value = text;
+            } catch (err) {
+                console.error('Falha ao ler o conteúdo da área de transferência: ', err);
+                alert('Não foi possível acessar a área de transferência. Verifique as permissões do navegador.');
+            }
+        });
+
+
         // 2. Adiciona o "ouvinte" para o evento de submissão do formulário
         analysisForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             const API_KEY = apiKeyInput.value.trim();
-            const urlToAnalyze = urlInput.value.trim();
-            let contentToAnalyze = fileContent || inputText.value.trim();
+            let contentToAnalyze = inputText.value.trim(); // Assume inputText como fonte principal
 
             if (!API_KEY) {
                 alert('Por favor, insira sua chave de API para continuar.');
@@ -462,17 +478,19 @@
             }
 
             // Lógica para determinar a fonte do conteúdo
-            if (urlToAnalyze) {
+            // Se o inputText começa com http:// ou https://, trata como URL
+            if (contentToAnalyze.startsWith('http://') || contentToAnalyze.startsWith('https://')) {
                 loadingIndicator.querySelector('p').textContent = 'Buscando conteúdo da URL...';
                 showLoading(true);
-                contentToAnalyze = await fetchContentFromUrl(urlToAnalyze);
-                if (!contentToAnalyze) {
+                const fetchedContent = await fetchContentFromUrl(contentToAnalyze);
+                if (!fetchedContent) {
                     alert('Não foi possível carregar o conteúdo da URL. Verifique se a URL está correta e se a página permite CORS.');
                     showLoading(false);
                     return;
                 }
+                contentToAnalyze = fetchedContent; // Usa o conteúdo buscado da URL
             } else if (!contentToAnalyze) {
-                alert('Por favor, insira um texto para analisar, uma URL ou faça upload de um arquivo.');
+                alert('Por favor, insira um texto para analisar ou uma URL.');
                 return;
             }
 
@@ -480,7 +498,6 @@
 
             showLoading(true);
             loadingIndicator.querySelector('p').textContent = 'Analisando... Por favor, aguarde. Isso pode levar alguns segundos.';
-            // outputText.value = ''; // REMOVIDO
             generatedJsonData = null; // Limpa o JSON anterior
             createMapButton.style.display = 'none'; // Esconde o botão
             createMapButton.disabled = true; // Desabilita o botão
@@ -517,18 +534,15 @@
 
                 try {
                     generatedJsonData = JSON.parse(resultText); // Armazena o JSON válido
-                    // outputText.value = JSON.stringify(parsedJson, null, 2); // REMOVIDO
                     createMapButton.style.display = 'block'; // Mostra o botão
                     createMapButton.disabled = false; // Habilita o botão
                 } catch (e) {
-                    // outputText.value = `Erro ao analisar JSON. Verifique a saída bruta:\n\n${resultText}\n\nDetalhes do erro: ${e.message}`; // REMOVIDO
                     alert(`Erro ao analisar JSON. Detalhes: ${e.message}. Por favor, verifique o conteúdo ou a chave da API.`);
                     createMapButton.style.display = 'none'; // Esconde o botão em caso de erro
                     createMapButton.disabled = true;
                 }
             } catch (error) {
                 console.error('Erro ao chamar a API do Gemini:', error);
-                // outputText.value = `Ocorreu um erro ao processar sua solicitação:\n\n${error.message}`; // REMOVIDO
                 alert(`Ocorreu um erro ao processar sua solicitação: ${error.message}`);
                 createMapButton.style.display = 'none'; // Esconde o botão em caso de erro
                 createMapButton.disabled = true;
@@ -561,102 +575,6 @@
             } catch (error) {
                 alert("Ocorreu um erro ao preparar os dados para o mapa mental. Por favor, tente novamente.");
                 console.error("Erro ao serializar JSON para localStorage:", error);
-            }
-        });
-
-        // --- Lógica para o upload de arquivos ---
-        fileUploadInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) {
-                fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
-                inputText.value = '';
-                inputText.disabled = false;
-                urlInput.disabled = false;
-                fileContent = null;
-                createMapButton.style.display = 'none'; // Esconde o botão
-                createMapButton.disabled = true;
-                return;
-            }
-
-            fileNameDisplay.textContent = file.name;
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-
-            inputText.disabled = true;
-            urlInput.disabled = true;
-            urlInput.value = '';
-            createMapButton.style.display = 'none'; // Esconde o botão
-            createMapButton.disabled = true;
-
-            if (fileExtension === 'txt' || fileExtension === 'md') {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    fileContent = e.target.result;
-                    inputText.value = `Conteúdo de '${file.name}' carregado. Clique em "Analisar" para processar.`;
-                };
-                reader.onerror = (e) => {
-                    console.error("Erro ao ler o arquivo:", e);
-                    alert("Erro ao ler o arquivo. Por favor, tente novamente.");
-                    fileNameDisplay.textContent = 'Erro na leitura do arquivo';
-                    inputText.disabled = false;
-                    urlInput.disabled = false;
-                    inputText.value = '';
-                    fileUploadInput.value = '';
-                    fileContent = null;
-                };
-                reader.readAsText(file);
-            } else {
-                alert(`O tipo de arquivo ".${fileExtension}" não pode ser lido diretamente pelo navegador nesta aplicação. Por favor, copie o texto e cole no campo acima ou use um arquivo .txt ou .md.`);
-                fileNameDisplay.textContent = 'Formato não suportado para leitura direta';
-                inputText.disabled = false;
-                urlInput.disabled = false;
-                inputText.value = '';
-                fileUploadInput.value = '';
-                fileContent = null;
-            }
-        });
-
-        // Habilitar/Desabilitar campos com base na entrada do usuário
-        inputText.addEventListener('input', () => {
-            if (inputText.value.trim() !== '') {
-                urlInput.disabled = true;
-                fileUploadInput.disabled = true;
-                fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
-                fileUploadInput.value = '';
-                fileContent = null;
-            } else if (!urlInput.value.trim() && !fileContent) {
-                urlInput.disabled = false;
-                fileUploadInput.disabled = false;
-            }
-            createMapButton.style.display = 'none'; // Esconde o botão ao digitar no inputText
-            createMapButton.disabled = true;
-        });
-
-        urlInput.addEventListener('input', () => {
-            if (urlInput.value.trim() !== '') {
-                inputText.disabled = true;
-                fileUploadInput.disabled = true;
-                fileNameDisplay.textContent = 'Nenhum arquivo selecionado';
-                fileUploadInput.value = '';
-                fileContent = null;
-            } else if (!inputText.value.trim() && !fileContent) {
-                inputText.disabled = false;
-                fileUploadInput.disabled = false;
-            }
-            createMapButton.style.display = 'none'; // Esconde o botão ao digitar na urlInput
-            createMapButton.disabled = true;
-        });
-
-        inputText.addEventListener('change', () => {
-            if (inputText.value.trim() === '') {
-                urlInput.disabled = false;
-                fileUploadInput.disabled = false;
-            }
-        });
-
-        urlInput.addEventListener('change', () => {
-            if (urlInput.value.trim() === '') {
-                inputText.disabled = false;
-                fileUploadInput.disabled = false;
             }
         });
 
