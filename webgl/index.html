@@ -390,6 +390,34 @@
             /* Darker blue on hover */
         }
 
+        /* Style for the AI New Map Button inside sidebar */
+        #ai-new-map-button-sidebar {
+            /* Renomeado para evitar conflito de ID */
+            background-color: #6f42c1;
+            /* Um roxo distinto */
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+            margin: 15px auto 0 auto;
+            /* Ajuste a margem para separar dos outros botões */
+            display: block;
+            width: fit-content;
+            font-weight: normal;
+        }
+
+        #ai-new-map-button-sidebar:hover {
+            background-color: #5a359c;
+            transform: translateY(-2px);
+        }
+
+        #ai-new-map-button-sidebar:active {
+            transform: translateY(0);
+        }
+
 
         /* Hide the real file input */
         #jsonUpload {
@@ -514,6 +542,8 @@
         </div>
 
         <button id="add-node-button" title="Adicionar Novo Nó">Adicionar Filho</button>
+        <button id="ai-new-map-button-sidebar" onclick="window.location.href='api.html'">Novo Mapa Mental com
+            IA</button>
     </div>
 
     <div id="action-menu-container">
@@ -524,8 +554,7 @@
             <button id="export-json-button">Exportar JSON</button>
             <button id="export-pdf-button">Exportar PDF</button>
             <button id="create-markdown-button">Criar Markdown</button>
-            <button id="recalculate-map-button">Recalcular Mapa</button> <button id="create-markdown-button"
-                onclick="window.location.href='api.html'">IA</button>
+            <button id="recalculate-map-button">Recalcular Mapa</button>
         </div>
     </div>
 

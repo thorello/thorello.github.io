@@ -182,31 +182,10 @@
             box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.2);
         }
 
-        /* Textarea de Entrada e Saída */
+        /* Textarea de Entrada */
         textarea#inputText {
             min-height: 120px;
             resize: vertical;
-        }
-
-        .output-container {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            margin-top: var(--spacing-md);
-        }
-
-        textarea#outputText {
-            flex-grow: 1;
-            min-height: 200px;
-            resize: vertical;
-            background-color: var(--light-gray);
-            border: 1px solid var(--medium-gray);
-            padding: var(--spacing-md);
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            /* CORREÇÃO AQUI: Permite rolagem interna para o textarea de saída */
-            overflow: auto;
         }
 
         /* Botões */
@@ -428,13 +407,9 @@
                 <p>Analisando... Por favor, aguarde. Isso pode levar alguns segundos.</p>
             </div>
 
-            <section class="output-container">
-                <label for="outputText">Resultado da Análise (JSON):</label>
-                <textarea id="outputText" placeholder="A estrutura JSON gerada pela API aparecerá aqui..."></textarea>
-            </section>
             <br>
 
-            <button type="button" id="createMapButton">
+            <button type="button" id="createMapButton" style="display: none;" disabled>
                 Criar Mapa Mental
             </button>
         </main>
@@ -449,7 +424,7 @@
         const apiKeyInput = document.getElementById('apiKey');
         const inputText = document.getElementById('inputText');
         const urlInput = document.getElementById('urlInput');
-        const outputText = document.getElementById('outputText');
+        // const outputText = document.getElementById('outputText'); // REMOVIDO
         const submitButton = document.getElementById('submitButton');
         const loadingIndicator = document.getElementById('loading');
         const createMapButton = document.getElementById('createMapButton');
@@ -457,6 +432,7 @@
         const fileNameDisplay = document.getElementById('fileNameDisplay');
 
         let fileContent = null; // Variável para armazenar o conteúdo do arquivo
+        let generatedJsonData = null; // Variável para armazenar o JSON gerado
 
         // --- MELHORIA: LEMBRAR A CHAVE DA API ---
         window.addEventListener('load', () => {
@@ -504,8 +480,10 @@
 
             showLoading(true);
             loadingIndicator.querySelector('p').textContent = 'Analisando... Por favor, aguarde. Isso pode levar alguns segundos.';
-            outputText.value = '';
-            createMapButton.disabled = true;
+            // outputText.value = ''; // REMOVIDO
+            generatedJsonData = null; // Limpa o JSON anterior
+            createMapButton.style.display = 'none'; // Esconde o botão
+            createMapButton.disabled = true; // Desabilita o botão
 
             const fullPrompt = promptBase + "\n" + contentToAnalyze;
 
@@ -538,16 +516,21 @@
                 }
 
                 try {
-                    const parsedJson = JSON.parse(resultText);
-                    outputText.value = JSON.stringify(parsedJson, null, 2);
-                    createMapButton.disabled = false;
+                    generatedJsonData = JSON.parse(resultText); // Armazena o JSON válido
+                    // outputText.value = JSON.stringify(parsedJson, null, 2); // REMOVIDO
+                    createMapButton.style.display = 'block'; // Mostra o botão
+                    createMapButton.disabled = false; // Habilita o botão
                 } catch (e) {
-                    outputText.value = `Erro ao analisar JSON. Verifique a saída bruta:\n\n${resultText}\n\nDetalhes do erro: ${e.message}`;
+                    // outputText.value = `Erro ao analisar JSON. Verifique a saída bruta:\n\n${resultText}\n\nDetalhes do erro: ${e.message}`; // REMOVIDO
+                    alert(`Erro ao analisar JSON. Detalhes: ${e.message}. Por favor, verifique o conteúdo ou a chave da API.`);
+                    createMapButton.style.display = 'none'; // Esconde o botão em caso de erro
                     createMapButton.disabled = true;
                 }
             } catch (error) {
                 console.error('Erro ao chamar a API do Gemini:', error);
-                outputText.value = `Ocorreu um erro ao processar sua solicitação:\n\n${error.message}`;
+                // outputText.value = `Ocorreu um erro ao processar sua solicitação:\n\n${error.message}`; // REMOVIDO
+                alert(`Ocorreu um erro ao processar sua solicitação: ${error.message}`);
+                createMapButton.style.display = 'none'; // Esconde o botão em caso de erro
                 createMapButton.disabled = true;
             } finally {
                 showLoading(false);
@@ -563,21 +546,21 @@
 
         // --- LÓGICA PARA O BOTÃO "CRIAR MAPA MENTAL" ---
         createMapButton.addEventListener('click', () => {
-            const jsonContent = outputText.value;
-            if (!jsonContent) {
-                alert("Não há conteúdo JSON para criar o mapa mental.");
+            if (!generatedJsonData) {
+                alert("Não há conteúdo JSON válido para criar o mapa mental.");
                 return;
             }
 
             try {
-                JSON.parse(jsonContent);
-
-                localStorage.setItem('mindMapData', jsonContent);
+                // Certifica-se de que o JSON é válido antes de armazenar
+                const jsonString = JSON.stringify(generatedJsonData);
+                localStorage.setItem('mindMapData', jsonString);
 
                 window.location.href = 'index.html';
 
             } catch (error) {
-                alert("O conteúdo na área de resultado não é um JSON válido. Não é possível criar o mapa.");
+                alert("Ocorreu um erro ao preparar os dados para o mapa mental. Por favor, tente novamente.");
+                console.error("Erro ao serializar JSON para localStorage:", error);
             }
         });
 
@@ -590,6 +573,8 @@
                 inputText.disabled = false;
                 urlInput.disabled = false;
                 fileContent = null;
+                createMapButton.style.display = 'none'; // Esconde o botão
+                createMapButton.disabled = true;
                 return;
             }
 
@@ -599,6 +584,8 @@
             inputText.disabled = true;
             urlInput.disabled = true;
             urlInput.value = '';
+            createMapButton.style.display = 'none'; // Esconde o botão
+            createMapButton.disabled = true;
 
             if (fileExtension === 'txt' || fileExtension === 'md') {
                 const reader = new FileReader();
@@ -613,6 +600,7 @@
                     inputText.disabled = false;
                     urlInput.disabled = false;
                     inputText.value = '';
+                    fileUploadInput.value = '';
                     fileContent = null;
                 };
                 reader.readAsText(file);
@@ -639,6 +627,8 @@
                 urlInput.disabled = false;
                 fileUploadInput.disabled = false;
             }
+            createMapButton.style.display = 'none'; // Esconde o botão ao digitar no inputText
+            createMapButton.disabled = true;
         });
 
         urlInput.addEventListener('input', () => {
@@ -652,6 +642,8 @@
                 inputText.disabled = false;
                 fileUploadInput.disabled = false;
             }
+            createMapButton.style.display = 'none'; // Esconde o botão ao digitar na urlInput
+            createMapButton.disabled = true;
         });
 
         inputText.addEventListener('change', () => {
