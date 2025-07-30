@@ -70,6 +70,8 @@ class MindMapViewer {
         this.addNodeButton = document.getElementById('add-node-button');
         this.aiNewMapButton = document.getElementById('ai-new-map-button-popUp'); // Renomeado para consistência
         this.addChildrenWithAIButton = document.getElementById('add-children-with-ai-button'); // Novo botão
+        this.loadingOverlay = document.getElementById('loading-overlay'); // Novo: Overlay de carregamento
+        this.loadingSpinner = document.getElementById('loading-spinner'); // Novo: Spinner de carregamento
 
         // --- State Variables ---
         this.nodeMap = new Map();
@@ -628,7 +630,7 @@ class MindMapViewer {
     }
 
     _onMouseDown(event) {
-        if (this.isPopUpOpen || event.button !== 0) return;
+        if (this.isPopUpOpen) return; // Prevent interaction if popup is open
 
         this.isConsideredClick = true;
         this.initialPointerCoords.set(event.clientX, event.clientY);
@@ -655,7 +657,7 @@ class MindMapViewer {
     }
 
     _onMouseMove(event) {
-        if (this.isPopUpOpen) return;
+        if (this.isPopUpOpen) return; // Prevent interaction if popup is open
 
         if (this.isConsideredClick && (this.isDraggingNode || this.isPanning)) {
             const moveDistance = Math.hypot(
@@ -688,6 +690,8 @@ class MindMapViewer {
     }
 
     _onMouseUp(event) {
+        if (this.isPopUpOpen) return; // Prevent interaction if popup is open
+
         if (this.isConsideredClick && !this.isDraggingNode) {
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -730,7 +734,7 @@ class MindMapViewer {
     }
 
     _onTouchStart(event) {
-        if (this.isPopUpOpen) return;
+        if (this.isPopUpOpen) return; // Prevent interaction if popup is open
         event.preventDefault();
         this.isConsideredClick = true;
         this.initialPointerCoords.set(event.touches[0].clientX, event.touches[0].clientY);
@@ -772,7 +776,7 @@ class MindMapViewer {
     }
 
     _onTouchMove(event) {
-        if (this.isPopUpOpen) return;
+        if (this.isPopUpOpen) return; // Prevent interaction if popup is open
         event.preventDefault();
 
         if (this.isConsideredClick && event.touches.length === 1) {
@@ -822,6 +826,8 @@ class MindMapViewer {
     }
 
     _onTouchEnd(event) {
+        if (this.isPopUpOpen) return; // Prevent interaction if popup is open
+
         if (this.isConsideredClick && !this._isPinching) {
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
@@ -1018,30 +1024,41 @@ class MindMapViewer {
     }
 
     /**
+     * Exibe ou oculta o overlay de carregamento.
+     * @param {boolean} show - True para mostrar, false para ocultar.
+     */
+    showLoadingOverlay(show) {
+        if (this.loadingOverlay) {
+            this.loadingOverlay.style.display = show ? 'flex' : 'none';
+        }
+    }
+
+    /**
      * Adiciona nós filhos ao nó selecionado usando a API Gemini.
      */
     async addChildrenWithAI() {
         if (!this.currentSelectedD3Node || this.currentSelectedD3Node.depth === 0) {
+            // This check is still valid for initial click, but the nulling happens later.
             alert('Por favor, selecione um nó (não o nó principal) para adicionar filhos com IA.');
             return;
         }
 
+        // Store the currentSelectedD3Node data BEFORE closing the popup
+        const selectedD3NodeToProcess = this.currentSelectedD3Node; // Store reference
+        const nodeContent = {
+            name: selectedD3NodeToProcess.data.name,
+            definition: selectedD3NodeToProcess.data.definition || '',
+        };
+
+        this.closePopUp(); // Close the popup immediately
+        this.showLoadingOverlay(true); // Show the loading overlay
+
         const API_KEY = localStorage.getItem('geminiApiKey'); // Pega a chave da API do localStorage
         if (!API_KEY) {
+            this.showLoadingOverlay(false); // Esconde o overlay se não houver chave
             alert('Por favor, insira sua chave de API do Google AI Studio na página de criação de novo mapa com IA (acessível pelo nó principal ou menu superior).');
             return;
         }
-
-        // Exibir um indicador de carregamento (opcional, mas recomendado)
-        // Você pode adicionar um elemento de texto ou spinner no seu HTML/CSS para isso
-        const loadingText = 'Gerando novos nós com IA... Por favor, aguarde.';
-        // Exemplo: document.getElementById('loading-spinner').style.display = 'block';
-        alert(loadingText); // Por simplicidade, usando alert por enquanto
-
-        const nodeContent = {
-            name: this.currentSelectedD3Node.data.name,
-            definition: this.currentSelectedD3Node.data.definition || '',
-        };
 
         const geminiPrompt = `Dada a seguinte informação de um nó de mapa mental:
         Nome: "${nodeContent.name}"
@@ -1103,35 +1120,32 @@ class MindMapViewer {
                 }
             }
 
-
             if (!Array.isArray(parsedJson)) {
                 throw new Error('A resposta da IA não é um array JSON válido de nós filhos.');
             }
 
-            // Adicionar novos filhos ao nó D3 selecionado
-            if (!this.currentSelectedD3Node.data.children) {
-                this.currentSelectedD3Node.data.children = [];
+            // Add new children to the stored D3 node, not this.currentSelectedD3Node
+            if (!selectedD3NodeToProcess.data.children) {
+                selectedD3NodeToProcess.data.children = [];
             }
             parsedJson.forEach(newChild => {
                 if (newChild.name && newChild.definition) {
-                    this.currentSelectedD3Node.data.children.push({
+                    selectedD3NodeToProcess.data.children.push({
                         name: newChild.name,
                         definition: newChild.definition,
-                        children: [] // Novos nós começam sem filhos
+                        children: [] // New nodes start with no children
                     });
                 }
             });
 
-            await this.recalculateMap(); // Redesenhar o mapa para incluir os novos nós
+            await this.recalculateMap(); // Redraw the map to include new nodes
             alert('Novos nós adicionados com sucesso pela IA!');
-            this.closePopUp(); // Fechar o popup após a adição
 
         } catch (error) {
             console.error('Erro ao adicionar nós com IA:', error);
             alert(`Ocorreu um erro ao gerar novos nós com IA: ${error.message}.`);
         } finally {
-            // Esconder o indicador de carregamento
-            // Exemplo: document.getElementById('loading-spinner').style.display = 'none';
+            this.showLoadingOverlay(false); // Hide the loading overlay
         }
     }
 
