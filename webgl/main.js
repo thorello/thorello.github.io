@@ -1,58 +1,49 @@
 import * as THREE from 'three';
 import { hierarchy, tree } from 'd3-hierarchy';
 import { Text } from 'troika-three-text';
-import { exportMindMapToPDF } from './pdfExport.js'; // Already imported
-import { exportMindMapToJson } from './jsonExport.js'; // NEW: Import export function
-import { importMindMapFromJson } from './jsonImport.js'; // NEW: Import import function
+import { exportMindMapToPDF } from './pdfExport.js';
+import { exportMindMapToJson } from './jsonExport.js';
+import { importMindMapFromJson } from './jsonImport.js';
 import './menuHandler.js';
 
-// NOVO: Versão do programa atualizada com correções de exportação e novo tema.
 const APP_VERSION = 'v2.0.0';
 
-// --- 1. CONFIGURAÇÕES CENTRALIZADAS (TEMA CLARO) ---
+// --- 1. Centralized Configuration (Light Theme) ---
 const CONFIG = {
-    backgroundColor: 0xF4F4F5, // Fundo cinza muito claro
+    backgroundColor: 0xF4F4F5,
     nodeColors: [
-        0xFFFFFF, // Branco
-        0xFFFFFF, // Branco
-        0xFFFFFF, // Branco
-        0xFFFFFF, // Branco
-        0xFFFFFF, // Branco
-        0xFFFFFF  // Branco
+        0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF
     ],
-    linkColor: 0x4B5563, // Cinza escuro para as conexões
-    dragHandleColor: 0x111827, // Preto para o manipulador de arrastar
-    textColor: 0x111827, // Preto para o texto
+    linkColor: 0x4B5563,
+    dragHandleColor: 0x111827,
+    textColor: 0x111827,
     font: {
-        size: 16, // Um pouco maior para melhor legibilidade
-        characterWidth: 0.5, // ESTIMATIVA: Largura média de um caractere em relação ao font size (ajuste conforme necessário)
+        size: 16,
+        characterWidth: 0.5,
     },
-    padding: { x: 30, y: 10 }, // Aumenta ligeiramente o preenchimento interno do nó
-    borderRadius: 6, // Cantos mais arredondados para um toque suave
-    dragHandleRadius: 6, // Um pouco menor e mais discreto
+    padding: { x: 30, y: 10 },
+    borderRadius: 6,
+    dragHandleRadius: 6,
     zoom: {
-        speed: 0.2, // Velocidade de zoom para roda do mouse e pinça (ajustável)
-        min: 0.05,  // Permite mais zoom out (mais longe)
-        max: 8,     // Permite mais zoom in (mais perto)
+        speed: 0.2,
+        min: 0.05,
+        max: 8,
     },
-    horizontalNodePadding: 0, // Base padding between nodes horizontally
-    verticalNodeSpacing: 80, // Vertical spacing between parent and child nodes
-    depth1HorizontalOffset: 80, // Offset fixo para nós na profundidade 1
-    // NOVAS PROPRIEDADES PARA TAMANHO FIXO DO NÓ
+    horizontalNodePadding: 0,
+    verticalNodeSpacing: 80,
+    depth1HorizontalOffset: 80,
     FIXED_NODE_CHARACTER_LIMIT: 35,
-    FIXED_NODE_HEIGHT_MULTIPLIER: 2.5, // Multiplicador para altura com base no font size (ajuste para 1 ou 2 linhas de texto)
+    FIXED_NODE_HEIGHT_MULTIPLIER: 2.5,
 };
 
-// Calcule a largura e altura fixas do nó com base nas configurações
 CONFIG.FIXED_NODE_WIDTH = (CONFIG.font.size * CONFIG.font.characterWidth * CONFIG.FIXED_NODE_CHARACTER_LIMIT) + (CONFIG.padding.x * 2);
 CONFIG.FIXED_NODE_HEIGHT = (CONFIG.font.size * CONFIG.FIXED_NODE_HEIGHT_MULTIPLIER) + (CONFIG.padding.y * 2);
 
-
 /**
- * Geometria para um retângulo com cantos arredondados.
- * @param {number} width - Largura do retângulo.
- * @param {number} height - Altura do retângulo.
- * @param {number} radius - Raio do canto.
+ * Creates rounded rectangle geometry.
+ * @param {number} width - Rectangle width.
+ * @param {number} height - Rectangle height.
+ * @param {number} radius - Corner radius.
  * @returns {THREE.ShapeGeometry}
  */
 function createRoundedRectGeometry(width, height, radius) {
@@ -79,7 +70,7 @@ class MindMapViewer {
         this.addNodeButton = document.getElementById('add-node-button');
         this.aiNewMapButtonContainer = document.getElementById('ai-new-map-button-container');
 
-        // --- Estado ---
+        // --- State Variables ---
         this.nodeMap = new Map();
         this.linkObjects = [];
         this.dragHandles = [];
@@ -87,33 +78,26 @@ class MindMapViewer {
         this.offset = new THREE.Vector3();
         this.isDraggingNode = false;
         this.initialIntersectionPoint = new THREE.Vector3();
-
-        // Adiciona a propriedade para armazenar a instância do nó raiz D3
         this.d3RootNode = null;
-        // NOVO: Armazena o nó D3 que está atualmente selecionado (para a popUp)
-        this.currentSelectedD3Node = null;
+        this.currentSelectedD3Node = null; // For popUp
 
-        // --- Variáveis de Estado para Controle de Câmera Personalizado ---
+        // --- Camera Control State ---
         this.isPanning = false;
         this.lastPointerPosition = new THREE.Vector2();
-
-        // Variáveis para controle de toque (pinch-to-zoom)
         this._isPinching = false;
         this.initialPinchDistance = 0;
         this.initialPinchZoom = 1;
         this.pinchCenterWorld = new THREE.Vector3();
-
-        // Variáveis para diferenciar toque/clique de arrastar
-        this.initialPointerCoords = new THREE.Vector2(); // Unificado para mouse e toque
+        this.initialPointerCoords = new THREE.Vector2();
         this.isConsideredClick = true;
-        this.tapThreshold = 5; // Limiar de movimento para cancelar um "clique"
+        this.tapThreshold = 5;
 
-        // --- Elementos da popUp ---
+        // --- PopUp Elements ---
         this.popUp = document.getElementById('popUp');
         this.popUpCloseButton = document.getElementById('popUp-close');
         this.isPopUpOpen = false;
 
-        // --- NOVOS ELEMENTOS DA SIDEBAR PARA EDIÇÃO ---
+        // --- Sidebar Editing Elements ---
         this.titleSection = document.getElementById('title-section');
         this.popUpTitle = document.getElementById('popUp-title');
         this.popUpTitleInput = document.getElementById('popUp-title-input');
@@ -130,19 +114,15 @@ class MindMapViewer {
 
         this.addNodeButton = document.getElementById('add-node-button');
 
-
         this._initScene();
         this._initEventListeners();
         this._createVersionInfo();
 
-        // O drawMindMap agora popula this.d3RootNode
         this.drawMindMap();
-
         this.animate();
     }
 
-    // --- MÉTODOS DE INICIALIZAÇÃO ---
-
+    // --- Initialization Methods ---
     _initScene() {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(CONFIG.backgroundColor);
@@ -168,13 +148,13 @@ class MindMapViewer {
 
     _initEventListeners() {
         window.addEventListener('resize', this._onWindowResize.bind(this));
-        // EVENTOS DE MOUSE
+        // Mouse Events
         this.renderer.domElement.addEventListener('mousedown', this._onMouseDown.bind(this));
         this.renderer.domElement.addEventListener('mousemove', this._onMouseMove.bind(this));
         this.renderer.domElement.addEventListener('mouseup', this._onMouseUp.bind(this));
         this.renderer.domElement.addEventListener('wheel', this._onMouseWheel.bind(this), { passive: false });
 
-        // EVENTOS DE TOQUE
+        // Touch Events
         this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
@@ -187,7 +167,7 @@ class MindMapViewer {
             this.addNodeButton.addEventListener('click', this.addChildNode.bind(this));
         }
 
-        // --- NOVOS EVENT LISTENERS PARA EDIÇÃO ---
+        // --- New Edit Event Listeners ---
         this.editTitleBtn.addEventListener('click', () => this.toggleEditMode('title', true));
         this.saveTitleBtn.addEventListener('click', () => this.saveNodeChanges('title'));
         this.cancelTitleBtn.addEventListener('click', () => this.toggleEditMode('title', false));
@@ -196,29 +176,23 @@ class MindMapViewer {
         this.saveContentBtn.addEventListener('click', () => this.saveNodeChanges('content'));
         this.cancelContentBtn.addEventListener('click', () => this.toggleEditMode('content', false));
 
-
         const exportPdfButton = document.getElementById('export-pdf-button');
         if (exportPdfButton) {
-            // Chama a função exportMindMapToPDF do módulo separado
             exportPdfButton.addEventListener('click', () => {
                 exportMindMapToPDF(this.nodeMap, this.linkObjects, CONFIG, this.mainGroup.position);
             });
         }
 
-        // Event listener para o botão de exportar JSON
         const exportJsonButton = document.getElementById('export-json-button');
         if (exportJsonButton) {
             exportJsonButton.addEventListener('click', () => {
-                // Chama a função de exportação do novo módulo
                 exportMindMapToJson();
             });
         }
 
-        // NOVO: Event listener para o input de upload de JSON
         const jsonUploadInput = document.getElementById('jsonUpload');
         if (jsonUploadInput) {
             jsonUploadInput.addEventListener('change', (event) => {
-                // Chama a função de importação do novo módulo, passando o contexto 'this' e o evento
                 importMindMapFromJson(event, (importedData) => {
                     this.data = importedData;
                     this.drawMindMap();
@@ -226,7 +200,6 @@ class MindMapViewer {
             });
         }
 
-        // NOVO: Event listener para o botão "Criar Markdown"
         const createMarkdownButton = document.getElementById('create-markdown-button');
         if (createMarkdownButton) {
             createMarkdownButton.addEventListener('click', () => {
@@ -234,7 +207,6 @@ class MindMapViewer {
             });
         }
 
-        // NEW: Event listener for the "Recalculate Map" button
         const recalculateMapButton = document.getElementById('recalculate-map-button');
         if (recalculateMapButton) {
             recalculateMapButton.addEventListener('click', () => {
@@ -242,13 +214,10 @@ class MindMapViewer {
             });
         }
 
-        // NEW: Event listener for the "New Map" button
         const newMapButton = document.getElementById('new-map-button');
         if (newMapButton) {
             newMapButton.addEventListener('click', () => {
-                // Clear the current mind map data from localStorage
                 localStorage.removeItem('mindMapData');
-                // Reload the default mind map
                 this._loadDefaultMindMapData();
             });
         }
@@ -259,50 +228,44 @@ class MindMapViewer {
         if (versionElement) {
             versionElement.textContent = `Mind Map ${APP_VERSION}`;
         } else {
-            console.warn("Elemento com id 'version-info' não encontrado.");
+            console.warn("Element with id 'version-info' not found.");
         }
     }
 
-    // --- LÓGICA DE CRIAÇÃO E ATUALIZAÇÃO ---
-
+    // --- Node and Link Creation/Update Logic ---
     _createNodeMesh(d3Node, direction) {
         return new Promise(resolve => {
             const nodeGroup = new THREE.Group();
             nodeGroup.userData = { d3Node: d3Node, isNode: true, direction: direction };
 
-            // NOVO: Define a cor do nó e do texto com base se é o nó raiz
             const isRootNode = d3Node.depth === 0;
-            const rootNodeColor = 0x3498db; // Cor do botão Exportar PDF
-            const rootTextColor = 0xFFFFFF; // Branco para o texto do nó raiz
+            const rootNodeColor = 0x3498db;
+            const rootTextColor = 0xFFFFFF;
 
-            const nodeColor = isRootNode ? rootNodeColor : CONFIG.nodeColors.length > 0 ? CONFIG.nodeColors.length > d3Node.depth ? CONFIG.nodeColors.slice().reverse()[d3Node.depth] : CONFIG.nodeColors.slice().reverse()[0] : 0xFFFFFF;
+            const nodeColor = isRootNode ? rootNodeColor : CONFIG.nodeColors.length > 0 ? CONFIG.nodeColors.slice().reverse()[d3Node.depth] : 0xFFFFFF;
             const textColor = isRootNode ? rootTextColor : CONFIG.textColor;
 
             const textMesh = new Text();
             textMesh.text = d3Node.data.name;
             textMesh.fontSize = CONFIG.font.size;
-            textMesh.color = textColor; // Usa a cor do texto definida acima
+            textMesh.color = textColor;
             textMesh.position.z = 0.1;
-            textMesh.anchorX = 'center'; // MODIFICADO PARA CENTRALIZAR
+            textMesh.anchorX = 'center';
             textMesh.anchorY = 'middle';
-            // Adiciona quebra de linha para o texto se ele for maior que 35 caracteres
             textMesh.maxWidth = CONFIG.FIXED_NODE_WIDTH - (CONFIG.padding.x * 2);
-
-
-            textMesh.name = 'nodeTextMesh'
+            textMesh.name = 'nodeTextMesh';
 
             textMesh.sync(() => {
                 const rectWidth = CONFIG.FIXED_NODE_WIDTH;
                 const rectHeight = CONFIG.FIXED_NODE_HEIGHT;
 
                 const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
-                const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor }); // Usa a cor do nó definida acima
+                const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
 
                 const rectMesh = new THREE.Mesh(rectGeo, rectMat);
                 rectMesh.name = 'nodeRectMesh';
                 nodeGroup.add(rectMesh);
 
-                // NOVO: Adiciona a borda (wireframe) APENAS se NÃO for o nó raiz
                 if (!isRootNode) {
                     const edges = new THREE.EdgesGeometry(rectGeo);
                     const lineMat = new THREE.LineBasicMaterial({ color: 0xCCCCCC, linewidth: 2 });
@@ -310,7 +273,7 @@ class MindMapViewer {
                     nodeGroup.add(wireframe);
                 }
 
-                textMesh.position.x = 0; // Garante que a posição X seja zero após centralizar
+                textMesh.position.x = 0;
 
                 nodeGroup.add(textMesh);
                 nodeGroup.userData.nodeWidth = rectWidth;
@@ -429,29 +392,21 @@ class MindMapViewer {
         }
     }
 
-    // NOVO: Método auxiliar para encontrar um d3Node correspondente aos dados de um nó
     _findD3NodeByData(targetData) {
         let foundNode = null;
         this.d3RootNode.each(d3Node => {
             if (d3Node.data === targetData) {
                 foundNode = d3Node;
-                return false; // Para a iteração
+                return false;
             }
         });
         return foundNode;
     }
 
-    // --- LÓGICA PRINCIPAL ---
-
-    // Inside your MindMapViewer class
-
+    // --- Main Logic ---
     async drawMindMap() {
-        // ... (existing code to clear and set up nodes and links) ...
-
-        // Remove todos os objetos existentes do mainGroup
         while (this.mainGroup.children.length > 0) {
             const object = this.mainGroup.children[0];
-            // Dispose de geometrias, materiais e texturas para evitar vazamentos de memória
             if (object.geometry) object.geometry.dispose();
             if (object.material) {
                 if (Array.isArray(object.material)) {
@@ -460,9 +415,7 @@ class MindMapViewer {
                     object.material.dispose();
                 }
             }
-            // Dispose dos filhos se for um grupo
             if (object.children) {
-                // Percorre os filhos para dispor de seus recursos também
                 object.children.forEach(child => {
                     if (child.geometry) child.geometry.dispose();
                     if (child.material) {
@@ -480,12 +433,10 @@ class MindMapViewer {
         this.linkObjects = [];
         this.dragHandles = [];
 
-        // Armazena a instância do nó raiz D3
         this.d3RootNode = hierarchy(this.data);
         const d3Links = this.d3RootNode.links();
         const d3Nodes = this.d3RootNode.descendants();
 
-        // Aplicar o layout D3 para nós sem posições persistidas ou como fallback
         const originalChildren = this.d3RootNode.children || [];
         if (originalChildren.length > 0) {
             const leftCount = Math.ceil(originalChildren.length / 2);
@@ -495,18 +446,17 @@ class MindMapViewer {
             if (leftChildren.length > 0) {
                 const leftRoot = hierarchy(this.data);
                 leftRoot.children = leftChildren;
-                const treeLayoutLeft = tree().nodeSize([CONFIG.verticalNodeSpacing, 1]); // Use fixed vertical spacing
+                const treeLayoutLeft = tree().nodeSize([CONFIG.verticalNodeSpacing, 1]);
                 treeLayoutLeft(leftRoot);
 
                 leftRoot.descendants().forEach(node => {
                     if (node.depth > 0) {
                         node.userData = node.userData || {};
                         Object.assign(node.userData, { assignedDirection: -1, d3X: node.x, d3Y: node.y });
-                    } else { // Nó raiz
+                    } else {
                         node.userData = node.userData || {};
                         Object.assign(node.userData, { assignedDirection: 0, d3X: 0, d3Y: 0 });
                     }
-                    // Garante que o userData é aplicado ao objeto d3Node da lista principal
                     const originalNodeInD3Nodes = d3Nodes.find(n => n.data === node.data && n.depth === node.depth);
                     if (originalNodeInD3Nodes) {
                         originalNodeInD3Nodes.userData = originalNodeInD3Nodes.userData || {};
@@ -518,18 +468,17 @@ class MindMapViewer {
             if (rightChildren.length > 0) {
                 const rightRoot = hierarchy(this.data);
                 rightRoot.children = rightChildren;
-                const treeLayoutRight = tree().nodeSize([CONFIG.verticalNodeSpacing, 1]); // Use fixed vertical spacing
+                const treeLayoutRight = tree().nodeSize([CONFIG.verticalNodeSpacing, 1]);
                 treeLayoutRight(rightRoot);
 
                 rightRoot.descendants().forEach(node => {
                     if (node.depth > 0) {
                         node.userData = node.userData || {};
                         Object.assign(node.userData, { assignedDirection: 1, d3X: node.x, d3Y: node.y });
-                    } else { // Nó raiz (já foi processado na esquerda ou é o único)
+                    } else {
                         node.userData = node.userData || {};
                         Object.assign(node.userData, { assignedDirection: 0, d3X: 0, d3Y: 0 });
                     }
-                    // Garante que o userData é aplicado ao objeto d3Node da lista principal
                     const originalNodeInD3Nodes = d3Nodes.find(n => n.data === node.data && n.depth === node.depth);
                     if (originalNodeInD3Nodes) {
                         originalNodeInD3Nodes.userData = originalNodeInD3Nodes.userData || {};
@@ -537,11 +486,9 @@ class MindMapViewer {
                     }
                 });
             }
-
             this.d3RootNode.children = originalChildren;
         }
         this.d3RootNode.userData = { ...this.d3RootNode.userData, assignedDirection: 0, d3X: 0, d3Y: 0 };
-
 
         const nodeCreationPromises = d3Nodes.map(d3Node => {
             const direction = d3Node.userData.assignedDirection;
@@ -553,11 +500,9 @@ class MindMapViewer {
             const nodeGroup = this.nodeMap.get(d3Node);
             if (!nodeGroup) return;
 
-            // NOVO: Usar posições persistidas se existirem
             if (d3Node.data.persistedX !== undefined && d3Node.data.persistedY !== undefined) {
                 nodeGroup.position.set(d3Node.data.persistedX, d3Node.data.persistedY, 0);
             } else {
-                // Lógica de posicionamento existente do D3
                 const direction = nodeGroup.userData.direction;
                 const nodeWidth = CONFIG.FIXED_NODE_WIDTH;
 
@@ -568,7 +513,7 @@ class MindMapViewer {
                     finalNodeX = 0;
                     finalNodeY = 0;
                 } else {
-                    finalNodeY = d3Node.userData.d3X; // O D3 X é o Y no seu sistema Three.js
+                    finalNodeY = d3Node.userData.d3X;
 
                     let previousNodeWidthForSpacing = CONFIG.FIXED_NODE_WIDTH;
 
@@ -591,7 +536,6 @@ class MindMapViewer {
                             finalNodeX = connectionPointX + (spacingNeeded * direction);
                         }
                     }
-                    // Salvar a posição inicial calculada pelo D3 se ainda não houver uma persistida
                     d3Node.data.persistedX = finalNodeX;
                     d3Node.data.persistedY = finalNodeY;
                 }
@@ -602,18 +546,14 @@ class MindMapViewer {
 
         d3Links.forEach(link => this._createLinkMesh(link));
 
-        // Calculate the bounding box and center the group.
         const box = new THREE.Box3().setFromObject(this.mainGroup);
         const center = box.getCenter(new THREE.Vector3());
         this.mainGroup.position.sub(center);
 
         this.camera.updateProjectionMatrix();
 
-        // Salvar os dados após o draw, garantindo que as posições calculadas
-        // (ou as persistidas) estejam no localStorage.
         localStorage.setItem('mindMapData', JSON.stringify(this.data));
 
-        // NEW: Focus on the root node after everything is drawn and centered
         const rootNodeGroup = this.nodeMap.get(this.d3RootNode);
         if (rootNodeGroup) {
             this._focusCameraOnNode(rootNodeGroup);
@@ -621,12 +561,12 @@ class MindMapViewer {
     }
 
     /**
-     * Foca a câmera em um nó específico.
-     * @param {THREE.Group} nodeGroup O grupo THREE.js que representa o nó.
+     * Focuses the camera on a specific node.
+     * @param {THREE.Group} nodeGroup - The THREE.js group representing the node.
      */
     _focusCameraOnNode(nodeGroup) {
         if (!nodeGroup) {
-            console.warn("Nó para focar a câmera não encontrado.");
+            console.warn("Node to focus camera on not found.");
             return;
         }
 
@@ -635,16 +575,13 @@ class MindMapViewer {
 
         this.camera.position.x = targetPosition.x;
         this.camera.position.y = targetPosition.y;
-        this.camera.position.z = 250; // Mantenha a câmera a uma distância padrão do plano XY
+        this.camera.position.z = 250;
 
-        // Ajusta o zoom para focar no nó, com um valor que o deixe bem visível.
-        // Um zoom de 1.5 a 2.0 geralmente é bom para focar em um nó.
-        this.camera.zoom = 1; // Ajuste conforme a preferência
+        this.camera.zoom = 1;
         this.camera.updateProjectionMatrix();
     }
 
-    // --- MANIPULADORES DE EVENTOS ---
-
+    // --- Event Handlers ---
     _onWindowResize() {
         this.camera.left = window.innerWidth / -2;
         this.camera.right = window.innerWidth / 2;
@@ -682,7 +619,7 @@ class MindMapViewer {
     _onMouseDown(event) {
         if (this.isPopUpOpen || event.button !== 0) return;
 
-        this.isConsideredClick = true; // Assume que é um clique no início
+        this.isConsideredClick = true;
         this.initialPointerCoords.set(event.clientX, event.clientY);
 
         this.mouse.copy(this._getPointerCoordinates(event));
@@ -740,7 +677,7 @@ class MindMapViewer {
     }
 
     _onMouseUp(event) {
-        if (this.isConsideredClick) {
+        if (this.isConsideredClick && !this.isDraggingNode) {
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
@@ -764,18 +701,15 @@ class MindMapViewer {
                 const d3Node = clickedNode.userData.d3Node;
                 this.currentSelectedD3Node = d3Node;
                 this.openPopUp(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
-            } else if (this.isPopUpOpen) {
-                if (!this.popUp.contains(event.target)) {
-                    this.closePopUp();
-                }
             }
         }
-        if (this.isDraggingNode && this.selectedNode) { // Salvar a posição do nó arrastado
+
+        if (this.isDraggingNode && this.selectedNode) {
             const d3Node = this.selectedNode.userData.d3Node;
             if (d3Node) {
                 d3Node.data.persistedX = this.selectedNode.position.x;
                 d3Node.data.persistedY = this.selectedNode.position.y;
-                localStorage.setItem('mindMapData', JSON.stringify(this.data)); // Salva os dados atualizados
+                localStorage.setItem('mindMapData', JSON.stringify(this.data));
             }
         }
         this.selectedNode = null;
@@ -813,7 +747,7 @@ class MindMapViewer {
             this.isDraggingNode = false;
             this.isPanning = false;
             this._isPinching = true;
-            this.isConsideredClick = false; // Prevent click on pinch
+            this.isConsideredClick = false;
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             this.initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
@@ -877,9 +811,7 @@ class MindMapViewer {
     }
 
     _onTouchEnd(event) {
-        // If it was a pinch gesture, ensure no click event is processed.
-        // The `isConsideredClick` flag is set to false during `_onTouchMove` if movement exceeds threshold or if it's a pinch.
-        if (this.isConsideredClick && !this._isPinching) { // Only process click if it was considered a click AND not a pinch
+        if (this.isConsideredClick && !this._isPinching) {
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
             let clickedNode = null;
@@ -898,26 +830,23 @@ class MindMapViewer {
                 const d3Node = clickedNode.userData.d3Node;
                 this.currentSelectedD3Node = d3Node;
                 this.openPopUp(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
-            } else if (this.isPopUpOpen) {
-                this.closePopUp();
             }
         }
-        if (this.isDraggingNode && this.selectedNode) { // Salvar a posição do nó arrastado
+        if (this.isDraggingNode && this.selectedNode) {
             const d3Node = this.selectedNode.userData.d3Node;
             if (d3Node) {
                 d3Node.data.persistedX = this.selectedNode.position.x;
                 d3Node.data.persistedY = this.selectedNode.position.y;
-                localStorage.setItem('mindMapData', JSON.stringify(this.data)); // Salva os dados atualizados
+                localStorage.setItem('mindMapData', JSON.stringify(this.data));
             }
         }
         this.isDraggingNode = false;
         this.isPanning = false;
         this._isPinching = false;
-        this.isConsideredClick = true; // Reset for the next interaction
+        this.isConsideredClick = true;
     }
 
-    // --- MÉTODOS DA SIDEBAR E EDIÇÃO ---
-
+    // --- Sidebar and Editing Methods ---
     openPopUp(title, content) {
         if (!this.popUp) return;
 
@@ -934,7 +863,6 @@ class MindMapViewer {
             this.addNodeButton.style.display = 'block';
         }
 
-        // NEW: Conditionally show/hide 'Novo Mapa Mental com IA' button
         if (this.aiNewMapButtonContainer) {
             if (this.currentSelectedD3Node && this.currentSelectedD3Node.depth === 0) {
                 this.aiNewMapButtonContainer.style.display = 'block';
@@ -983,7 +911,6 @@ class MindMapViewer {
     async saveNodeChanges(field) {
         if (!this.currentSelectedD3Node) return;
 
-        // Guarda a referência ao objeto de dados do nó antes de qualquer alteração.
         const nodeDataToFocus = this.currentSelectedD3Node.data;
 
         const input = field === 'title' ? this.popUpTitleInput : this.popUpContentInput;
@@ -1001,10 +928,8 @@ class MindMapViewer {
             this.popUpContent.textContent = newValue || 'Nenhuma explicação disponível.';
         }
 
-        // Espera o mapa ser completamente redesenhado
-        await this.drawMindMap(); // <<< AQUI O MAPA É REDESENHADO
+        await this.drawMindMap();
 
-        // Após redesenhar, encontra o novo grupo de nós correspondente aos dados atualizados
         let nodeGroupToFocus = null;
         for (const [d3Node, nodeGroup] of this.nodeMap.entries()) {
             if (d3Node.data === nodeDataToFocus) {
@@ -1013,17 +938,14 @@ class MindMapViewer {
             }
         }
 
-        // Se encontrou, foca a câmera nele
         if (nodeGroupToFocus) {
-            this._focusCameraOnNode(nodeGroupToFocus); // <<< E O FOCO É AJUSTADO
+            this._focusCameraOnNode(nodeGroupToFocus);
         }
 
-        // Retorna ao modo de visualização
         this.toggleEditMode(field, false);
     }
 
-
-    async addChildNode() { // Tornar a função assíncrona
+    async addChildNode() {
         if (!this.currentSelectedD3Node) {
             alert('Por favor, selecione um nó para adicionar um filho.');
             return;
@@ -1045,10 +967,8 @@ class MindMapViewer {
         }
         this.currentSelectedD3Node.data.children.push(newChildData);
 
-        // Aguarde o mapa ser redesenhado e as posições recalculadas
         await this.recalculateMap();
 
-        // Encontre o nó D3 correspondente aos dados do novo nó na nova hierarquia
         let newD3ChildNode = null;
         this.d3RootNode.each(d3Node => {
             if (d3Node.data === newChildData) {
@@ -1056,23 +976,18 @@ class MindMapViewer {
             }
         });
 
-        // Se encontrou o nó D3, encontre o grupo Three.js correspondente e foque
         if (newD3ChildNode) {
             const newNodeGroup = this.nodeMap.get(newD3ChildNode);
             if (newNodeGroup) {
                 this._focusCameraOnNode(newNodeGroup);
-                // Opcional: Selecionar o novo nó e abrir a popUp para ele
                 this.currentSelectedD3Node = newD3ChildNode;
                 this.openPopUp(newD3ChildNode.data.name, newD3ChildNode.data.definition || 'Nenhuma explicação disponível.');
             }
         }
 
-        // Add a small delay and then close the popUp.
-        // This gives the browser a moment to finish processing the event queue,
-        // preventing the _onMouseUp/_onTouchEnd from re-opening it.
         setTimeout(() => {
             this.closePopUp();
-        }, 100); // You can adjust this delay if needed
+        }, 100);
     }
 
     exportJsonToMarkdownPage() {
@@ -1082,11 +997,11 @@ class MindMapViewer {
                 sessionStorage.setItem('markdownData', storedData);
                 window.location.href = 'json2md.html';
             } catch (error) {
-                console.error('Erro ao preparar dados para Markdown:', error);
-                alert('Ocorreu um erro ao preparar os dados para exportação Markdown.');
+                console.error('Error preparing data for Markdown:', error);
+                alert('An error occurred while preparing data for Markdown export.');
             }
         } else {
-            alert('Nenhum dado do mapa mental encontrado para criar Markdown.');
+            alert('No mind map data found to create Markdown.');
         }
     }
 
@@ -1094,8 +1009,7 @@ class MindMapViewer {
      * Recalculates the mind map positions using the D3 algorithm,
      * clearing any previously persisted manual positions.
      */
-    async recalculateMap() { // Adicione 'async' aqui
-        // Clear persisted positions from all nodes in the data
+    async recalculateMap() {
         this.d3RootNode.each(d3Node => {
             if (d3Node.data.persistedX !== undefined) {
                 delete d3Node.data.persistedX;
@@ -1104,13 +1018,11 @@ class MindMapViewer {
                 delete d3Node.data.persistedY;
             }
         });
-        // Redraw the map, which will now use the D3 algorithm for positioning
-        await this.drawMindMap(); // Adicione 'await' aqui
+        await this.drawMindMap();
     }
 
     /**
      * Loads the default mind map data from mindmap.json.
-     * This function is now a method of the class.
      */
     _loadDefaultMindMapData() {
         fetch('mindmap.json')
@@ -1119,30 +1031,29 @@ class MindMapViewer {
                 return response.json();
             })
             .then(data => {
-                this.data = data; // Update the instance's data
-                localStorage.setItem('mindMapData', JSON.stringify(this.data)); // Save to localStorage
-                this.drawMindMap(); // Redraw the map with new data
-                this.closePopUp(); // Optionally close popUp when loading new map
+                this.data = data;
+                localStorage.setItem('mindMapData', JSON.stringify(this.data));
+                this.drawMindMap();
+                this.closePopUp();
             })
             .catch(error => {
-                console.error('Erro ao carregar os dados do mapa mental padrão:', error);
-                this.container.innerHTML = '<p style="color: red;">Erro ao carregar o mapa mental.</p>';
+                console.error('Error loading default mind map data:', error);
+                this.container.innerHTML = '<p style="color: red;">Error loading mind map.</p>';
             });
     }
 
-    // --- LOOP DE ANIMAÇÃO ---
+    // --- Animation Loop ---
     animate() {
         requestAnimationFrame(this.animate.bind(this));
         this.renderer.render(this.scene, this.camera);
     }
 }
 
-
-// --- INICIALIZAÇÃO ---
+// --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
     const mindmapContainer = document.getElementById('mindmap-container');
     if (!mindmapContainer) {
-        console.error("Container do mapa mental não encontrado.");
+        console.error("Mind map container not found.");
         return;
     }
 
@@ -1151,17 +1062,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storedData) {
         try {
             const data = JSON.parse(storedData);
-            // Pass the initial data to the MindMapViewer constructor
             new MindMapViewer(mindmapContainer, data);
         } catch (error) {
-            console.error('Falha ao parsear os dados do mapa mental do localStorage:', error);
-            // If parsing fails, load default
-            const viewer = new MindMapViewer(mindmapContainer, {}); // Initialize with empty data for now
+            console.error('Failed to parse mind map data from localStorage:', error);
+            const viewer = new MindMapViewer(mindmapContainer, {});
             viewer._loadDefaultMindMapData();
         }
     } else {
-        // If no stored data, load default
-        const viewer = new MindMapViewer(mindmapContainer, {}); // Initialize with empty data for now
+        const viewer = new MindMapViewer(mindmapContainer, {});
         viewer._loadDefaultMindMapData();
     }
 });
