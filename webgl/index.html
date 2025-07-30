@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         /* Import Google Fonts - Removendo fontes futuristas e adicionando uma mais clássica */
+        /* Corrected Google Fonts @import URL */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;600&display=swap');
 
         body {
@@ -413,7 +414,6 @@
 
         /* Style for the AI New Map Button inside popUp */
         #ai-new-map-button-popUp {
-            /* Renomeado para evitar conflito de ID */
             background-color: #6f42c1;
             /* Um roxo distinto */
             color: #ffffff;
@@ -436,6 +436,32 @@
         }
 
         #ai-new-map-button-popUp:active {
+            transform: translateY(0);
+        }
+
+        /* NOVO: Estilo para o botão "Adicionar nodes com IA" */
+        #add-children-with-ai-button {
+            background-color: #00a86b;
+            /* Um verde esmeralda distinto */
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+            margin: 15px auto 0 auto;
+            display: block;
+            width: fit-content;
+            font-weight: normal;
+        }
+
+        #add-children-with-ai-button:hover {
+            background-color: #008f5d;
+            transform: translateY(-2px);
+        }
+
+        #add-children-with-ai-button:active {
             transform: translateY(0);
         }
 
@@ -557,9 +583,10 @@
         </div>
 
         <button id="add-node-button" title="Adicionar Novo Nó">Adicionar Filho</button>
-        <div id="ai-new-map-button-container" style="display: none;">
-            <button id="ai-new-map-button-popUp" onclick="window.location.href='api.html'">Novo Mapa Mental com
-                IA</button>
+
+        <div id="ai-buttons-container">
+            <button id="ai-new-map-button-popUp" style="display: none;">Novo Mapa Mental com IA</button>
+            <button id="add-children-with-ai-button" style="display: none;">Adicionar nodes com IA</button>
         </div>
     </div>
 

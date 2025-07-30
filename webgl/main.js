@@ -68,7 +68,8 @@ class MindMapViewer {
         this.container = container;
         this.data = data;
         this.addNodeButton = document.getElementById('add-node-button');
-        this.aiNewMapButtonContainer = document.getElementById('ai-new-map-button-container');
+        this.aiNewMapButton = document.getElementById('ai-new-map-button-popUp'); // Renomeado para consistência
+        this.addChildrenWithAIButton = document.getElementById('add-children-with-ai-button'); // Novo botão
 
         // --- State Variables ---
         this.nodeMap = new Map();
@@ -111,8 +112,6 @@ class MindMapViewer {
         this.editContentBtn = document.getElementById('edit-content-btn');
         this.saveContentBtn = document.getElementById('save-content-btn');
         this.cancelContentBtn = document.getElementById('cancel-content-btn');
-
-        this.addNodeButton = document.getElementById('add-node-button');
 
         this._initScene();
         this._initEventListeners();
@@ -166,6 +165,18 @@ class MindMapViewer {
         if (this.addNodeButton) {
             this.addNodeButton.addEventListener('click', this.addChildNode.bind(this));
         }
+
+        // Novo: Event Listener para o botão 'Adicionar nodes com IA'
+        if (this.addChildrenWithAIButton) {
+            this.addChildrenWithAIButton.addEventListener('click', this.addChildrenWithAI.bind(this));
+        }
+        // Novo: Event Listener para o botão 'Novo Mapa Mental com IA'
+        if (this.aiNewMapButton) {
+            this.aiNewMapButton.addEventListener('click', () => {
+                window.location.href = 'api.html';
+            });
+        }
+
 
         // --- New Edit Event Listeners ---
         this.editTitleBtn.addEventListener('click', () => this.toggleEditMode('title', true));
@@ -863,12 +874,21 @@ class MindMapViewer {
             this.addNodeButton.style.display = 'block';
         }
 
-        if (this.aiNewMapButtonContainer) {
-            if (this.currentSelectedD3Node && this.currentSelectedD3Node.depth === 0) {
-                this.aiNewMapButtonContainer.style.display = 'block';
+        // Lógica de exibição dos botões de IA
+        if (this.currentSelectedD3Node) {
+            // "Novo Mapa Mental com IA" (apenas para o nó raiz)
+            if (this.currentSelectedD3Node.depth === 0) {
+                if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'block';
+                if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'none'; // Esconde o outro botão
             } else {
-                this.aiNewMapButtonContainer.style.display = 'none';
+                // "Adicionar nodes com IA" (para todos os outros nós)
+                if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none'; // Esconde o outro botão
+                if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'block';
             }
+        } else {
+            // Se nenhum nó estiver selecionado, esconde ambos
+            if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none';
+            if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'none';
         }
     }
 
@@ -881,6 +901,13 @@ class MindMapViewer {
 
         if (this.addNodeButton) {
             this.addNodeButton.style.display = 'none';
+        }
+        // Esconde ambos os botões de IA ao fechar o popup
+        if (this.aiNewMapButton) {
+            this.aiNewMapButton.style.display = 'none';
+        }
+        if (this.addChildrenWithAIButton) {
+            this.addChildrenWithAIButton.style.display = 'none';
         }
     }
 
@@ -989,6 +1016,125 @@ class MindMapViewer {
             this.closePopUp();
         }, 100);
     }
+
+    /**
+     * Adiciona nós filhos ao nó selecionado usando a API Gemini.
+     */
+    async addChildrenWithAI() {
+        if (!this.currentSelectedD3Node || this.currentSelectedD3Node.depth === 0) {
+            alert('Por favor, selecione um nó (não o nó principal) para adicionar filhos com IA.');
+            return;
+        }
+
+        const API_KEY = localStorage.getItem('geminiApiKey'); // Pega a chave da API do localStorage
+        if (!API_KEY) {
+            alert('Por favor, insira sua chave de API do Google AI Studio na página de criação de novo mapa com IA (acessível pelo nó principal ou menu superior).');
+            return;
+        }
+
+        // Exibir um indicador de carregamento (opcional, mas recomendado)
+        // Você pode adicionar um elemento de texto ou spinner no seu HTML/CSS para isso
+        const loadingText = 'Gerando novos nós com IA... Por favor, aguarde.';
+        // Exemplo: document.getElementById('loading-spinner').style.display = 'block';
+        alert(loadingText); // Por simplicidade, usando alert por enquanto
+
+        const nodeContent = {
+            name: this.currentSelectedD3Node.data.name,
+            definition: this.currentSelectedD3Node.data.definition || '',
+        };
+
+        const geminiPrompt = `Dada a seguinte informação de um nó de mapa mental:
+        Nome: "${nodeContent.name}"
+        Definição: "${nodeContent.definition}"
+
+        Por favor, gere um array JSON de até 5 nós filhos relacionados a este conteúdo. Cada nó filho deve ter um "name" (título curto) e uma "definition" (breve explicação). O idioma deve ser português.
+        A estrutura deve ser estritamente:
+        [
+            { "name": "Nome do Nó Filho 1", "definition": "Breve explicação do nó filho 1." },
+            { "name": "Nome do Nó Filho 2", "definition": "Breve explicação do nó filho 2." }
+        ]
+        Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou formatação de markdown (como \`\`\`json).`;
+
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: geminiPrompt }] }]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Erro na API do Gemini: ${errorData.error.message || response.statusText}`);
+            }
+
+            const data = await response.json();
+            let resultText = data.candidates[0].content.parts[0].text;
+
+            // Tentar extrair o JSON puro, removendo marcações de código se presentes
+            let parsedJson;
+            try {
+                // Remove potenciais `json ou ``` de início e fim
+                resultText = resultText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
+                parsedJson = JSON.parse(resultText);
+            } catch (parseError) {
+                console.warn("Falha ao parsear JSON diretamente, tentando extrair entre chaves/colchetes.", parseError);
+                const firstChar = resultText.indexOf('{');
+                const firstArrayChar = resultText.indexOf('[');
+                let startIndex = -1;
+                let endIndex = -1;
+
+                if (firstArrayChar !== -1 && (firstChar === -1 || firstArrayChar < firstChar)) {
+                    startIndex = firstArrayChar;
+                    endIndex = resultText.lastIndexOf(']');
+                } else if (firstChar !== -1) {
+                    startIndex = firstChar;
+                    endIndex = resultText.lastIndexOf('}');
+                }
+
+                if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+                    resultText = resultText.substring(startIndex, endIndex + 1);
+                    parsedJson = JSON.parse(resultText);
+                } else {
+                    throw new Error('Não foi possível extrair um JSON válido da resposta da IA.');
+                }
+            }
+
+
+            if (!Array.isArray(parsedJson)) {
+                throw new Error('A resposta da IA não é um array JSON válido de nós filhos.');
+            }
+
+            // Adicionar novos filhos ao nó D3 selecionado
+            if (!this.currentSelectedD3Node.data.children) {
+                this.currentSelectedD3Node.data.children = [];
+            }
+            parsedJson.forEach(newChild => {
+                if (newChild.name && newChild.definition) {
+                    this.currentSelectedD3Node.data.children.push({
+                        name: newChild.name,
+                        definition: newChild.definition,
+                        children: [] // Novos nós começam sem filhos
+                    });
+                }
+            });
+
+            await this.recalculateMap(); // Redesenhar o mapa para incluir os novos nós
+            alert('Novos nós adicionados com sucesso pela IA!');
+            this.closePopUp(); // Fechar o popup após a adição
+
+        } catch (error) {
+            console.error('Erro ao adicionar nós com IA:', error);
+            alert(`Ocorreu um erro ao gerar novos nós com IA: ${error.message}.`);
+        } finally {
+            // Esconder o indicador de carregamento
+            // Exemplo: document.getElementById('loading-spinner').style.display = 'none';
+        }
+    }
+
 
     exportJsonToMarkdownPage() {
         const storedData = localStorage.getItem('mindMapData');
