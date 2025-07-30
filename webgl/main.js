@@ -90,7 +90,7 @@ class MindMapViewer {
 
         // Adiciona a propriedade para armazenar a instância do nó raiz D3
         this.d3RootNode = null;
-        // NOVO: Armazena o nó D3 que está atualmente selecionado (para a sidebar)
+        // NOVO: Armazena o nó D3 que está atualmente selecionado (para a popUp)
         this.currentSelectedD3Node = null;
 
         // --- Variáveis de Estado para Controle de Câmera Personalizado ---
@@ -108,22 +108,22 @@ class MindMapViewer {
         this.isConsideredClick = true;
         this.tapThreshold = 5; // Limiar de movimento para cancelar um "clique"
 
-        // --- Elementos da sidebar ---
-        this.sidebar = document.getElementById('sidebar');
-        this.sidebarCloseButton = document.getElementById('sidebar-close');
-        this.isSidebarOpen = false;
+        // --- Elementos da popUp ---
+        this.popUp = document.getElementById('popUp');
+        this.popUpCloseButton = document.getElementById('popUp-close');
+        this.isPopUpOpen = false;
 
         // --- NOVOS ELEMENTOS DA SIDEBAR PARA EDIÇÃO ---
         this.titleSection = document.getElementById('title-section');
-        this.sidebarTitle = document.getElementById('sidebar-title');
-        this.sidebarTitleInput = document.getElementById('sidebar-title-input');
+        this.popUpTitle = document.getElementById('popUp-title');
+        this.popUpTitleInput = document.getElementById('popUp-title-input');
         this.editTitleBtn = document.getElementById('edit-title-btn');
         this.saveTitleBtn = document.getElementById('save-title-btn');
         this.cancelTitleBtn = document.getElementById('cancel-title-btn');
 
         this.contentSection = document.getElementById('content-section');
-        this.sidebarContent = document.getElementById('sidebar-content');
-        this.sidebarContentInput = document.getElementById('sidebar-content-input');
+        this.popUpContent = document.getElementById('popUp-content');
+        this.popUpContentInput = document.getElementById('popUp-content-input');
         this.editContentBtn = document.getElementById('edit-content-btn');
         this.saveContentBtn = document.getElementById('save-content-btn');
         this.cancelContentBtn = document.getElementById('cancel-content-btn');
@@ -179,8 +179,8 @@ class MindMapViewer {
         this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
 
-        if (this.sidebarCloseButton) {
-            this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
+        if (this.popUpCloseButton) {
+            this.popUpCloseButton.addEventListener('click', this.closePopUp.bind(this));
         }
 
         if (this.addNodeButton) {
@@ -665,7 +665,7 @@ class MindMapViewer {
 
     _onMouseWheel(event) {
         event.preventDefault();
-        if (this.isSidebarOpen) return;
+        if (this.isPopUpOpen) return;
 
         this.mouse.copy(this._getPointerCoordinates(event));
         const worldPosBeforeZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
@@ -680,7 +680,7 @@ class MindMapViewer {
     }
 
     _onMouseDown(event) {
-        if (this.isSidebarOpen || event.button !== 0) return;
+        if (this.isPopUpOpen || event.button !== 0) return;
 
         this.isConsideredClick = true; // Assume que é um clique no início
         this.initialPointerCoords.set(event.clientX, event.clientY);
@@ -707,7 +707,7 @@ class MindMapViewer {
     }
 
     _onMouseMove(event) {
-        if (this.isSidebarOpen) return;
+        if (this.isPopUpOpen) return;
 
         if (this.isConsideredClick && (this.isDraggingNode || this.isPanning)) {
             const moveDistance = Math.hypot(
@@ -763,10 +763,10 @@ class MindMapViewer {
             if (clickedNode) {
                 const d3Node = clickedNode.userData.d3Node;
                 this.currentSelectedD3Node = d3Node;
-                this.openSidebar(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
-            } else if (this.isSidebarOpen) {
-                if (!this.sidebar.contains(event.target)) {
-                    this.closeSidebar();
+                this.openPopUp(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
+            } else if (this.isPopUpOpen) {
+                if (!this.popUp.contains(event.target)) {
+                    this.closePopUp();
                 }
             }
         }
@@ -785,7 +785,7 @@ class MindMapViewer {
     }
 
     _onTouchStart(event) {
-        if (this.isSidebarOpen) return;
+        if (this.isPopUpOpen) return;
         event.preventDefault();
         this.isConsideredClick = true;
         this.initialPointerCoords.set(event.touches[0].clientX, event.touches[0].clientY);
@@ -827,7 +827,7 @@ class MindMapViewer {
     }
 
     _onTouchMove(event) {
-        if (this.isSidebarOpen) return;
+        if (this.isPopUpOpen) return;
         event.preventDefault();
 
         if (this.isConsideredClick && event.touches.length === 1) {
@@ -897,9 +897,9 @@ class MindMapViewer {
             if (clickedNode && !clickedNode.userData.isDragHandle) {
                 const d3Node = clickedNode.userData.d3Node;
                 this.currentSelectedD3Node = d3Node;
-                this.openSidebar(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
-            } else if (this.isSidebarOpen) {
-                this.closeSidebar();
+                this.openPopUp(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
+            } else if (this.isPopUpOpen) {
+                this.closePopUp();
             }
         }
         if (this.isDraggingNode && this.selectedNode) { // Salvar a posição do nó arrastado
@@ -918,17 +918,17 @@ class MindMapViewer {
 
     // --- MÉTODOS DA SIDEBAR E EDIÇÃO ---
 
-    openSidebar(title, content) {
-        if (!this.sidebar) return;
+    openPopUp(title, content) {
+        if (!this.popUp) return;
 
-        this.sidebarTitle.textContent = title;
-        this.sidebarContent.textContent = content;
+        this.popUpTitle.textContent = title;
+        this.popUpContent.textContent = content;
 
         this.toggleEditMode('title', false);
         this.toggleEditMode('content', false);
 
-        this.sidebar.classList.add('open');
-        this.isSidebarOpen = true;
+        this.popUp.classList.add('open');
+        this.isPopUpOpen = true;
 
         if (this.addNodeButton) {
             this.addNodeButton.style.display = 'block';
@@ -944,11 +944,11 @@ class MindMapViewer {
         }
     }
 
-    closeSidebar() {
-        if (!this.sidebar) return;
+    closePopUp() {
+        if (!this.popUp) return;
 
-        this.sidebar.classList.remove('open');
-        this.isSidebarOpen = false;
+        this.popUp.classList.remove('open');
+        this.isPopUpOpen = false;
         this.currentSelectedD3Node = null;
 
         if (this.addNodeButton) {
@@ -963,7 +963,7 @@ class MindMapViewer {
 
         if (isEditing) {
             const input = editView.querySelector('input, textarea');
-            const currentText = (field === 'title' ? this.sidebarTitle : this.sidebarContent).textContent;
+            const currentText = (field === 'title' ? this.popUpTitle : this.popUpContent).textContent;
 
             if (field === 'content' && currentText === 'Nenhuma explicação disponível.') {
                 input.value = '';
@@ -986,7 +986,7 @@ class MindMapViewer {
         // Guarda a referência ao objeto de dados do nó antes de qualquer alteração.
         const nodeDataToFocus = this.currentSelectedD3Node.data;
 
-        const input = field === 'title' ? this.sidebarTitleInput : this.sidebarContentInput;
+        const input = field === 'title' ? this.popUpTitleInput : this.popUpContentInput;
         const newValue = input.value.trim();
 
         if (field === 'title') {
@@ -995,10 +995,10 @@ class MindMapViewer {
                 return;
             }
             nodeDataToFocus.name = newValue;
-            this.sidebarTitle.textContent = newValue;
+            this.popUpTitle.textContent = newValue;
         } else {
             nodeDataToFocus.definition = newValue;
-            this.sidebarContent.textContent = newValue || 'Nenhuma explicação disponível.';
+            this.popUpContent.textContent = newValue || 'Nenhuma explicação disponível.';
         }
 
         // Espera o mapa ser completamente redesenhado
@@ -1061,17 +1061,17 @@ class MindMapViewer {
             const newNodeGroup = this.nodeMap.get(newD3ChildNode);
             if (newNodeGroup) {
                 this._focusCameraOnNode(newNodeGroup);
-                // Opcional: Selecionar o novo nó e abrir a sidebar para ele
+                // Opcional: Selecionar o novo nó e abrir a popUp para ele
                 this.currentSelectedD3Node = newD3ChildNode;
-                this.openSidebar(newD3ChildNode.data.name, newD3ChildNode.data.definition || 'Nenhuma explicação disponível.');
+                this.openPopUp(newD3ChildNode.data.name, newD3ChildNode.data.definition || 'Nenhuma explicação disponível.');
             }
         }
 
-        // Add a small delay and then close the sidebar.
+        // Add a small delay and then close the popUp.
         // This gives the browser a moment to finish processing the event queue,
         // preventing the _onMouseUp/_onTouchEnd from re-opening it.
         setTimeout(() => {
-            this.closeSidebar();
+            this.closePopUp();
         }, 100); // You can adjust this delay if needed
     }
 
@@ -1122,7 +1122,7 @@ class MindMapViewer {
                 this.data = data; // Update the instance's data
                 localStorage.setItem('mindMapData', JSON.stringify(this.data)); // Save to localStorage
                 this.drawMindMap(); // Redraw the map with new data
-                this.closeSidebar(); // Optionally close sidebar when loading new map
+                this.closePopUp(); // Optionally close popUp when loading new map
             })
             .catch(error => {
                 console.error('Erro ao carregar os dados do mapa mental padrão:', error);

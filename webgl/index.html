@@ -28,8 +28,8 @@
             height: 100vh;
         }
 
-        /* --- Sidebar (Popup) Styles --- */
-        #sidebar {
+        /* --- PopUp (Popup) Styles --- */
+        #popUp {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -53,7 +53,7 @@
             background-image: none;
         }
 
-        #sidebar.open {
+        #popUp.open {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
             pointer-events: auto;
@@ -62,7 +62,7 @@
             padding-bottom: 10px;
         }
 
-        #sidebar h2 {
+        #popUp h2 {
             font-family: 'Roboto', sans-serif;
             color: #2c3e50;
             text-shadow: none;
@@ -74,11 +74,11 @@
             position: relative;
         }
 
-        #sidebar h2::after {
+        #popUp h2::after {
             content: none;
         }
 
-        #sidebar p {
+        #popUp p {
             line-height: 1.8;
             color: #555555;
             font-size: 1em;
@@ -88,7 +88,7 @@
                 /* Aumentado a margem inferior aos parágrafos */
         }
 
-        #sidebar-close {
+        #popUp-close {
             position: absolute;
             top: 15px;
             right: 15px;
@@ -104,7 +104,7 @@
             font-weight: bold;
         }
 
-        #sidebar-close:hover {
+        #popUp-close:hover {
             color: #e74c3c;
             background-color: transparent;
             text-shadow: none;
@@ -228,7 +228,7 @@
             background-color: #5a6268;
         }
 
-        /* --- Add Node Button (inside sidebar) --- */
+        /* --- Add Node Button (inside popUp) --- */
         #add-node-button {
             background-color: #3498db;
             /* Cor azul para "Adicionar Filho" */
@@ -267,21 +267,21 @@
         }
 
         /* Custom scrollbar styling for a classic look */
-        #sidebar::-webkit-scrollbar {
+        #popUp::-webkit-scrollbar {
             width: 8px;
         }
 
-        #sidebar::-webkit-scrollbar-track {
+        #popUp::-webkit-scrollbar-track {
             background: #f0f0f0;
         }
 
-        #sidebar::-webkit-scrollbar-thumb {
+        #popUp::-webkit-scrollbar-thumb {
             background-color: #cccccc;
             border-radius: 10px;
             border: 2px solid #f0f0f0;
         }
 
-        #sidebar::-webkit-scrollbar-thumb:hover {
+        #popUp::-webkit-scrollbar-thumb:hover {
             background-color: #aaaaaa;
         }
 
@@ -411,8 +411,8 @@
             /* Darker blue on hover */
         }
 
-        /* Style for the AI New Map Button inside sidebar */
-        #ai-new-map-button-sidebar {
+        /* Style for the AI New Map Button inside popUp */
+        #ai-new-map-button-popUp {
             /* Renomeado para evitar conflito de ID */
             background-color: #6f42c1;
             /* Um roxo distinto */
@@ -430,12 +430,12 @@
             font-weight: normal;
         }
 
-        #ai-new-map-button-sidebar:hover {
+        #ai-new-map-button-popUp:hover {
             background-color: #5a359c;
             transform: translateY(-2px);
         }
 
-        #ai-new-map-button-sidebar:active {
+        #ai-new-map-button-popUp:active {
             transform: translateY(0);
         }
 
@@ -470,7 +470,7 @@
 
         /* Responsive rules for mobile devices */
         @media (max-width: 768px) {
-            #sidebar {
+            #popUp {
                 width: 90%;
                 height: 80%;
                 padding: 20px;
@@ -480,20 +480,20 @@
                 clip-path: none;
             }
 
-            #sidebar.open {
+            #popUp.open {
                 transform: translate(-50%, -50%) scale(1);
             }
 
-            #sidebar h2 {
+            #popUp h2 {
                 font-size: 1.5em;
                 border-bottom: 1px solid #3498db;
             }
 
-            #sidebar p {
+            #popUp p {
                 font-size: 0.9em;
             }
 
-            #sidebar-close {
+            #popUp-close {
                 font-size: 24px;
                 padding: 0;
             }
@@ -521,18 +521,18 @@
 </head>
 
 <body>
-    <div id="sidebar">
-        <button id="sidebar-close">&times;</button>
+    <div id="popUp">
+        <button id="popUp-close">&times;</button>
 
         <div id="title-section">
             <div class="display-view">
                 <button id="edit-title-btn" class="edit-btn" title="Editar Título">
                     <i class="material-icons">edit_square</i>
                 </button>
-                <h2 id="sidebar-title"></h2>
+                <h2 id="popUp-title"></h2>
             </div>
             <div class="edit-view">
-                <input type="text" id="sidebar-title-input" />
+                <input type="text" id="popUp-title-input" />
                 <div class="edit-actions">
                     <button id="save-title-btn" class="save-btn">Salvar</button>
                     <button id="cancel-title-btn" class="cancel-btn">Cancelar</button>
@@ -545,10 +545,10 @@
                 <button id="edit-content-btn" class="edit-btn" title="Editar Explicação">
                     <i class="material-icons">edit_square</i>
                 </button>
-                <p id="sidebar-content"></p>
+                <p id="popUp-content"></p>
             </div>
             <div class="edit-view">
-                <textarea id="sidebar-content-input"></textarea>
+                <textarea id="popUp-content-input"></textarea>
                 <div class="edit-actions">
                     <button id="save-content-btn" class="save-btn">Salvar</button>
                     <button id="cancel-content-btn" class="cancel-btn">Cancelar</button>
@@ -558,7 +558,7 @@
 
         <button id="add-node-button" title="Adicionar Novo Nó">Adicionar Filho</button>
         <div id="ai-new-map-button-container" style="display: none;">
-            <button id="ai-new-map-button-sidebar" onclick="window.location.href='api.html'">Novo Mapa Mental com
+            <button id="ai-new-map-button-popUp" onclick="window.location.href='api.html'">Novo Mapa Mental com
                 IA</button>
         </div>
     </div>
