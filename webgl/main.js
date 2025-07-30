@@ -101,6 +101,14 @@ class MindMapViewer {
         this.popUpCloseButton = document.getElementById('popUp-close');
         this.isPopUpOpen = false;
 
+        // --- NEW JSON Paste PopUp Elements ---
+        this.jsonPastePopUp = document.getElementById('json-paste-popUp');
+        this.jsonPastePopUpCloseButton = document.getElementById('json-paste-popUp-close');
+        this.jsonPasteTextarea = document.getElementById('json-paste-textarea');
+        this.jsonPasteImportButton = document.getElementById('json-paste-import-button');
+        this.isJsonPastePopUpOpen = false;
+
+
         // --- Sidebar Editing Elements ---
         this.titleSection = document.getElementById('title-section');
         this.popUpTitle = document.getElementById('popUp-title');
@@ -163,6 +171,22 @@ class MindMapViewer {
 
         if (this.popUpCloseButton) {
             this.popUpCloseButton.addEventListener('click', this.closePopUp.bind(this));
+        }
+
+        // NEW JSON Paste PopUp Event Listeners
+        if (this.jsonPastePopUpCloseButton) {
+            this.jsonPastePopUpCloseButton.addEventListener('click', this.closeJsonPastePopUp.bind(this));
+        }
+
+        if (this.jsonPasteImportButton) {
+            this.jsonPasteImportButton.addEventListener('click', this.importJsonFromPaste.bind(this));
+        }
+
+        const pasteJsonButton = document.getElementById('paste-json-button');
+        if (pasteJsonButton) {
+            pasteJsonButton.addEventListener('click', () => {
+                this.openJsonPastePopUp();
+            });
         }
 
         if (this.addNodeButton) {
@@ -631,7 +655,7 @@ class MindMapViewer {
 
     _onMouseWheel(event) {
         event.preventDefault();
-        if (this.isPopUpOpen) return;
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return;
 
         this.mouse.copy(this._getPointerCoordinates(event));
         const worldPosBeforeZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
@@ -646,7 +670,7 @@ class MindMapViewer {
     }
 
     _onMouseDown(event) {
-        if (this.isPopUpOpen) return; // Prevent interaction if popup is open
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return; // Prevent interaction if popup is open
 
         this.isConsideredClick = true;
         this.initialPointerCoords.set(event.clientX, event.clientY);
@@ -673,7 +697,7 @@ class MindMapViewer {
     }
 
     _onMouseMove(event) {
-        if (this.isPopUpOpen) return; // Prevent interaction if popup is open
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return; // Prevent interaction if popup is open
 
         if (this.isConsideredClick && (this.isDraggingNode || this.isPanning)) {
             const moveDistance = Math.hypot(
@@ -706,7 +730,7 @@ class MindMapViewer {
     }
 
     _onMouseUp(event) {
-        if (this.isPopUpOpen) return; // Prevent interaction if popup is open
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return; // Prevent interaction if popup is open
 
         if (this.isConsideredClick && !this.isDraggingNode) {
             this.mouse.copy(this._getPointerCoordinates(event));
@@ -750,7 +774,7 @@ class MindMapViewer {
     }
 
     _onTouchStart(event) {
-        if (this.isPopUpOpen) return;
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return;
         event.preventDefault();
 
         // Limpa qualquer timeout pendente ao iniciar um novo toque
@@ -799,7 +823,7 @@ class MindMapViewer {
     }
 
     _onTouchMove(event) {
-        if (this.isPopUpOpen) return;
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return;
         event.preventDefault();
 
         // Se houver qualquer movimento ou mais de um dedo, cancela o "click"
@@ -858,7 +882,7 @@ class MindMapViewer {
     }
 
     _onTouchEnd(event) {
-        if (this.isPopUpOpen) return;
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return;
 
         // Se ainda houver toques ativos (por exemplo, um dedo levantado de dois)
         if (event.touches.length > 0) {
@@ -977,6 +1001,39 @@ class MindMapViewer {
         // Esconde o botão de excluir ao fechar o popup
         if (this.deleteNodeButton) {
             this.deleteNodeButton.style.display = 'none';
+        }
+    }
+
+    // NEW: JSON Paste PopUp Methods
+    openJsonPastePopUp() {
+        if (!this.jsonPastePopUp) return;
+        this.jsonPastePopUp.classList.add('open');
+        this.isJsonPastePopUpOpen = true;
+        this.jsonPasteTextarea.value = ''; // Clear previous content
+    }
+
+    closeJsonPastePopUp() {
+        if (!this.jsonPastePopUp) return;
+        this.jsonPastePopUp.classList.remove('open');
+        this.isJsonPastePopUpOpen = false;
+    }
+
+    importJsonFromPaste() {
+        const jsonText = this.jsonPasteTextarea.value.trim();
+        if (!jsonText) {
+            alert('Por favor, cole o conteúdo JSON na área de texto.');
+            return;
+        }
+
+        try {
+            const parsedData = JSON.parse(jsonText);
+            this.data = parsedData;
+            this.drawMindMap();
+            this.closeJsonPastePopUp();
+            alert('Mapa mental importado com sucesso!');
+        } catch (error) {
+            console.error('Erro ao analisar JSON colado:', error);
+            alert('Erro: O texto colado não é um JSON válido. Por favor, verifique o formato.');
         }
     }
 

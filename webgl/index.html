@@ -257,7 +257,8 @@
         #add-node-button,
         #ai-new-map-button-popUp,
         #add-children-with-ai-button,
-        #delete-node-button {
+        #delete-node-button,
+        #json-paste-import-button {
             margin: 0 auto;
             /* Centraliza os botões individualmente dentro do contêiner flex */
             width: 100%;
@@ -305,21 +306,25 @@
         }
 
         /* Custom scrollbar styling for a classic look */
-        #popUp::-webkit-scrollbar {
+        #popUp::-webkit-scrollbar,
+        #json-paste-popUp::-webkit-scrollbar {
             width: 8px;
         }
 
-        #popUp::-webkit-scrollbar-track {
+        #popUp::-webkit-scrollbar-track,
+        #json-paste-popUp::-webkit-scrollbar-track {
             background: #f0f0f0;
         }
 
-        #popUp::-webkit-scrollbar-thumb {
+        #popUp::-webkit-scrollbar-thumb,
+        #json-paste-popUp::-webkit-scrollbar-thumb {
             background-color: #cccccc;
             border-radius: 10px;
             border: 2px solid #f0f0f0;
         }
 
-        #popUp::-webkit-scrollbar-thumb:hover {
+        #popUp::-webkit-scrollbar-thumb:hover,
+        #json-paste-popUp::-webkit-scrollbar-thumb:hover {
             background-color: #aaaaaa;
         }
 
@@ -586,9 +591,115 @@
             }
         }
 
+        /* --- JSON Paste PopUp Styles (New) --- */
+        #json-paste-popUp {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 600px;
+            /* Larger width for more content */
+            max-width: 95%;
+            max-height: 90%;
+            background-color: #ffffff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 30px;
+            box-sizing: border-box;
+            transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow-y: auto;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #json-paste-popUp.open {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto;
+        }
+
+        #json-paste-popUp h2 {
+            font-family: 'Roboto', sans-serif;
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        #json-paste-popUp-close {
+            position: absolute;
+            top: 6px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-family: 'Roboto', sans-serif;
+            font-size: 40px;
+            color: #888888;
+            cursor: pointer;
+            z-index: 1001;
+            transition: color 0.3s ease;
+            box-shadow: none;
+            font-weight: bold;
+        }
+
+        #json-paste-popUp-close:hover {
+            color: #e74c3c;
+            background-color: transparent;
+            text-shadow: none;
+            box-shadow: none;
+        }
+
+        #json-paste-textarea {
+            width: 100%;
+            flex-grow: 1;
+            /* Allows textarea to take available space */
+            min-height: 200px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Fira Code', 'Lucida Console', monospace;
+            /* Monospace for code */
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        #json-paste-import-button {
+            background-color: #28a745;
+            color: #ffffff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+            align-self: center;
+            /* Center the button horizontally */
+            width: 100%;
+            max-width: 200px;
+        }
+
+        #json-paste-import-button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        #json-paste-import-button:active {
+            transform: translateY(0);
+        }
+
+
         /* Responsive rules for mobile devices */
         @media (max-width: 768px) {
-            #popUp {
+
+            #popUp,
+            #json-paste-popUp {
                 width: 90%;
                 height: 80%;
                 padding: 20px;
@@ -598,11 +709,13 @@
                 clip-path: none;
             }
 
-            #popUp.open {
+            #popUp.open,
+            #json-paste-popUp.open {
                 transform: translate(-50%, -50%) scale(1);
             }
 
-            #popUp h2 {
+            #popUp h2,
+            #json-paste-popUp h2 {
                 font-size: 1.5em;
                 border-bottom: 1px solid #3498db;
             }
@@ -611,7 +724,8 @@
                 font-size: 0.9em;
             }
 
-            #popUp-close {
+            #popUp-close,
+            #json-paste-popUp-close {
                 font-size: 40px;
                 padding: 0;
             }
@@ -645,7 +759,8 @@
             #add-node-button,
             #ai-new-map-button-popUp,
             #add-children-with-ai-button,
-            #delete-node-button {
+            #delete-node-button,
+            #json-paste-import-button {
                 padding: 12px;
                 /* Aumenta o tamanho dos botões para facilitar o toque */
                 font-size: 1.1em;
@@ -700,6 +815,13 @@
         </div>
     </div>
 
+    <div id="json-paste-popUp">
+        <button id="json-paste-popUp-close">&times;</button>
+        <h2>Colar JSON do Mapa Mental</h2>
+        <textarea id="json-paste-textarea" placeholder="Cole seu JSON de mapa mental aqui..."></textarea>
+        <button id="json-paste-import-button">Importar JSON</button>
+    </div>
+
     <div id="loading-overlay">
         <div id="loading-spinner"></div>
     </div>
@@ -709,8 +831,9 @@
         <div id="menu-content">
             <button id="new-map-button">Novo Mapa</button>
             <button id="load-manual-map-button">Manual</button>
-            <label for="jsonUpload" id="import-json-button">Importar Mapa</label>
+            <label for="jsonUpload" id="import-json-button">Importar Mapa (Arquivo)</label>
             <input type="file" id="jsonUpload" accept=".json">
+            <button id="paste-json-button">Importar Mapa (Colar JSON)</button>
             <button id="export-json-button">Salvar Mapa</button>
             <button id="export-pdf-button">Exportar PDF</button>
             <button id="create-markdown-button">Criar Relatório</button>
