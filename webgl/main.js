@@ -5,6 +5,7 @@ import { exportMindMapToPDF } from './pdfExport.js';
 import { exportMindMapToJson } from './jsonExport.js';
 import { importMindMapFromJson } from './jsonImport.js';
 import './menuHandler.js';
+import { promptBase } from './prompts.js'; // Import the promptBase
 
 const APP_VERSION = 'v2.0.0';
 
@@ -101,12 +102,19 @@ class MindMapViewer {
         this.popUpCloseButton = document.getElementById('popUp-close');
         this.isPopUpOpen = false;
 
-        // --- NEW JSON Paste PopUp Elements ---
+        // --- JSON Paste PopUp Elements ---
         this.jsonPastePopUp = document.getElementById('json-paste-popUp');
         this.jsonPastePopUpCloseButton = document.getElementById('json-paste-popUp-close');
         this.jsonPasteTextarea = document.getElementById('json-paste-textarea');
         this.jsonPasteImportButton = document.getElementById('json-paste-import-button');
         this.isJsonPastePopUpOpen = false;
+
+        // --- NEW Prompt Generator PopUp Elements ---
+        this.promptGeneratorPopUp = document.getElementById('prompt-generator-popUp');
+        this.promptGeneratorPopUpCloseButton = document.getElementById('prompt-generator-popUp-close');
+        this.promptInputTextarea = document.getElementById('prompt-input-textarea');
+        this.copyPromptButton = document.getElementById('copy-prompt-button');
+        this.isPromptGeneratorPopUpOpen = false;
 
 
         // --- Sidebar Editing Elements ---
@@ -173,7 +181,7 @@ class MindMapViewer {
             this.popUpCloseButton.addEventListener('click', this.closePopUp.bind(this));
         }
 
-        // NEW JSON Paste PopUp Event Listeners
+        // JSON Paste PopUp Event Listeners
         if (this.jsonPastePopUpCloseButton) {
             this.jsonPastePopUpCloseButton.addEventListener('click', this.closeJsonPastePopUp.bind(this));
         }
@@ -188,6 +196,23 @@ class MindMapViewer {
                 this.openJsonPastePopUp();
             });
         }
+
+        // NEW Prompt Generator PopUp Event Listeners
+        if (this.promptGeneratorPopUpCloseButton) {
+            this.promptGeneratorPopUpCloseButton.addEventListener('click', this.closePromptGeneratorPopUp.bind(this));
+        }
+
+        if (this.copyPromptButton) {
+            this.copyPromptButton.addEventListener('click', this.copyGeneratedPrompt.bind(this));
+        }
+
+        const generatePromptButton = document.getElementById('generate-prompt-button');
+        if (generatePromptButton) {
+            generatePromptButton.addEventListener('click', () => {
+                this.openPromptGeneratorPopUp();
+            });
+        }
+
 
         if (this.addNodeButton) {
             this.addNodeButton.addEventListener('click', this.addChildNode.bind(this));
@@ -655,7 +680,7 @@ class MindMapViewer {
 
     _onMouseWheel(event) {
         event.preventDefault();
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return;
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
         this.mouse.copy(this._getPointerCoordinates(event));
         const worldPosBeforeZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
@@ -670,7 +695,7 @@ class MindMapViewer {
     }
 
     _onMouseDown(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return; // Prevent interaction if popup is open
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return; // Prevent interaction if popup is open
 
         this.isConsideredClick = true;
         this.initialPointerCoords.set(event.clientX, event.clientY);
@@ -697,7 +722,7 @@ class MindMapViewer {
     }
 
     _onMouseMove(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return; // Prevent interaction if popup is open
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return; // Prevent interaction if popup is open
 
         if (this.isConsideredClick && (this.isDraggingNode || this.isPanning)) {
             const moveDistance = Math.hypot(
@@ -730,7 +755,7 @@ class MindMapViewer {
     }
 
     _onMouseUp(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return; // Prevent interaction if popup is open
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return; // Prevent interaction if popup is open
 
         if (this.isConsideredClick && !this.isDraggingNode) {
             this.mouse.copy(this._getPointerCoordinates(event));
@@ -774,7 +799,7 @@ class MindMapViewer {
     }
 
     _onTouchStart(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return;
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
         event.preventDefault();
 
         // Limpa qualquer timeout pendente ao iniciar um novo toque
@@ -823,7 +848,7 @@ class MindMapViewer {
     }
 
     _onTouchMove(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return;
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
         event.preventDefault();
 
         // Se houver qualquer movimento ou mais de um dedo, cancela o "click"
@@ -882,7 +907,7 @@ class MindMapViewer {
     }
 
     _onTouchEnd(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen) return;
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
         // Se ainda houver toques ativos (por exemplo, um dedo levantado de dois)
         if (event.touches.length > 0) {
@@ -1004,7 +1029,7 @@ class MindMapViewer {
         }
     }
 
-    // NEW: JSON Paste PopUp Methods
+    // JSON Paste PopUp Methods
     openJsonPastePopUp() {
         if (!this.jsonPastePopUp) return;
         this.jsonPastePopUp.classList.add('open');
@@ -1034,6 +1059,34 @@ class MindMapViewer {
         } catch (error) {
             console.error('Erro ao analisar JSON colado:', error);
             alert('Erro: O texto colado não é um JSON válido. Por favor, verifique o formato.');
+        }
+    }
+
+    // NEW: Prompt Generator PopUp Methods
+    openPromptGeneratorPopUp() {
+        if (!this.promptGeneratorPopUp) return;
+        this.promptGeneratorPopUp.classList.add('open');
+        this.isPromptGeneratorPopUpOpen = true;
+        this.promptInputTextarea.value = ''; // Clear previous content
+    }
+
+    closePromptGeneratorPopUp() {
+        if (!this.promptGeneratorPopUp) return;
+        this.promptGeneratorPopUp.classList.remove('open');
+        this.isPromptGeneratorPopUpOpen = false;
+    }
+
+    async copyGeneratedPrompt() {
+        const userText = this.promptInputTextarea.value.trim();
+        const fullPrompt = promptBase + ' Content: ' + userText;
+
+        try {
+            await navigator.clipboard.writeText(fullPrompt);
+            alert('Prompt copiado para a área de transferência!');
+            this.closePromptGeneratorPopUp(); // Close after copying
+        } catch (err) {
+            console.error('Falha ao copiar o prompt: ', err);
+            alert('Erro ao copiar o prompt. Por favor, copie manualmente.');
         }
     }
 

@@ -258,7 +258,8 @@
         #ai-new-map-button-popUp,
         #add-children-with-ai-button,
         #delete-node-button,
-        #json-paste-import-button {
+        #json-paste-import-button,
+        #copy-prompt-button {
             margin: 0 auto;
             /* Centraliza os botões individualmente dentro do contêiner flex */
             width: 100%;
@@ -307,24 +308,28 @@
 
         /* Custom scrollbar styling for a classic look */
         #popUp::-webkit-scrollbar,
-        #json-paste-popUp::-webkit-scrollbar {
+        #json-paste-popUp::-webkit-scrollbar,
+        #prompt-generator-popUp::-webkit-scrollbar {
             width: 8px;
         }
 
         #popUp::-webkit-scrollbar-track,
-        #json-paste-popUp::-webkit-scrollbar-track {
+        #json-paste-popUp::-webkit-scrollbar-track,
+        #prompt-generator-popUp::-webkit-scrollbar-track {
             background: #f0f0f0;
         }
 
         #popUp::-webkit-scrollbar-thumb,
-        #json-paste-popUp::-webkit-scrollbar-thumb {
+        #json-paste-popUp::-webkit-scrollbar-thumb,
+        #prompt-generator-popUp::-webkit-scrollbar-thumb {
             background-color: #cccccc;
             border-radius: 10px;
             border: 2px solid #f0f0f0;
         }
 
         #popUp::-webkit-scrollbar-thumb:hover,
-        #json-paste-popUp::-webkit-scrollbar-thumb:hover {
+        #json-paste-popUp::-webkit-scrollbar-thumb:hover,
+        #prompt-generator-popUp::-webkit-scrollbar-thumb:hover {
             background-color: #aaaaaa;
         }
 
@@ -694,12 +699,111 @@
             transform: translateY(0);
         }
 
+        /* --- Prompt Generator PopUp Styles (New) --- */
+        #prompt-generator-popUp {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 600px;
+            max-width: 95%;
+            max-height: 90%;
+            background-color: #ffffff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 30px;
+            box-sizing: border-box;
+            transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow-y: auto;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #prompt-generator-popUp.open {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto;
+        }
+
+        #prompt-generator-popUp h2 {
+            font-family: 'Roboto', sans-serif;
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        #prompt-generator-popUp-close {
+            position: absolute;
+            top: 6px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-family: 'Roboto', sans-serif;
+            font-size: 40px;
+            color: #888888;
+            cursor: pointer;
+            z-index: 1001;
+            transition: color 0.3s ease;
+            box-shadow: none;
+            font-weight: bold;
+        }
+
+        #prompt-generator-popUp-close:hover {
+            color: #e74c3c;
+            background-color: transparent;
+            text-shadow: none;
+            box-shadow: none;
+        }
+
+        #prompt-input-textarea {
+            width: 100%;
+            flex-grow: 1;
+            min-height: 150px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 1em;
+            margin-bottom: 20px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        #copy-prompt-button {
+            background-color: #6c757d;
+            color: #ffffff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+            align-self: center;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        #copy-prompt-button:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        #copy-prompt-button:active {
+            transform: translateY(0);
+        }
 
         /* Responsive rules for mobile devices */
         @media (max-width: 768px) {
 
             #popUp,
-            #json-paste-popUp {
+            #json-paste-popUp,
+            #prompt-generator-popUp {
                 width: 90%;
                 height: 80%;
                 padding: 20px;
@@ -710,12 +814,14 @@
             }
 
             #popUp.open,
-            #json-paste-popUp.open {
+            #json-paste-popUp.open,
+            #prompt-generator-popUp.open {
                 transform: translate(-50%, -50%) scale(1);
             }
 
             #popUp h2,
-            #json-paste-popUp h2 {
+            #json-paste-popUp h2,
+            #prompt-generator-popUp h2 {
                 font-size: 1.5em;
                 border-bottom: 1px solid #3498db;
             }
@@ -725,7 +831,8 @@
             }
 
             #popUp-close,
-            #json-paste-popUp-close {
+            #json-paste-popUp-close,
+            #prompt-generator-popUp-close {
                 font-size: 40px;
                 padding: 0;
             }
@@ -760,7 +867,8 @@
             #ai-new-map-button-popUp,
             #add-children-with-ai-button,
             #delete-node-button,
-            #json-paste-import-button {
+            #json-paste-import-button,
+            #copy-prompt-button {
                 padding: 12px;
                 /* Aumenta o tamanho dos botões para facilitar o toque */
                 font-size: 1.1em;
@@ -817,10 +925,20 @@
 
     <div id="json-paste-popUp">
         <button id="json-paste-popUp-close">&times;</button>
-        <h2>Colar JSON do Mapa Mental</h2>
-        <textarea id="json-paste-textarea" placeholder="Cole seu JSON de mapa mental aqui..."></textarea>
-        <button id="json-paste-import-button">Importar JSON</button>
+        <h2>Gerar Mapa a Partir de JSON</h2>
+        <textarea id="json-paste-textarea" placeholder="Crie ou Cole seu JSON de mapa mental aqui..."></textarea>
+        <button id="json-paste-import-button">Criar Mapa</button>
     </div>
+
+    <div id="prompt-generator-popUp">
+        <button id="prompt-generator-popUp-close">&times;</button>
+        <h2>Gerador de Prompt para IA</h2>
+        <p>Cole o texto base para o mapa mental aqui e depois cole no seu GPT preferido:</p>
+        <textarea id="prompt-input-textarea"
+            placeholder="Ex: 'Os principais tipos de programação e suas características...'"></textarea>
+        <button id="copy-prompt-button">Copiar Prompt</button>
+    </div>
+
 
     <div id="loading-overlay">
         <div id="loading-spinner"></div>
@@ -831,9 +949,10 @@
         <div id="menu-content">
             <button id="new-map-button">Novo Mapa</button>
             <button id="load-manual-map-button">Manual</button>
-            <label for="jsonUpload" id="import-json-button">Importar Mapa (Arquivo)</label>
+            <label for="jsonUpload" id="import-json-button">Importar Mapa</label>
             <input type="file" id="jsonUpload" accept=".json">
-            <button id="paste-json-button">Importar Mapa (Colar JSON)</button>
+            <button id="paste-json-button">Criar JSON</button>
+            <button id="generate-prompt-button">Gerar Prompt</button>
             <button id="export-json-button">Salvar Mapa</button>
             <button id="export-pdf-button">Exportar PDF</button>
             <button id="create-markdown-button">Criar Relatório</button>
