@@ -511,18 +511,12 @@ class MindMapViewer {
         });
         await Promise.all(nodeCreationPromises);
 
-        // A lógica de maxNodeWidths não é mais estritamente necessária para o posicionamento,
-        // já que a largura é fixa. No entanto, se houver outras partes do código que a utilizem
-        // para algo além do posicionamento horizontal, pode ser mantida ou adaptada.
-        // Para este problema, podemos simplificar a parte de `maxNodeWidths`
-        // e usar diretamente `CONFIG.FIXED_NODE_WIDTH`.
-
         d3Nodes.forEach(d3Node => {
             const nodeGroup = this.nodeMap.get(d3Node);
             if (!nodeGroup) return;
 
             const direction = nodeGroup.userData.direction;
-            const nodeWidth = CONFIG.FIXED_NODE_WIDTH; // Usar a largura fixa
+            const nodeWidth = CONFIG.FIXED_NODE_WIDTH;
 
             let finalNodeX = 0;
             let finalNodeY = 0;
@@ -531,48 +525,27 @@ class MindMapViewer {
                 finalNodeX = 0;
                 finalNodeY = 0;
             } else {
-                finalNodeY = d3Node.userData.d3X; // d3.tree uses x for vertical and y for horizontal
+                finalNodeY = d3Node.userData.d3X;
 
-                let previousDepthX = 0;
-                let previousNodeWidthForSpacing = 0; // Usará a largura fixa para o espaçamento
+                let previousNodeWidthForSpacing = CONFIG.FIXED_NODE_WIDTH;
 
-                if (d3Node.parent) {
-                    const parentNodeGroup = this.nodeMap.get(d3Node.parent);
-                    if (parentNodeGroup) {
-                        previousDepthX = parentNodeGroup.position.x;
-                    }
-                    // Usar a largura fixa do nó pai para cálculo de espaçamento
-                    previousNodeWidthForSpacing = CONFIG.FIXED_NODE_WIDTH;
-                }
-
-                // Lógica de cálculo de espaçamento condicional à profundidade
                 if (d3Node.depth === 1) {
-                    // Para profundidade 1, use um offset fixo em relação à raiz
-                    const rootNodeGroup = this.nodeMap.get(this.d3RootNode); // Usa this.d3RootNode
-                    const rootWidth = rootNodeGroup ? CONFIG.FIXED_NODE_WIDTH : 0; // Usar largura fixa da raiz
-
-                    // Conecte-se à borda da raiz e adicione um offset fixo e metade da largura do nó atual.
+                    const rootNodeGroup = this.nodeMap.get(this.d3RootNode);
+                    const rootWidth = rootNodeGroup ? CONFIG.FIXED_NODE_WIDTH : 0;
                     finalNodeX = (rootWidth / 2) * direction + CONFIG.depth1HorizontalOffset * direction + (nodeWidth / 2) * direction;
-
-                } else if (d3Node.depth >= 2) {
-                    // Para profundidade 2 ou mais, use a lógica de espaçamento dinâmico
-                    if (d3Node.parent) {
-                        const parentNode = d3Node.parent;
-                        const parentGroup = this.nodeMap.get(parentNode);
-                        if (parentGroup) {
-                            const parentWidth = CONFIG.FIXED_NODE_WIDTH; // Usar largura fixa do pai
-                            const parentDir = parentGroup.userData.direction;
-
-                            let connectionPointX = parentGroup.position.x;
-                            if (parentDir !== 0) {
-                                connectionPointX += (parentWidth / 2) * parentDir;
-                            } else {
-                                connectionPointX += (parentWidth / 2) * direction;
-                            }
-
-                            let spacingNeeded = (nodeWidth / 2) + (previousNodeWidthForSpacing / 2) + CONFIG.horizontalNodePadding; // Adicionado padding horizontal
-                            finalNodeX = connectionPointX + (spacingNeeded * direction);
+                } else if (d3Node.depth >= 2 && d3Node.parent) {
+                    const parentGroup = this.nodeMap.get(d3Node.parent);
+                    if (parentGroup) {
+                        const parentWidth = CONFIG.FIXED_NODE_WIDTH;
+                        const parentDir = parentGroup.userData.direction;
+                        let connectionPointX = parentGroup.position.x;
+                        if (parentDir !== 0) {
+                            connectionPointX += (parentWidth / 2) * parentDir;
+                        } else {
+                            connectionPointX += (parentWidth / 2) * direction;
                         }
+                        let spacingNeeded = (nodeWidth / 2) + (previousNodeWidthForSpacing / 2) + CONFIG.horizontalNodePadding;
+                        finalNodeX = connectionPointX + (spacingNeeded * direction);
                     }
                 }
             }
@@ -586,9 +559,6 @@ class MindMapViewer {
         const center = box.getCenter(new THREE.Vector3());
         this.mainGroup.position.sub(center);
 
-        // Chame a função para focar a câmera no nó principal após o mapa ser desenhado
-        this._focusCameraOnNode(this.nodeMap.get(this.d3RootNode));
-
         this.camera.updateProjectionMatrix();
     }
 
@@ -598,25 +568,19 @@ class MindMapViewer {
      */
     _focusCameraOnNode(nodeGroup) {
         if (!nodeGroup) {
-            console.warn("Nó para focar a câmera não encontrado. Verifique se o nó principal foi mapeado corretamente.");
+            console.warn("Nó para focar a câmera não encontrado.");
             return;
         }
 
-        // Obtém a posição do nó no sistema de coordenadas globais do Three.js.
-        // Como o mainGroup já foi centralizado, esta posição já representa o centro global do nó.
         const targetPosition = new THREE.Vector3();
         nodeGroup.getWorldPosition(targetPosition);
 
-        // Define a posição da câmera diretamente para a posição global (x e y) do nó.
-        // Isso fará com que o centro do viewport da câmera (o centro da tela)
-        // se alinhe com o centro do nó.
         this.camera.position.x = targetPosition.x;
         this.camera.position.y = targetPosition.y;
-        this.camera.position.z = 150; // Mantém a distância original da câmera
+        this.camera.position.z = 150;
 
-        // Você também pode ajustar o zoom para que o nó principal fique bem visível
-        // Um valor de zoom de 1.0 geralmente é um bom ponto de partida para o nó principal
-        this.camera.zoom = 1.0;
+        // Ajusta o zoom para focar no nó, com um valor que o deixe bem visível.
+        this.camera.zoom = 1.5;
         this.camera.updateProjectionMatrix();
     }
 
@@ -686,14 +650,13 @@ class MindMapViewer {
     _onMouseMove(event) {
         if (this.isSidebarOpen) return;
 
-        // Se estivermos arrastando com o mouse ou pan, verificamos se o movimento excede o limite de clique
         if (this.isConsideredClick && (this.isDraggingNode || this.isPanning)) {
             const moveDistance = Math.hypot(
                 event.clientX - this.initialPointerCoords.x,
                 event.clientY - this.initialPointerCoords.y
             );
             if (moveDistance > this.tapThreshold) {
-                this.isConsideredClick = false; // Cancela o "clique" se houver arrasto
+                this.isConsideredClick = false;
             }
         }
 
@@ -718,8 +681,7 @@ class MindMapViewer {
     }
 
     _onMouseUp(event) {
-        if (this.isConsideredClick) { // Só dispara o clique se não houve arrasto
-            // Reutiliza a lógica de detecção de nó clicado do _onNodeClick original
+        if (this.isConsideredClick) {
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
@@ -728,7 +690,7 @@ class MindMapViewer {
                 let currentObject = intersect.object;
                 while (currentObject) {
                     if (currentObject.userData.isDragHandle) {
-                        clickedNode = null; // Não é um clique de nó se for no handle
+                        clickedNode = null;
                         break;
                     }
                     if (currentObject.userData.isNode) {
@@ -740,11 +702,10 @@ class MindMapViewer {
                 if (clickedNode) break;
             }
             if (clickedNode) {
-                const d3Node = clickedNode.userData.d3Node; // Obtenha o objeto d3Node
-                this.currentSelectedD3Node = d3Node; // Armazena o nó D3 selecionado
+                const d3Node = clickedNode.userData.d3Node;
+                this.currentSelectedD3Node = d3Node;
                 this.openSidebar(d3Node.data.name, d3Node.data.explanation || 'Nenhuma explicação disponível.');
             } else if (this.isSidebarOpen) {
-                // Não feche a sidebar se o clique foi dentro dela
                 if (!this.sidebar.contains(event.target)) {
                     this.closeSidebar();
                 }
@@ -753,7 +714,7 @@ class MindMapViewer {
         this.selectedNode = null;
         this.isDraggingNode = false;
         this.isPanning = false;
-        this.isConsideredClick = true; // Reseta para o próximo evento
+        this.isConsideredClick = true;
     }
 
     _onTouchStart(event) {
@@ -781,11 +742,11 @@ class MindMapViewer {
                 this.isPanning = true;
                 this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
             }
-        } /** If there are two touches, handle pinch-to-zoom */ else if (event.touches.length === 2) {
+        } else if (event.touches.length === 2) {
             this.isDraggingNode = false;
             this.isPanning = false;
             this._isPinching = true;
-            this.isConsideredClick = false; // Múltiplos toques não são cliques simples
+            this.isConsideredClick = false;
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             this.initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
@@ -802,14 +763,13 @@ class MindMapViewer {
         if (this.isSidebarOpen) return;
         event.preventDefault();
 
-        // Se estivermos arrastando com um único toque, verificamos se o movimento excede o limite de clique
         if (this.isConsideredClick && event.touches.length === 1) {
             const moveDistance = Math.hypot(
                 event.touches[0].clientX - this.initialPointerCoords.x,
                 event.touches[0].clientY - this.initialPointerCoords.y
             );
             if (moveDistance > this.tapThreshold) {
-                this.isConsideredClick = false; // Cancela o "clique" se houver arrasto
+                this.isConsideredClick = false;
             }
         }
 
@@ -850,7 +810,7 @@ class MindMapViewer {
     }
 
     _onTouchEnd(event) {
-        if (this.isConsideredClick) { // Só considera como clique se não houve arrasto/pinch
+        if (this.isConsideredClick) {
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
             let clickedNode = null;
@@ -866,8 +826,8 @@ class MindMapViewer {
                 if (clickedNode) break;
             }
             if (clickedNode && !clickedNode.userData.isDragHandle) {
-                const d3Node = clickedNode.userData.d3Node; // Obtenha o objeto d3Node
-                this.currentSelectedD3Node = d3Node; // Armazena o nó D3 selecionado
+                const d3Node = clickedNode.userData.d3Node;
+                this.currentSelectedD3Node = d3Node;
                 this.openSidebar(d3Node.data.name, d3Node.data.explanation || 'Nenhuma explicação disponível.');
             } else if (this.isSidebarOpen) {
                 this.closeSidebar();
@@ -876,7 +836,7 @@ class MindMapViewer {
         this.isDraggingNode = false;
         this.isPanning = false;
         this._isPinching = false;
-        this.isConsideredClick = true; // Reseta para o próximo evento
+        this.isConsideredClick = true;
     }
 
     // --- MÉTODOS DA SIDEBAR E EDIÇÃO ---
@@ -887,7 +847,6 @@ class MindMapViewer {
         this.sidebarTitle.textContent = title;
         this.sidebarContent.textContent = content;
 
-        // Garante que a sidebar sempre abra no modo de visualização
         this.toggleEditMode('title', false);
         this.toggleEditMode('content', false);
 
@@ -920,7 +879,6 @@ class MindMapViewer {
             const input = editView.querySelector('input, textarea');
             const currentText = (field === 'title' ? this.sidebarTitle : this.sidebarContent).textContent;
 
-            // Corrige o valor para o textarea, caso esteja vazio
             if (field === 'content' && currentText === 'Nenhuma explicação disponível.') {
                 input.value = '';
             } else {
@@ -936,8 +894,11 @@ class MindMapViewer {
         }
     }
 
-    saveNodeChanges(field) {
+    async saveNodeChanges(field) {
         if (!this.currentSelectedD3Node) return;
+
+        // Guarda a referência ao objeto de dados do nó antes de qualquer alteração.
+        const nodeDataToFocus = this.currentSelectedD3Node.data;
 
         const input = field === 'title' ? this.sidebarTitleInput : this.sidebarContentInput;
         const newValue = input.value.trim();
@@ -947,15 +908,33 @@ class MindMapViewer {
                 alert('O nome do nó não pode ser vazio.');
                 return;
             }
-            this.currentSelectedD3Node.data.name = newValue;
+            nodeDataToFocus.name = newValue;
             this.sidebarTitle.textContent = newValue;
         } else {
-            this.currentSelectedD3Node.data.explanation = newValue;
+            nodeDataToFocus.explanation = newValue;
             this.sidebarContent.textContent = newValue || 'Nenhuma explicação disponível.';
         }
 
         localStorage.setItem('mindMapData', JSON.stringify(this.data));
-        this.drawMindMap();
+
+        // Espera o mapa ser completamente redesenhado
+        await this.drawMindMap();
+
+        // Após redesenhar, encontra o novo grupo de nós correspondente aos dados atualizados
+        let nodeGroupToFocus = null;
+        for (const [d3Node, nodeGroup] of this.nodeMap.entries()) {
+            if (d3Node.data === nodeDataToFocus) {
+                nodeGroupToFocus = nodeGroup;
+                break;
+            }
+        }
+
+        // Se encontrou, foca a câmera nele
+        if (nodeGroupToFocus) {
+            this._focusCameraOnNode(nodeGroupToFocus);
+        }
+
+        // Retorna ao modo de visualização
         this.toggleEditMode(field, false);
     }
 
@@ -968,7 +947,7 @@ class MindMapViewer {
 
         const newChildName = prompt('Digite o nome do novo nó filho:');
         if (newChildName === null || newChildName.trim() === '') {
-            return; // Usuário cancelou ou inseriu nome vazio
+            return;
         }
 
         const newChildData = {
@@ -984,7 +963,19 @@ class MindMapViewer {
 
         localStorage.setItem('mindMapData', JSON.stringify(this.data));
 
-        this.drawMindMap();
+        this.drawMindMap().then(() => {
+            let nodeGroupToFocus = null;
+            for (const [d3Node, nodeGroup] of this.nodeMap.entries()) {
+                if (d3Node.data === newChildData) {
+                    nodeGroupToFocus = nodeGroup;
+                    break;
+                }
+            }
+            if (nodeGroupToFocus) {
+                this._focusCameraOnNode(nodeGroupToFocus);
+            }
+        });
+
         this.closeSidebar();
     }
 
@@ -1011,55 +1002,42 @@ class MindMapViewer {
 }
 
 
-// --- INICIALIZAÇÃO (MODIFICADA) ---
+// --- INICIALIZAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
     const mindmapContainer = document.getElementById('mindmap-container');
     if (!mindmapContainer) {
-        console.error("Container do mapa mental não encontrado. Por favor, garanta que um elemento com id 'mindmap-container' exista no seu HTML.");
+        console.error("Container do mapa mental não encontrado.");
         return;
     }
 
-    // Tenta carregar os dados do localStorage primeiro
     const storedData = localStorage.getItem('mindMapData');
 
     if (storedData) {
-        // Se encontrou dados, usa-os
-        console.log("Dados do mapa mental encontrados no localStorage. Carregando...");
         try {
             const data = JSON.parse(storedData);
-            // Salva os dados no localStorage novamente se eles vieram de lá
-            // para manter a consistência para futuras exportações ou recarregamentos.
-            // Isso evita que, se o usuário fechar e reabrir, ele perca os dados.
             localStorage.setItem('mindMapData', JSON.stringify(data));
             new MindMapViewer(mindmapContainer, data);
         } catch (error) {
             console.error('Falha ao parsear os dados do mapa mental do localStorage:', error);
-            mindmapContainer.innerHTML = '<p style="color: red;">Erro ao carregar dados da página anterior. Carregando mapa padrão.</p>';
-            loadDefaultMindMap(); // Carrega o mapa padrão como fallback
+            loadDefaultMindMap();
         }
     } else {
-        // Se não encontrou dados, carrega o arquivo padrão
-        console.log("Nenhum dado no localStorage. Carregando mapa mental padrão de 'mindmap.json'.");
         loadDefaultMindMap();
     }
 
-    // Função para carregar o mapa mental padrão
     function loadDefaultMindMap() {
         fetch('mindmap.json')
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response.json();
             })
             .then(data => {
-                // Ao carregar o mapa padrão, também o salva no localStorage para futuras exportações
                 localStorage.setItem('mindMapData', JSON.stringify(data));
                 new MindMapViewer(mindmapContainer, data);
             })
             .catch(error => {
                 console.error('Erro ao carregar os dados do mapa mental padrão:', error);
-                mindmapContainer.innerHTML = '<p style="color: red;">Erro ao carregar o mapa mental. Por favor, tente novamente mais tarde.</p>';
+                mindmapContainer.innerHTML = '<p style="color: red;">Erro ao carregar o mapa mental.</p>';
             });
     }
 });
