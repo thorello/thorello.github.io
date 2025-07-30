@@ -737,12 +737,16 @@ class MindMapViewer {
         if (this.isPopUpOpen) return;
         event.preventDefault();
 
+        // Limpa qualquer timeout pendente ao iniciar um novo toque
+        if (this.tapTimeout) {
+            clearTimeout(this.tapTimeout);
+            this.tapTimeout = null;
+        }
+
+        this.isConsideredClick = true;
         this.initialPointerCoords.set(event.touches[0].clientX, event.touches[0].clientY);
 
         if (event.touches.length === 1) {
-            this.isConsideredClick = true; // Assume it's a click initially for single touch
-            this._isPinching = false; // Ensure pinching is false for single touch
-
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.dragHandles);
@@ -754,19 +758,18 @@ class MindMapViewer {
                     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
                     this.raycaster.ray.intersectPlane(plane, this.initialIntersectionPoint);
                     this.offset.copy(this.initialIntersectionPoint).sub(this.selectedNode.position);
-                    this.isPanning = false; // Not panning if dragging a node
+                    this.isPanning = false;
                 }
             } else {
-                this.isDraggingNode = false; // Not dragging if no handle intersected
-                this.isPanning = true; // Assume panning for single touch if not dragging handle
+                this.isDraggingNode = false;
+                this.isPanning = true;
                 this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
             }
         } else if (event.touches.length === 2) {
             this.isDraggingNode = false;
             this.isPanning = false;
-            this._isPinching = true; // Definitely pinching
-            this.isConsideredClick = false; // Definitely not a click
-
+            this._isPinching = true;
+            this.isConsideredClick = false; // Definitivamente não é um clique se for pinch
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             this.initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
@@ -783,12 +786,14 @@ class MindMapViewer {
         if (this.isPopUpOpen) return;
         event.preventDefault();
 
-        // If it's a multi-touch gesture (potential pinch), immediately set isConsideredClick to false
+        // Se houver qualquer movimento ou mais de um dedo, cancela o "click"
+        if (this.tapTimeout) {
+            clearTimeout(this.tapTimeout);
+            this.tapTimeout = null;
+        }
         if (event.touches.length > 1) {
             this.isConsideredClick = false;
-            this._isPinching = true; // Ensure pinching flag is set when 2 touches are active
-            this.isDraggingNode = false; // Cannot drag node while pinching
-            this.isPanning = false; // Cannot pan while pinching
+            this._isPinching = true; // Garante que a flag de pinch está ativa
         }
 
         if (this.isConsideredClick && event.touches.length === 1) {
@@ -797,7 +802,7 @@ class MindMapViewer {
                 event.touches[0].clientY - this.initialPointerCoords.y
             );
             if (moveDistance > this.tapThreshold) {
-                this.isConsideredClick = false; // Too much movement for a click
+                this.isConsideredClick = false;
             }
         }
 
@@ -818,7 +823,7 @@ class MindMapViewer {
             this.camera.position.x -= deltaX * panSpeed;
             this.camera.position.y += deltaY * panSpeed;
             this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
-        } else if (event.touches.length === 2 && this._isPinching) {
+        } else if (this._isPinching && event.touches.length === 2) {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             const currentPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
@@ -839,7 +844,48 @@ class MindMapViewer {
     _onTouchEnd(event) {
         if (this.isPopUpOpen) return;
 
-        // Save node position if dragging was active
+        // Se ainda houver toques ativos (por exemplo, um dedo levantado de dois)
+        if (event.touches.length > 0) {
+            // Não faz nada ainda, esperando a finalização completa do gesto
+            return;
+        }
+
+        // Se um pinch-zoom foi detectado, não abre o popup
+        if (this._isPinching) {
+            this.isDraggingNode = false;
+            this.isPanning = false;
+            this._isPinching = false;
+            this.isConsideredClick = true; // Reset para a próxima interação
+            return;
+        }
+
+        // Se foi considerado um clique e não um pinch, agenda a abertura do popup
+        if (this.isConsideredClick) {
+            // Pequeno delay (ex: 200ms) para dar tempo para um segundo toque iniciar (no caso de double-tap ou pinch)
+            this.tapTimeout = setTimeout(() => {
+                this.raycaster.setFromCamera(this.mouse, this.camera);
+                const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
+                let clickedNode = null;
+                for (const intersect of intersects) {
+                    let parent = intersect.object.parent;
+                    while (parent) {
+                        if (parent.userData.isNode) {
+                            clickedNode = parent;
+                            break;
+                        }
+                        parent = parent.parent;
+                    }
+                    if (clickedNode) break;
+                }
+                if (clickedNode && !clickedNode.userData.isDragHandle) {
+                    const d3Node = clickedNode.userData.d3Node;
+                    this.currentSelectedD3Node = d3Node;
+                    this.openPopUp(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
+                }
+                this.tapTimeout = null; // Limpa o timer após a execução
+            }, 200); // 200 milissegundos de delay. Você pode ajustar este valor.
+        }
+
         if (this.isDraggingNode && this.selectedNode) {
             const d3Node = this.selectedNode.userData.d3Node;
             if (d3Node) {
@@ -848,37 +894,12 @@ class MindMapViewer {
                 localStorage.setItem('mindMapData', JSON.stringify(this.data));
             }
         }
-
-        // Determine if a click should be registered based on the final state and initial assumptions
-        if (this.isConsideredClick && !this._isPinching && event.touches.length === 0) {
-            this.raycaster.setFromCamera(this.mouse, this.camera);
-            const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
-            let clickedNode = null;
-            for (const intersect of intersects) {
-                let parent = intersect.object.parent;
-                while (parent) {
-                    if (parent.userData.isNode) {
-                        clickedNode = parent;
-                        break;
-                    }
-                    parent = parent.parent;
-                }
-                if (clickedNode) break;
-            }
-            if (clickedNode && !clickedNode.userData.isDragHandle) {
-                const d3Node = clickedNode.userData.d3Node;
-                this.currentSelectedD3Node = d3Node;
-                this.openPopUp(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
-            }
-        }
-
-        // Reset all state flags for the next interaction
-        this.selectedNode = null;
         this.isDraggingNode = false;
         this.isPanning = false;
-        this._isPinching = false; // Crucial: Reset after all touch processing
-        this.isConsideredClick = true; // Reset for next interaction
+        // _isPinching já é resetado acima se for um pinch
+        this.isConsideredClick = true;
     }
+
 
     // --- Sidebar and Editing Methods ---
     openPopUp(title, content) {

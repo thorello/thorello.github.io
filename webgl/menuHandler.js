@@ -11,12 +11,21 @@ document.addEventListener('DOMContentLoaded', () => {
             menuContainer.classList.toggle('open');
         });
 
-        // Fecha o menu se clicar em qualquer lugar fora dele
+        // Fecha o menu se clicar em qualquer lugar fora dele (para mouse)
         document.addEventListener('click', (event) => {
             if (!menuContainer.contains(event.target)) {
                 menuContainer.classList.remove('open');
             }
         });
+
+        // Fecha o menu se tocar em qualquer lugar fora dele (para touch)
+        // Usar { passive: true } para otimização em eventos de toque, já que não estamos chamando preventDefault()
+        document.addEventListener('touchstart', (event) => {
+            if (!menuContainer.contains(event.target)) {
+                menuContainer.classList.remove('open');
+            }
+        }, { passive: true });
+
     } else {
         console.warn("Menu elements (action-menu-container or menu-toggle-button) not found. Menu functionality may be limited.");
     }
