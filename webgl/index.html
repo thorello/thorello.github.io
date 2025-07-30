@@ -27,7 +27,7 @@
             height: 100vh;
         }
 
-        /* Styles for the interactive sidebar */
+        /* --- Sidebar (Popup) Styles --- */
         #sidebar {
             position: fixed;
             top: 50%;
@@ -36,28 +36,19 @@
             width: 500px;
             max-width: 90%;
             max-height: 90%;
-            /* NOVO: Fundo branco sólido */
             background-color: #ffffff;
-            /* NOVO: Sombra suave e sem brilho neon */
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            /* NOVO: Bordas suavemente arredondadas (revertendo o clip-path) */
             border-radius: 8px;
-            /* NOVO: Sem borda visível, a sombra já define */
             border: 1px solid #e0e0e0;
-            /* Borda sutil */
-
-            padding: 30px;
+            padding: 40px;
+            /* Aumentado o padding para afastar elementos da borda */
             box-sizing: border-box;
             transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             overflow-y: auto;
             z-index: 1000;
-
             opacity: 0;
             pointer-events: none;
-
-            /* Removendo clip-path para bordas arredondadas */
             clip-path: none;
-            /* Removendo padrões de fundo */
             background-image: none;
         }
 
@@ -69,21 +60,16 @@
 
         #sidebar h2 {
             font-family: 'Roboto', sans-serif;
-            /* Fonte mais robusta para títulos */
             color: #2c3e50;
-            /* Azul escuro ou preto para o título */
             text-shadow: none;
-            /* Sem sombra de texto */
             margin-top: 0;
-            /* NOVO: Borda inferior simples e elegante */
             border-bottom: 2px solid #3498db;
-            /* Cor de destaque para a borda */
             padding-bottom: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            /* Aumentado a margem inferior do título */
             position: relative;
         }
 
-        /* NOVO: Remover detalhe decorativo do título */
         #sidebar h2::after {
             content: none;
         }
@@ -91,11 +77,10 @@
         #sidebar p {
             line-height: 1.8;
             color: #555555;
-            /* Cinza médio para o texto do corpo */
             font-size: 1em;
-            /* Aumentado levemente para legibilidade */
             text-shadow: none;
-            /* Sem sombra de texto */
+            margin-bottom: 25px;
+            /* Aumentado a margem inferior aos parágrafos */
         }
 
         #sidebar-close {
@@ -103,81 +88,107 @@
             top: 15px;
             right: 15px;
             background: none;
-            /* NOVO: Botão de fechar simples e elegante */
             border: none;
             font-family: 'Roboto', sans-serif;
             font-size: 28px;
-            /* Tamanho maior para visibilidade */
             color: #888888;
-            /* Cinza neutro */
             cursor: pointer;
             z-index: 1001;
             transition: color 0.3s ease;
             box-shadow: none;
-            /* Sem sombra */
             font-weight: bold;
-            /* Deixa o 'x' mais robusto */
         }
 
         #sidebar-close:hover {
             color: #e74c3c;
-            /* Vermelho suave ao passar o mouse */
             background-color: transparent;
             text-shadow: none;
             box-shadow: none;
         }
 
-        /* --- NOVOS ESTILOS PARA EDIÇÃO NA SIDEBAR --- */
+        /* --- Editing View Styles --- */
         .display-view {
             position: relative;
+            margin-bottom: 20px;
+            /* Espaçamento entre display e edit views */
         }
 
         .edit-btn {
             position: absolute;
-            top: -10px;
+            top: 0;
             right: 0;
             background: transparent;
             border: none;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             color: #aaa;
             transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
         }
 
         .edit-btn:hover {
             color: #3498db;
         }
 
+        .edit-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
         .edit-view {
             display: none;
-            /* Oculto por padrão */
+            margin-top: 20px;
+            /* Espaçamento ao ativar a edição */
         }
 
         .edit-view input,
         .edit-view textarea {
             width: 100%;
             box-sizing: border-box;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             font-family: 'Open Sans', sans-serif;
             font-size: 1em;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .edit-view input:focus,
+        .edit-view textarea:focus {
+            border-color: #3498db;
+            outline: none;
         }
 
         .edit-view textarea {
-            min-height: 120px;
+            min-height: 150px;
             resize: vertical;
         }
 
+        .edit-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
         .edit-actions button {
-            padding: 8px 12px;
+            padding: 10px 15px;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
             color: white;
             font-size: 14px;
-            margin-right: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        .edit-actions button:active {
+            transform: translateY(1px);
         }
 
         .save-btn {
@@ -196,7 +207,43 @@
             background-color: #5a6268;
         }
 
-        /* ------------------------------------------- */
+        /* --- Add Node Button (inside sidebar) --- */
+        #add-node-button {
+            background-color: #3498db;
+            /* Cor azul para "Adicionar Filho" */
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            /* Botão menor */
+            font-size: 1em;
+            /* Tamanho da fonte menor */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+            margin: 30px auto 0 auto;
+            /* Centraliza o botão e adiciona margem superior */
+            display: block;
+            /* Garante que o margin: auto funcione para centralizar */
+            width: fit-content;
+            /* Ajusta a largura ao conteúdo */
+            font-weight: normal;
+            /* Texto normal */
+        }
+
+        #add-node-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        #add-node-button:active {
+            transform: translateY(0);
+        }
+
+        /* Remove SVG styles as it's no longer an icon but text */
+        #add-node-button svg {
+            display: none;
+            /* Esconde o SVG, já que o texto será usado */
+        }
 
         /* Custom scrollbar styling for a classic look */
         #sidebar::-webkit-scrollbar {
@@ -205,12 +252,10 @@
 
         #sidebar::-webkit-scrollbar-track {
             background: #f0f0f0;
-            /* Fundo da barra de rolagem claro */
         }
 
         #sidebar::-webkit-scrollbar-thumb {
             background-color: #cccccc;
-            /* Cor do "polegar" da barra de rolagem */
             border-radius: 10px;
             border: 2px solid #f0f0f0;
         }
@@ -225,32 +270,16 @@
             bottom: 10px;
             left: 10px;
             color: rgba(0, 0, 0, 0.5);
-            /* Cor mais escura e discreta */
             background-color: rgba(255, 255, 255, 0.7);
-            /* Fundo semitransparente branco */
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 12px;
             font-family: 'Open Sans', sans-serif;
-            /* Usar a fonte principal */
             z-index: 1000;
             pointer-events: none;
         }
 
-        /* Estilos para os botões de ação */
-        /* Remova ou comente este bloco CSS antigo */
-        /*
-.action-buttons {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 100;
-    display: flex;
-    gap: 10px;
-}
-*/
-
-        /* NOVO: Estilos para o contêiner do menu de ações */
+        /* Action Menu (top right) */
         #action-menu-container {
             position: absolute;
             top: 10px;
@@ -258,10 +287,8 @@
             z-index: 100;
         }
 
-        /* NOVO: Estilo para o botão principal que abre o menu */
         #menu-toggle-button {
             background-color: #3498db;
-            /* Azul suave */
             border: none;
             color: #ffffff;
             padding: 8px 16px;
@@ -275,20 +302,15 @@
 
         #menu-toggle-button:hover {
             background-color: #2980b9;
-            /* Azul mais escuro no hover */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* NOVO: Estilos para o conteúdo do menu (os botões) */
         #menu-content {
             display: flex;
             flex-direction: column;
-            /* Empilha os botões verticalmente */
             gap: 8px;
-            /* Espaçamento entre os botões */
             position: absolute;
             top: calc(100% + 5px);
-            /* Posiciona abaixo do botão de toggle */
             right: 0;
             background-color: #ffffff;
             border-radius: 5px;
@@ -300,20 +322,16 @@
             visibility: hidden;
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
             min-width: 160px;
-            /* Garante uma largura mínima */
         }
 
-        /* NOVO: Estilo para mostrar o menu quando o contêiner tiver a classe 'open' */
         #action-menu-container.open #menu-content {
             opacity: 1;
             visibility: visible;
             transform: scale(1);
         }
 
-        /* Ajuste nos seletores dos botões para funcionar dentro do novo menu */
         #menu-content button,
         #menu-content label {
-            /* Aplicar estilos também ao label para o upload */
             background-color: #3498db;
             border: none;
             color: #ffffff;
@@ -325,11 +343,9 @@
             transition: background-color 0.3s, box-shadow 0.3s;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             display: flex;
-            /* Mantido para alinhamento */
             align-items: center;
             justify-content: center;
             width: 100%;
-            /* Faz os botões ocuparem todo o espaço do menu */
             box-sizing: border-box;
         }
 
@@ -339,100 +355,42 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .action-buttons button,
-        .action-buttons label {
-            /* Aplicar estilos também ao label para o upload */
-            background-color: #3498db;
-            /* Azul suave */
-            border: none;
-            color: #ffffff;
-            padding: 8px 16px;
-            font-family: 'Open Sans', sans-serif;
-            font-size: 14px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, box-shadow 0.3s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            display: inline-flex;
-            /* Para alinhar o texto e o ícone se houver */
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-buttons button:hover,
-        .action-buttons label:hover {
-            background-color: #2980b9;
-            /* Azul mais escuro no hover */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
         #export-json-button {
             background-color: #28a745;
-            /* Cor verde para exportar JSON */
         }
 
         #export-json-button:hover {
             background-color: #218838;
-            /* Verde mais escuro no hover */
         }
 
         #import-json-button {
             background-color: #f39c12;
-            /* Cor laranja para importar JSON */
         }
 
         #import-json-button:hover {
             background-color: #e67e22;
-            /* Laranja mais escuro no hover */
         }
 
         #create-markdown-button {
             background-color: #8A2BE2;
-            /* Cor roxa */
         }
 
         #create-markdown-button:hover {
             background-color: #6A1BA7;
-            /* Roxo mais escuro no hover */
         }
 
-        /* NOVO: Estilo para o botão de adicionar nó filho na sidebar */
-        #add-node-button {
-            background-color: #28a745;
-            /* Verde */
-            color: #ffffff;
-            border: none;
-            padding: 10px 15px;
-            font-size: 1em;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-top: 20px;
-            /* Espaçamento do conteúdo */
-            width: 100%;
-            display: none;
-            /* Inicia escondido */
-        }
-
-        #add-node-button:hover {
-            background-color: #218838;
-            /* Verde escuro no hover */
-        }
-
-
-        /* Esconder o input file real */
+        /* Hide the real file input */
         #jsonUpload {
             display: none;
         }
 
-        /* NOVO: Estilos para o botão de Voltar - Topo esquerdo */
+        /* Back Button (top left) */
         #back-button {
             position: absolute;
             top: 10px;
             left: 10px;
             z-index: 100;
             background-color: #6c757d;
-            /* Um cinza neutro */
             border: none;
             color: #ffffff;
             padding: 8px 16px;
@@ -446,10 +404,8 @@
 
         #back-button:hover {
             background-color: #5a6268;
-            /* Um cinza um pouco mais escuro no hover */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-
 
         /* Responsive rules for mobile devices */
         @media (max-width: 768px) {
@@ -461,7 +417,6 @@
                 border-radius: 8px;
                 transform: translate(-50%, -50%) scale(0.95);
                 clip-path: none;
-                /* Remover clip-path também no mobile */
             }
 
             #sidebar.open {
@@ -480,18 +435,15 @@
             #sidebar-close {
                 font-size: 24px;
                 padding: 0;
-                /* Remover padding no mobile */
             }
 
             #back-button {
                 padding: 6px 12px;
-                /* Ajuste para telas menores */
                 font-size: 12px;
             }
 
             .action-buttons {
                 flex-direction: column;
-                /* Empilha os botões em telas pequenas */
                 gap: 5px;
                 top: 5px;
                 right: 5px;
@@ -502,7 +454,6 @@
                 padding: 6px 10px;
                 font-size: 12px;
                 width: 100%;
-                /* Ocupa a largura total quando empilhado */
             }
         }
     </style>
@@ -515,7 +466,12 @@
         <div id="title-section">
             <div class="display-view">
                 <h2 id="sidebar-title"></h2>
-                <button id="edit-title-btn" class="edit-btn" title="Editar Título">✏️</button>
+                <button id="edit-title-btn" class="edit-btn" title="Editar Título">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path
+                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                    </svg>
+                </button>
             </div>
             <div class="edit-view">
                 <input type="text" id="sidebar-title-input" />
@@ -529,7 +485,12 @@
         <div id="content-section">
             <div class="display-view">
                 <p id="sidebar-content"></p>
-                <button id="edit-content-btn" class="edit-btn" title="Editar Explicação">✏️</button>
+                <button id="edit-content-btn" class="edit-btn" title="Editar Explicação">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path
+                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                    </svg>
+                </button>
             </div>
             <div class="edit-view">
                 <textarea id="sidebar-content-input"></textarea>
@@ -540,7 +501,7 @@
             </div>
         </div>
 
-        <button id="add-node-button">+</button>
+        <button id="add-node-button" title="Adicionar Novo Nó">Adicionar Filho</button>
     </div>
 
     <div id="action-menu-container">
@@ -554,7 +515,6 @@
             <button id="create-markdown-button" onclick="window.location.href='api.html'">IA</button>
         </div>
     </div>
-
 
     <div id="mindmap-container"></div>
 
