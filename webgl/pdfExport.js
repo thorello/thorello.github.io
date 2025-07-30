@@ -65,8 +65,24 @@ export function exportMindMapToPDF(nodeMap, linkObjects, CONFIG, mainGroupPositi
     };
 
     doc.setLineWidth(0.5);
-    const linkColorHex = '#' + new THREE.Color(CONFIG.linkColor).getHexString();
-    doc.setDrawColor(linkColorHex);
+
+    // --- INÍCIO DA ALTERAÇÃO PARA CORES MAIS SUAVES NAS LINHAS DE LINK ---
+    const originalLinkColor = new THREE.Color(CONFIG.linkColor);
+    const hsl = { h: 0, s: 0, l: 0 }; // Objeto para armazenar os valores HSL
+    originalLinkColor.getHSL(hsl); // Pega os valores HSL da cor original
+
+    // Ajusta saturação e luminosidade para uma aparência mais suave
+    // Reduz a saturação em 40% (multiplica por 0.6)
+    const softerSaturation = Math.max(0, hsl.s * 0.6);
+    // Aumenta a luminosidade em 10% (adiciona 0.1), garantindo que não ultrapasse 1
+    const softerLightness = Math.min(1, hsl.l + 0.1);
+
+    const softerLinkColor = new THREE.Color();
+    softerLinkColor.setHSL(hsl.h, softerSaturation, softerLightness); // Cria a nova cor suave
+
+    const softerLinkColorHex = '#' + softerLinkColor.getHexString();
+    doc.setDrawColor(softerLinkColorHex); // Aplica a cor suave para as linhas
+    // --- FIM DA ALTERAÇÃO ---
 
     linkObjects.forEach(linkObject => {
         const curve = linkObject.userData.curve;
@@ -102,32 +118,28 @@ export function exportMindMapToPDF(nodeMap, linkObjects, CONFIG, mainGroupPositi
         doc.setDrawColor("#CCCCCC");
         doc.roundedRect(rectX, rectY, rectWidth, rectHeight, borderRadius, borderRadius, 'FD');
 
-        const textColorHex = '#' + new THREE.Color(CONFIG.textColor).getHexString();
         const fontSize = CONFIG.font.size * scale;
 
-        doc.setTextColor(textColorHex);
+        let currentColorHex = '#' + new THREE.Color(CONFIG.textColor).getHexString();
+        // Verifica se é o nó central (assumindo depth === 0 para o nó raiz D3)
+        if (nodeGroup.userData?.d3Node?.depth === 0) {
+            currentColorHex = '#FFFFFF'; // Define a cor do texto como branco para o nó central
+        }
+        doc.setTextColor(currentColorHex);
+
         doc.setFontSize(fontSize);
         doc.setFont("helvetica");
 
-        let textAlign = 'center';
-        let textX = nodePos.x;
-        const paddingX = CONFIG.padding.x * scale;
-
-        if (nodeGroup.userData.direction === 1) {
-            textAlign = 'left';
-            textX = rectX + paddingX;
-        } else if (nodeGroup.userData.direction === -1) {
-            textAlign = 'right';
-            textX = rectX + rectWidth - paddingX;
-        }
+        const textX = nodePos.x; // Centro horizontal do nó
+        const textY = nodePos.y; // Centro vertical do nó
 
         const textContent =
             (textMesh && textMesh.text) ||
             (nodeGroup.userData?.d3Node?.data?.name) ||
             'No text available';
 
-        doc.text(textContent, textX, nodePos.y, {
-            align: textAlign,
+        doc.text(textContent, textX, textY, {
+            align: 'center',
             baseline: 'middle'
         });
     });
