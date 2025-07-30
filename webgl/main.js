@@ -106,14 +106,28 @@ class MindMapViewer {
         this.isConsideredClick = true;
         this.tapThreshold = 5; // Limiar de movimento para cancelar um "clique"
 
-        // Elementos da sidebar
+        // --- Elementos da sidebar ---
         this.sidebar = document.getElementById('sidebar');
-        this.sidebarTitle = document.getElementById('sidebar-title');
-        this.sidebarContent = document.getElementById('sidebar-content');
         this.sidebarCloseButton = document.getElementById('sidebar-close');
-        // NOVO: Botão de adicionar nó filho
-        this.addNodeButton = document.getElementById('add-node-button');
         this.isSidebarOpen = false;
+
+        // --- NOVOS ELEMENTOS DA SIDEBAR PARA EDIÇÃO ---
+        this.titleSection = document.getElementById('title-section');
+        this.sidebarTitle = document.getElementById('sidebar-title');
+        this.sidebarTitleInput = document.getElementById('sidebar-title-input');
+        this.editTitleBtn = document.getElementById('edit-title-btn');
+        this.saveTitleBtn = document.getElementById('save-title-btn');
+        this.cancelTitleBtn = document.getElementById('cancel-title-btn');
+
+        this.contentSection = document.getElementById('content-section');
+        this.sidebarContent = document.getElementById('sidebar-content');
+        this.sidebarContentInput = document.getElementById('sidebar-content-input');
+        this.editContentBtn = document.getElementById('edit-content-btn');
+        this.saveContentBtn = document.getElementById('save-content-btn');
+        this.cancelContentBtn = document.getElementById('cancel-content-btn');
+
+        this.addNodeButton = document.getElementById('add-node-button');
+
 
         this._initScene();
         this._initEventListeners();
@@ -166,10 +180,19 @@ class MindMapViewer {
         if (this.sidebarCloseButton) {
             this.sidebarCloseButton.addEventListener('click', this.closeSidebar.bind(this));
         }
-        // NOVO: Event listener para o botão de adicionar nó
+
         if (this.addNodeButton) {
             this.addNodeButton.addEventListener('click', this.addChildNode.bind(this));
         }
+
+        // --- NOVOS EVENT LISTENERS PARA EDIÇÃO ---
+        this.editTitleBtn.addEventListener('click', () => this.toggleEditMode('title', true));
+        this.saveTitleBtn.addEventListener('click', () => this.saveNodeChanges('title'));
+        this.cancelTitleBtn.addEventListener('click', () => this.toggleEditMode('title', false));
+
+        this.editContentBtn.addEventListener('click', () => this.toggleEditMode('content', true));
+        this.saveContentBtn.addEventListener('click', () => this.saveNodeChanges('content'));
+        this.cancelContentBtn.addEventListener('click', () => this.toggleEditMode('content', false));
 
 
         const exportPdfButton = document.getElementById('export-pdf-button');
@@ -721,7 +744,10 @@ class MindMapViewer {
                 this.currentSelectedD3Node = d3Node; // Armazena o nó D3 selecionado
                 this.openSidebar(d3Node.data.name, d3Node.data.explanation || 'Nenhuma explicação disponível.');
             } else if (this.isSidebarOpen) {
-                this.closeSidebar();
+                // Não feche a sidebar se o clique foi dentro dela
+                if (!this.sidebar.contains(event.target)) {
+                    this.closeSidebar();
+                }
             }
         }
         this.selectedNode = null;
@@ -853,33 +879,87 @@ class MindMapViewer {
         this.isConsideredClick = true; // Reseta para o próximo evento
     }
 
-    // --- MÉTODOS DA SIDEBAR ---
+    // --- MÉTODOS DA SIDEBAR E EDIÇÃO ---
+
     openSidebar(title, content) {
-        if (this.sidebar) {
-            this.sidebarTitle.textContent = title;
-            this.sidebarContent.textContent = content;
-            this.sidebar.classList.add('open');
-            this.isSidebarOpen = true;
-            // Mostra o botão de adicionar nó quando a sidebar é aberta
-            if (this.addNodeButton) {
-                this.addNodeButton.style.display = 'block';
-            }
+        if (!this.sidebar) return;
+
+        this.sidebarTitle.textContent = title;
+        this.sidebarContent.textContent = content;
+
+        // Garante que a sidebar sempre abra no modo de visualização
+        this.toggleEditMode('title', false);
+        this.toggleEditMode('content', false);
+
+        this.sidebar.classList.add('open');
+        this.isSidebarOpen = true;
+
+        if (this.addNodeButton) {
+            this.addNodeButton.style.display = 'block';
         }
     }
 
     closeSidebar() {
-        if (this.sidebar) {
-            this.sidebar.classList.remove('open');
-            this.isSidebarOpen = false;
-            this.currentSelectedD3Node = null; // Limpa o nó selecionado ao fechar
-            // Esconde o botão de adicionar nó quando a sidebar é fechada
-            if (this.addNodeButton) {
-                this.addNodeButton.style.display = 'none';
-            }
+        if (!this.sidebar) return;
+
+        this.sidebar.classList.remove('open');
+        this.isSidebarOpen = false;
+        this.currentSelectedD3Node = null;
+
+        if (this.addNodeButton) {
+            this.addNodeButton.style.display = 'none';
         }
     }
 
-    // NOVO: Função para adicionar um nó filho
+    toggleEditMode(field, isEditing) {
+        const section = field === 'title' ? this.titleSection : this.contentSection;
+        const displayView = section.querySelector('.display-view');
+        const editView = section.querySelector('.edit-view');
+
+        if (isEditing) {
+            const input = editView.querySelector('input, textarea');
+            const currentText = (field === 'title' ? this.sidebarTitle : this.sidebarContent).textContent;
+
+            // Corrige o valor para o textarea, caso esteja vazio
+            if (field === 'content' && currentText === 'Nenhuma explicação disponível.') {
+                input.value = '';
+            } else {
+                input.value = currentText;
+            }
+
+            displayView.style.display = 'none';
+            editView.style.display = 'block';
+            input.focus();
+        } else {
+            displayView.style.display = 'block';
+            editView.style.display = 'none';
+        }
+    }
+
+    saveNodeChanges(field) {
+        if (!this.currentSelectedD3Node) return;
+
+        const input = field === 'title' ? this.sidebarTitleInput : this.sidebarContentInput;
+        const newValue = input.value.trim();
+
+        if (field === 'title') {
+            if (newValue === '') {
+                alert('O nome do nó não pode ser vazio.');
+                return;
+            }
+            this.currentSelectedD3Node.data.name = newValue;
+            this.sidebarTitle.textContent = newValue;
+        } else {
+            this.currentSelectedD3Node.data.explanation = newValue;
+            this.sidebarContent.textContent = newValue || 'Nenhuma explicação disponível.';
+        }
+
+        localStorage.setItem('mindMapData', JSON.stringify(this.data));
+        this.drawMindMap();
+        this.toggleEditMode(field, false);
+    }
+
+
     addChildNode() {
         if (!this.currentSelectedD3Node) {
             alert('Por favor, selecione um nó para adicionar um filho.');
@@ -897,28 +977,23 @@ class MindMapViewer {
             children: []
         };
 
-        // Adiciona o novo nó aos dados do nó pai
         if (!this.currentSelectedD3Node.data.children) {
             this.currentSelectedD3Node.data.children = [];
         }
         this.currentSelectedD3Node.data.children.push(newChildData);
 
-        // Atualiza os dados no localStorage
         localStorage.setItem('mindMapData', JSON.stringify(this.data));
 
-        // Redesenha o mapa mental para incluir o novo nó
         this.drawMindMap();
-        this.closeSidebar(); // Fecha a sidebar após adicionar o nó
+        this.closeSidebar();
     }
 
-    // NOVO: Função para exportar JSON para a página de Markdown
     exportJsonToMarkdownPage() {
         const storedData = localStorage.getItem('mindMapData');
         if (storedData) {
             try {
-                // Armazena os dados no sessionStorage para serem acessíveis pela json2md.html
                 sessionStorage.setItem('markdownData', storedData);
-                window.location.href = 'json2md.html'; // Redireciona para a página de Markdown
+                window.location.href = 'json2md.html';
             } catch (error) {
                 console.error('Erro ao preparar dados para Markdown:', error);
                 alert('Ocorreu um erro ao preparar os dados para exportação Markdown.');

@@ -127,6 +127,77 @@
             box-shadow: none;
         }
 
+        /* --- NOVOS ESTILOS PARA EDIÇÃO NA SIDEBAR --- */
+        .display-view {
+            position: relative;
+        }
+
+        .edit-btn {
+            position: absolute;
+            top: -10px;
+            right: 0;
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #aaa;
+            transition: color 0.2s;
+        }
+
+        .edit-btn:hover {
+            color: #3498db;
+        }
+
+        .edit-view {
+            display: none;
+            /* Oculto por padrão */
+        }
+
+        .edit-view input,
+        .edit-view textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .edit-view textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .edit-actions button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        .save-btn {
+            background-color: #28a745;
+        }
+
+        .save-btn:hover {
+            background-color: #218838;
+        }
+
+        .cancel-btn {
+            background-color: #6c757d;
+        }
+
+        .cancel-btn:hover {
+            background-color: #5a6268;
+        }
+
+        /* ------------------------------------------- */
+
         /* Custom scrollbar styling for a classic look */
         #sidebar::-webkit-scrollbar {
             width: 8px;
@@ -440,8 +511,35 @@
 <body>
     <div id="sidebar">
         <button id="sidebar-close">&times;</button>
-        <h2 id="sidebar-title"></h2>
-        <p id="sidebar-content"></p>
+
+        <div id="title-section">
+            <div class="display-view">
+                <h2 id="sidebar-title"></h2>
+                <button id="edit-title-btn" class="edit-btn" title="Editar Título">✏️</button>
+            </div>
+            <div class="edit-view">
+                <input type="text" id="sidebar-title-input" />
+                <div class="edit-actions">
+                    <button id="save-title-btn" class="save-btn">Salvar</button>
+                    <button id="cancel-title-btn" class="cancel-btn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-section">
+            <div class="display-view">
+                <p id="sidebar-content"></p>
+                <button id="edit-content-btn" class="edit-btn" title="Editar Explicação">✏️</button>
+            </div>
+            <div class="edit-view">
+                <textarea id="sidebar-content-input"></textarea>
+                <div class="edit-actions">
+                    <button id="save-content-btn" class="save-btn">Salvar</button>
+                    <button id="cancel-content-btn" class="cancel-btn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
         <button id="add-node-button">+</button>
     </div>
 
