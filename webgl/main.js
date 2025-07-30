@@ -231,6 +231,14 @@ class MindMapViewer {
                 this.exportJsonToMarkdownPage();
             });
         }
+
+        // NEW: Event listener for the "Recalculate Map" button
+        const recalculateMapButton = document.getElementById('recalculate-map-button');
+        if (recalculateMapButton) {
+            recalculateMapButton.addEventListener('click', () => {
+                this.recalculateMap();
+            });
+        }
     }
 
     _createVersionInfo() {
@@ -1030,6 +1038,24 @@ class MindMapViewer {
         } else {
             alert('Nenhum dado do mapa mental encontrado para criar Markdown.');
         }
+    }
+
+    /**
+     * Recalculates the mind map positions using the D3 algorithm,
+     * clearing any previously persisted manual positions.
+     */
+    recalculateMap() {
+        // Clear persisted positions from all nodes in the data
+        this.d3RootNode.each(d3Node => {
+            if (d3Node.data.persistedX !== undefined) {
+                delete d3Node.data.persistedX;
+            }
+            if (d3Node.data.persistedY !== undefined) {
+                delete d3Node.data.persistedY;
+            }
+        });
+        // Redraw the map, which will now use the D3 algorithm for positioning
+        this.drawMindMap();
     }
 
     // --- LOOP DE ANIMAÇÃO ---

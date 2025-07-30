@@ -379,6 +379,18 @@
             background-color: #6A1BA7;
         }
 
+        /* NEW: Style for the Recalculate Map button */
+        #recalculate-map-button {
+            background-color: #007bff;
+            /* A nice blue */
+        }
+
+        #recalculate-map-button:hover {
+            background-color: #0056b3;
+            /* Darker blue on hover */
+        }
+
+
         /* Hide the real file input */
         #jsonUpload {
             display: none;
@@ -512,7 +524,8 @@
             <button id="export-json-button">Exportar JSON</button>
             <button id="export-pdf-button">Exportar PDF</button>
             <button id="create-markdown-button">Criar Markdown</button>
-            <button id="create-markdown-button" onclick="window.location.href='api.html'">IA</button>
+            <button id="recalculate-map-button">Recalcular Mapa</button> <button id="create-markdown-button"
+                onclick="window.location.href='api.html'">IA</button>
         </div>
     </div>
 
