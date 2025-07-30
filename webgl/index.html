@@ -256,7 +256,8 @@
         /* Ajustes para os botões existentes dentro do novo contêiner */
         #add-node-button,
         #ai-new-map-button-popUp,
-        #add-children-with-ai-button {
+        #add-children-with-ai-button,
+        #delete-node-button {
             margin: 0 auto;
             /* Centraliza os botões individualmente dentro do contêiner flex */
             width: 100%;
@@ -497,6 +498,27 @@
             transform: translateY(0);
         }
 
+        /* Style for the Delete Node Button inside popUp */
+        #delete-node-button {
+            background-color: #dc3545;
+            /* Um vermelho distintivo para exclusão */
+            color: #ffffff;
+            border: none;
+            padding: 8px 15px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s;
+        }
+
+        #delete-node-button:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+
+        #delete-node-button:active {
+            transform: translateY(0);
+        }
 
         /* Hide the real file input */
         #jsonUpload {
@@ -622,7 +644,8 @@
 
             #add-node-button,
             #ai-new-map-button-popUp,
-            #add-children-with-ai-button {
+            #add-children-with-ai-button,
+            #delete-node-button {
                 padding: 12px;
                 /* Aumenta o tamanho dos botões para facilitar o toque */
                 font-size: 1.1em;
@@ -673,6 +696,7 @@
             <button id="add-node-button" title="Adicionar Novo Nó">Adicionar Filho</button>
             <button id="ai-new-map-button-popUp" style="display: none;">Novo Mapa Mental com IA</button>
             <button id="add-children-with-ai-button" style="display: none;">Adicionar nodes com IA</button>
+            <button id="delete-node-button" style="display: none;">Excluir Nó</button>
         </div>
     </div>
 

@@ -70,6 +70,7 @@ class MindMapViewer {
         this.addNodeButton = document.getElementById('add-node-button');
         this.aiNewMapButton = document.getElementById('ai-new-map-button-popUp'); // Renomeado para consistência
         this.addChildrenWithAIButton = document.getElementById('add-children-with-ai-button'); // Novo botão
+        this.deleteNodeButton = document.getElementById('delete-node-button'); // Novo botão
         this.loadingOverlay = document.getElementById('loading-overlay'); // Novo: Overlay de carregamento
         this.loadingSpinner = document.getElementById('loading-spinner'); // Novo: Spinner de carregamento
 
@@ -177,6 +178,11 @@ class MindMapViewer {
             this.aiNewMapButton.addEventListener('click', () => {
                 window.location.href = 'api.html';
             });
+        }
+
+        // Event Listener para o botão 'Excluir Nó'
+        if (this.deleteNodeButton) {
+            this.deleteNodeButton.addEventListener('click', this.deleteSelectedNode.bind(this));
         }
 
 
@@ -924,15 +930,20 @@ class MindMapViewer {
             if (this.currentSelectedD3Node.depth === 0) {
                 if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'block';
                 if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'none'; // Esconde o outro botão
+                // Esconde o botão de excluir para o nó raiz
+                if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'none';
             } else {
                 // "Adicionar nodes com IA" (para todos os outros nós)
                 if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none'; // Esconde o outro botão
                 if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'block';
+                // Mostra o botão de excluir para nós que não são raiz
+                if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'block';
             }
         } else {
             // Se nenhum nó estiver selecionado, esconde ambos
             if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none';
             if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'none';
+            if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'none';
         }
     }
 
@@ -952,6 +963,10 @@ class MindMapViewer {
         }
         if (this.addChildrenWithAIButton) {
             this.addChildrenWithAIButton.style.display = 'none';
+        }
+        // Esconde o botão de excluir ao fechar o popup
+        if (this.deleteNodeButton) {
+            this.deleteNodeButton.style.display = 'none';
         }
     }
 
@@ -1217,6 +1232,49 @@ class MindMapViewer {
             }
         });
         await this.drawMindMap();
+    }
+
+    /**
+     * Deleta o nó selecionado e todos os seus filhos do mapa mental.
+     */
+    /**
+         * Deleta o nó selecionado e todos os seus filhos do mapa mental.
+         */
+    async deleteSelectedNode() {
+        if (!this.currentSelectedD3Node) {
+            alert('Por favor, selecione um nó para excluir.');
+            return;
+        }
+
+        if (this.currentSelectedD3Node.depth === 0) {
+            alert('Não é possível excluir o nó raiz do mapa mental.');
+            return;
+        }
+
+        const confirmDelete = confirm(`Tem certeza que deseja excluir o nó "${this.currentSelectedD3Node.data.name}" e todos os seus filhos?`);
+        if (!confirmDelete) {
+            return;
+        }
+
+        const d3NodeToDelete = this.currentSelectedD3Node;
+        const parentD3Node = d3NodeToDelete.parent;
+
+        if (parentD3Node && parentD3Node.data.children) {
+            // Remove o nó do array de filhos do pai
+            parentD3Node.data.children = parentD3Node.data.children.filter(
+                child => child !== d3NodeToDelete.data
+            );
+
+            // Se o nó excluído era o último filho, remove o array de children para evitar nós vazios
+            if (parentD3Node.data.children.length === 0) {
+                delete parentD3Node.data.children;
+            }
+        }
+
+        this.closePopUp();
+        // Chama recalculateMap para limpar as posições persistidas e redesenhar
+        await this.recalculateMap();
+        alert('Nó e seus filhos excluídos com sucesso.');
     }
 
     /**
