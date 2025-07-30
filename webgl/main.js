@@ -233,11 +233,21 @@ class MindMapViewer {
             });
         }
 
+        // Modified: "Novo Mapa" button now loads new_mindmap.json
         const newMapButton = document.getElementById('new-map-button');
         if (newMapButton) {
             newMapButton.addEventListener('click', () => {
-                localStorage.removeItem('mindMapData');
-                this._loadDefaultMindMapData();
+                localStorage.removeItem('mindMapData'); // Clear local storage for a fresh start
+                this._loadMindMapFromFile('new_mindmap.json'); // Load from new_mindmap.json
+            });
+        }
+
+        // NEW: "Manual" button to load mindmap.json
+        const loadManualMapButton = document.getElementById('load-manual-map-button');
+        if (loadManualMapButton) {
+            loadManualMapButton.addEventListener('click', () => {
+                localStorage.removeItem('mindMapData'); // Clear local storage
+                this._loadMindMapFromFile('mindmap.json'); // Load from mindmap.json
             });
         }
     }
@@ -1237,9 +1247,6 @@ class MindMapViewer {
     /**
      * Deleta o nó selecionado e todos os seus filhos do mapa mental.
      */
-    /**
-         * Deleta o nó selecionado e todos os seus filhos do mapa mental.
-         */
     async deleteSelectedNode() {
         if (!this.currentSelectedD3Node) {
             alert('Por favor, selecione um nó para excluir.');
@@ -1278,10 +1285,11 @@ class MindMapViewer {
     }
 
     /**
-     * Loads the default mind map data from mindmap.json.
+     * Loads mind map data from a specified JSON file.
+     * @param {string} filename - The name of the JSON file to load.
      */
-    _loadDefaultMindMapData() {
-        fetch('mindmap.json')
+    _loadMindMapFromFile(filename) {
+        fetch(filename)
             .then(response => {
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response.json();
@@ -1293,8 +1301,8 @@ class MindMapViewer {
                 this.closePopUp();
             })
             .catch(error => {
-                console.error('Error loading default mind map data:', error);
-                this.container.innerHTML = '<p style="color: red;">Error loading mind map.</p>';
+                console.error(`Error loading mind map data from ${filename}:`, error);
+                this.container.innerHTML = `<p style="color: red;">Error loading mind map from ${filename}.</p>`;
             });
     }
 
@@ -1314,18 +1322,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const storedData = localStorage.getItem('mindMapData');
+    const viewer = new MindMapViewer(mindmapContainer, {}); // Initialize with empty data
 
     if (storedData) {
         try {
             const data = JSON.parse(storedData);
-            new MindMapViewer(mindmapContainer, data);
+            viewer.data = data; // Assign loaded data
+            viewer.drawMindMap();
         } catch (error) {
             console.error('Failed to parse mind map data from localStorage:', error);
-            const viewer = new MindMapViewer(mindmapContainer, {});
-            viewer._loadDefaultMindMapData();
+            viewer._loadMindMapFromFile('mindmap.json'); // Fallback to default if localStorage is corrupt
         }
     } else {
-        const viewer = new MindMapViewer(mindmapContainer, {});
-        viewer._loadDefaultMindMapData();
+        viewer._loadMindMapFromFile('mindmap.json'); // Load default on first visit or no stored data
     }
 });

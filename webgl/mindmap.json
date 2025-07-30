@@ -38,8 +38,13 @@
                     "children": []
                 },
                 {
-                    "name": "Adicionar um Novo Filho (Manual)",
+                    "name": "Adicionar um Novo Filho",
                     "definition": "Com um nó selecionado e o pop-up aberto, clique no botão 'Adicionar Filho'. Será pedido um nome para o novo nó. Ele será adicionado como filho do nó selecionado e você poderá editá-lo em seguida.",
+                    "children": []
+                },
+                {
+                    "name": "Excluir Nó",
+                    "definition": "Para remover um nó e todos os seus filhos, selecione o nó (não o nó principal) e clique no botão 'Excluir Nó' no pop-up de edição. Uma confirmação será solicitada.",
                     "children": []
                 }
             ]
@@ -50,7 +55,7 @@
             "children": [
                 {
                     "name": "Novo Mapa Mental com IA",
-                    "definition": "No pop-up do nó principal (este nó), clique em 'Novo Mapa Mental com IA'. Você será direcionado a uma página onde pode colar sua Chave de API do Google AI Studio (Gemini) e inserir um texto ou URL. A IA analisará o conteúdo e criará um novo mapa mental para você.",
+                    "definition": "No pop-up do nó principal (este nó) ou através do botão 'Novo Mapa Mental com IA' no menu de ações, você será direcionado a uma página onde pode colar sua Chave de API do Google AI Studio (Gemini) e inserir um texto ou URL. A IA analisará o conteúdo e criará um novo mapa mental para você.",
                     "children": []
                 },
                 {
@@ -96,7 +101,12 @@
                 },
                 {
                     "name": "Novo Mapa",
-                    "definition": "Inicia um mapa mental completamente novo, limpando o mapa atual.",
+                    "definition": "Inicia um mapa mental completamente novo, carregando uma estrutura padrão sem dados anteriores.",
+                    "children": []
+                },
+                {
+                    "name": "Manual",
+                    "definition": "Carrega o mapa mental de instruções padrão, útil para resetar e revisar as funcionalidades.",
                     "children": []
                 }
             ]
