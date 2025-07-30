@@ -18,7 +18,7 @@ const CONFIG = {
         0xFFFFFF, // Branco
         0xFFFFFF, // Branco
         0xFFFFFF, // Branco
-        0xFFFFFF  // Branco
+        0xFFFFFF  // Branco
     ],
     linkColor: 0x4B5563, // Cinza escuro para as conexões
     dragHandleColor: 0x111827, // Preto para o manipulador de arrastar
@@ -32,8 +32,8 @@ const CONFIG = {
     dragHandleRadius: 6, // Um pouco menor e mais discreto
     zoom: {
         speed: 0.2, // Velocidade de zoom para roda do mouse e pinça (ajustável)
-        min: 0.05,  // Permite mais zoom out (mais longe)
-        max: 8,     // Permite mais zoom in (mais perto)
+        min: 0.05,  // Permite mais zoom out (mais longe)
+        max: 8,     // Permite mais zoom in (mais perto)
     },
     horizontalNodePadding: 0, // Base padding between nodes horizontally
     verticalNodeSpacing: 80, // Vertical spacing between parent and child nodes
@@ -443,7 +443,11 @@ class MindMapViewer {
 
     // --- LÓGICA PRINCIPAL ---
 
+    // Inside your MindMapViewer class
+
     async drawMindMap() {
+        // ... (existing code to clear and set up nodes and links) ...
+
         // Remove todos os objetos existentes do mainGroup
         while (this.mainGroup.children.length > 0) {
             const object = this.mainGroup.children[0];
@@ -598,6 +602,7 @@ class MindMapViewer {
 
         d3Links.forEach(link => this._createLinkMesh(link));
 
+        // Calculate the bounding box and center the group.
         const box = new THREE.Box3().setFromObject(this.mainGroup);
         const center = box.getCenter(new THREE.Vector3());
         this.mainGroup.position.sub(center);
@@ -607,6 +612,12 @@ class MindMapViewer {
         // Salvar os dados após o draw, garantindo que as posições calculadas
         // (ou as persistidas) estejam no localStorage.
         localStorage.setItem('mindMapData', JSON.stringify(this.data));
+
+        // NEW: Focus on the root node after everything is drawn and centered
+        const rootNodeGroup = this.nodeMap.get(this.d3RootNode);
+        if (rootNodeGroup) {
+            this._focusCameraOnNode(rootNodeGroup);
+        }
     }
 
     /**
@@ -624,10 +635,11 @@ class MindMapViewer {
 
         this.camera.position.x = targetPosition.x;
         this.camera.position.y = targetPosition.y;
-        this.camera.position.z = 150;
+        this.camera.position.z = 250; // Mantenha a câmera a uma distância padrão do plano XY
 
         // Ajusta o zoom para focar no nó, com um valor que o deixe bem visível.
-        this.camera.zoom = 1.5;
+        // Um zoom de 1.5 a 2.0 geralmente é bom para focar em um nó.
+        this.camera.zoom = 1; // Ajuste conforme a preferência
         this.camera.updateProjectionMatrix();
     }
 
@@ -990,7 +1002,7 @@ class MindMapViewer {
         }
 
         // Espera o mapa ser completamente redesenhado
-        await this.drawMindMap();
+        await this.drawMindMap(); // <<< AQUI O MAPA É REDESENHADO
 
         // Após redesenhar, encontra o novo grupo de nós correspondente aos dados atualizados
         let nodeGroupToFocus = null;
@@ -1003,7 +1015,7 @@ class MindMapViewer {
 
         // Se encontrou, foca a câmera nele
         if (nodeGroupToFocus) {
-            this._focusCameraOnNode(nodeGroupToFocus);
+            this._focusCameraOnNode(nodeGroupToFocus); // <<< E O FOCO É AJUSTADO
         }
 
         // Retorna ao modo de visualização
@@ -1011,7 +1023,7 @@ class MindMapViewer {
     }
 
 
-    addChildNode() {
+    async addChildNode() { // Tornar a função assíncrona
         if (!this.currentSelectedD3Node) {
             alert('Por favor, selecione um nó para adicionar um filho.');
             return;
@@ -1033,20 +1045,34 @@ class MindMapViewer {
         }
         this.currentSelectedD3Node.data.children.push(newChildData);
 
-        this.drawMindMap().then(() => {
-            let nodeGroupToFocus = null;
-            for (const [d3Node, nodeGroup] of this.nodeMap.entries()) {
-                if (d3Node.data === newChildData) {
-                    nodeGroupToFocus = nodeGroup;
-                    break;
-                }
-            }
-            if (nodeGroupToFocus) {
-                this._focusCameraOnNode(nodeGroupToFocus);
+        // Aguarde o mapa ser redesenhado e as posições recalculadas
+        await this.recalculateMap();
+
+        // Encontre o nó D3 correspondente aos dados do novo nó na nova hierarquia
+        let newD3ChildNode = null;
+        this.d3RootNode.each(d3Node => {
+            if (d3Node.data === newChildData) {
+                newD3ChildNode = d3Node;
             }
         });
 
-        this.closeSidebar();
+        // Se encontrou o nó D3, encontre o grupo Three.js correspondente e foque
+        if (newD3ChildNode) {
+            const newNodeGroup = this.nodeMap.get(newD3ChildNode);
+            if (newNodeGroup) {
+                this._focusCameraOnNode(newNodeGroup);
+                // Opcional: Selecionar o novo nó e abrir a sidebar para ele
+                this.currentSelectedD3Node = newD3ChildNode;
+                this.openSidebar(newD3ChildNode.data.name, newD3ChildNode.data.definition || 'Nenhuma explicação disponível.');
+            }
+        }
+
+        // Add a small delay and then close the sidebar.
+        // This gives the browser a moment to finish processing the event queue,
+        // preventing the _onMouseUp/_onTouchEnd from re-opening it.
+        setTimeout(() => {
+            this.closeSidebar();
+        }, 100); // You can adjust this delay if needed
     }
 
     exportJsonToMarkdownPage() {
@@ -1068,7 +1094,7 @@ class MindMapViewer {
      * Recalculates the mind map positions using the D3 algorithm,
      * clearing any previously persisted manual positions.
      */
-    recalculateMap() {
+    async recalculateMap() { // Adicione 'async' aqui
         // Clear persisted positions from all nodes in the data
         this.d3RootNode.each(d3Node => {
             if (d3Node.data.persistedX !== undefined) {
@@ -1079,7 +1105,7 @@ class MindMapViewer {
             }
         });
         // Redraw the map, which will now use the D3 algorithm for positioning
-        this.drawMindMap();
+        await this.drawMindMap(); // Adicione 'await' aqui
     }
 
     /**
