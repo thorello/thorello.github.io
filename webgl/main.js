@@ -751,7 +751,7 @@ class MindMapViewer {
             if (clickedNode) {
                 const d3Node = clickedNode.userData.d3Node;
                 this.currentSelectedD3Node = d3Node;
-                this.openSidebar(d3Node.data.name, d3Node.data.explanation || 'Nenhuma explicação disponível.');
+                this.openSidebar(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
             } else if (this.isSidebarOpen) {
                 if (!this.sidebar.contains(event.target)) {
                     this.closeSidebar();
@@ -885,7 +885,7 @@ class MindMapViewer {
             if (clickedNode && !clickedNode.userData.isDragHandle) {
                 const d3Node = clickedNode.userData.d3Node;
                 this.currentSelectedD3Node = d3Node;
-                this.openSidebar(d3Node.data.name, d3Node.data.explanation || 'Nenhuma explicação disponível.');
+                this.openSidebar(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
             } else if (this.isSidebarOpen) {
                 this.closeSidebar();
             }
@@ -985,7 +985,7 @@ class MindMapViewer {
             nodeDataToFocus.name = newValue;
             this.sidebarTitle.textContent = newValue;
         } else {
-            nodeDataToFocus.explanation = newValue;
+            nodeDataToFocus.definition = newValue;
             this.sidebarContent.textContent = newValue || 'Nenhuma explicação disponível.';
         }
 
@@ -1024,7 +1024,7 @@ class MindMapViewer {
 
         const newChildData = {
             name: newChildName,
-            explanation: 'Nova explicação para ' + newChildName,
+            definition: 'Nova explicação para ' + newChildName,
             children: []
         };
 

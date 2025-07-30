@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa Mental com WebGL</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         /* Import Google Fonts - Removendo fontes futuristas e adicionando uma mais clássica */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;600&display=swap');
@@ -56,6 +57,9 @@
             opacity: 1;
             transform: translate(-50%, -50%) scale(1);
             pointer-events: auto;
+            padding-left: 25px;
+            padding-right: 25px;
+            padding-bottom: 10px;
         }
 
         #sidebar h2 {
@@ -79,8 +83,9 @@
             color: #555555;
             font-size: 1em;
             text-shadow: none;
-            margin-bottom: 25px;
-            /* Aumentado a margem inferior aos parágrafos */
+            margin-bottom: 10px;
+            margin-top: 0px
+                /* Aumentado a margem inferior aos parágrafos */
         }
 
         #sidebar-close {
@@ -109,35 +114,51 @@
         /* --- Editing View Styles --- */
         .display-view {
             position: relative;
-            margin-bottom: 20px;
             /* Espaçamento entre display e edit views */
+            display: grid !important;
+            /* Transforma o contêiner em um grid container */
+            /* Define duas colunas: a primeira para o botão (conteúdo intrínseco) e a segunda para o texto (resto do espaço) */
+            grid-template-columns: auto 1fr;
+            place-items: start start;
+            align-items: center;
+            /* Alinha os itens verticalmente ao centro dentro de suas células de grid */
+            gap: 10px;
+            /* Adiciona um espaço entre as colunas */
         }
 
         .edit-btn {
-            position: absolute;
-            top: 0;
-            right: 0;
+
+            place-self: start start;
+            /* Remove o posicionamento absoluto para que o Grid possa controlá-lo */
             background: transparent;
             border: none;
             font-size: 18px;
+            /* Tamanho da fonte que controla o tamanho do ícone Material */
             cursor: pointer;
-            color: #aaa;
+            color: #aaaaaa;
+            /* Cor do ícone */
             transition: color 0.2s;
             display: flex;
+            /* Mantém flex para centralizar o ícone dentro do botão, embora Material Icons se centralize bem */
             align-items: center;
             justify-content: center;
+            opacity: 0.5;
             width: 30px;
+            /* Largura do botão */
             height: 30px;
+            top: 0px;
+            /* Altura do botão */
         }
 
         .edit-btn:hover {
             color: #3498db;
         }
 
-        .edit-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
+        /* Remova quaisquer estilos de SVG ou IMG específicos para os ícones aqui */
+        .edit-btn svg,
+        .edit-btn img {
+            display: none;
+            /* Garante que os antigos SVGs/IMGS não apareçam se por algum motivo ainda estiverem lá */
         }
 
         .edit-view {
@@ -505,13 +526,10 @@
 
         <div id="title-section">
             <div class="display-view">
-                <h2 id="sidebar-title"></h2>
                 <button id="edit-title-btn" class="edit-btn" title="Editar Título">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path
-                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                    </svg>
+                    <i class="material-icons">edit_square</i>
                 </button>
+                <h2 id="sidebar-title"></h2>
             </div>
             <div class="edit-view">
                 <input type="text" id="sidebar-title-input" />
@@ -524,13 +542,10 @@
 
         <div id="content-section">
             <div class="display-view">
-                <p id="sidebar-content"></p>
                 <button id="edit-content-btn" class="edit-btn" title="Editar Explicação">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path
-                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                    </svg>
+                    <i class="material-icons">edit_square</i>
                 </button>
+                <p id="sidebar-content"></p>
             </div>
             <div class="edit-view">
                 <textarea id="sidebar-content-input"></textarea>

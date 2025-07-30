@@ -266,143 +266,143 @@
     <script>
         let jsonData = {
             "name": "Ataques a Redes",
-            "explanation": "Visão geral dos principais ataques a redes, incluindo Negação de Serviço, Força Bruta, Varredura de Portas, Decepção, Falsificação e Interceptação, com suas definições, variações, impactos e contramedidas.",
+            "definition": "Visão geral dos principais ataques a redes, incluindo Negação de Serviço, Força Bruta, Varredura de Portas, Decepção, Falsificação e Interceptação, com suas definições, variações, impactos e contramedidas.",
             "children": [
                 {
                     "name": "Negação de Serviço (DoS/DDoS)",
-                    "explanation": "Ataques que visam tornar um recurso de computação indisponível para usuários legítimos, sem roubar informações. Podem ser DoS (fonte única) ou DDoS (múltiplas fontes distribuídas geograficamente, usando botnets).",
+                    "definition": "Ataques que visam tornar um recurso de computação indisponível para usuários legítimos, sem roubar informações. Podem ser DoS (fonte única) ou DDoS (múltiplas fontes distribuídas geograficamente, usando botnets).",
                     "children": [
                         {
                             "name": "Categorias de Ataques DoS/DDoS",
-                            "explanation": "Tipos de ataques de negação de serviço baseados na forma como consomem recursos do alvo.",
+                            "definition": "Tipos de ataques de negação de serviço baseados na forma como consomem recursos do alvo.",
                             "children": [
                                 {
                                     "name": "Ataques de Volume",
-                                    "explanation": "Inundam a largura de banda da rede do alvo com tráfego massivo, como UDP Flood e ICMP Flood.",
+                                    "definition": "Inundam a largura de banda da rede do alvo com tráfego massivo, como UDP Flood e ICMP Flood.",
                                     "children": []
                                 },
                                 {
                                     "name": "Ataques de Protocolo",
-                                    "explanation": "Consomem recursos de servidores ou equipamentos de rede explorando vulnerabilidades em protocolos, como SYN Flood, que deixa conexões TCP semiabertas.",
+                                    "definition": "Consomem recursos de servidores ou equipamentos de rede explorando vulnerabilidades em protocolos, como SYN Flood, que deixa conexões TCP semiabertas.",
                                     "children": []
                                 },
                                 {
                                     "name": "Ataques à Camada de Aplicação",
-                                    "explanation": "Direcionados a aplicações específicas, enviando requisições que parecem legítimas para consumir intensivamente CPU e memória do servidor, como HTTP Flood.",
+                                    "definition": "Direcionados a aplicações específicas, enviando requisições que parecem legítimas para consumir intensivamente CPU e memória do servidor, como HTTP Flood.",
                                     "children": []
                                 }
                             ]
                         },
                         {
                             "name": "Impacto Principal DoS/DDoS",
-                            "explanation": "Violação do princípio da Disponibilidade, impedindo que usuários legítimos acessem os serviços.",
+                            "definition": "Violação do princípio da Disponibilidade, impedindo que usuários legítimos acessem os serviços.",
                             "children": []
                         },
                         {
                             "name": "Contramedidas DoS/DDoS",
-                            "explanation": "Estratégias para mitigar ataques de negação de serviço, incluindo firewalls, Sistemas de Prevenção de Intrusão (IPS), limitação de taxa (rate limiting) e serviços especializados de mitigação anti-DDoS com scrubbing centers.",
+                            "definition": "Estratégias para mitigar ataques de negação de serviço, incluindo firewalls, Sistemas de Prevenção de Intrusão (IPS), limitação de taxa (rate limiting) e serviços especializados de mitigação anti-DDoS com scrubbing centers.",
                             "children": []
                         },
                         {
                             "name": "Foco CEBRASPE DoS/DDoS",
-                            "explanation": "Pontos importantes para exames, como a diferença entre DoS (uma fonte) e DDoS (múltiplas fontes), o objetivo primordial de esgotar recursos (não roubar dados) e o SYN Flood como ataque de protocolo clássico.",
+                            "definition": "Pontos importantes para exames, como a diferença entre DoS (uma fonte) e DDoS (múltiplas fontes), o objetivo primordial de esgotar recursos (não roubar dados) e o SYN Flood como ataque de protocolo clássico.",
                             "children": []
                         }
                     ]
                 },
                 {
                     "name": "Força Bruta e Varredura de Portas",
-                    "explanation": "Ataques focados na descoberta de credenciais ou na identificação de vulnerabilidades em sistemas através do reconhecimento de portas abertas.",
+                    "definition": "Ataques focados na descoberta de credenciais ou na identificação de vulnerabilidades em sistemas através do reconhecimento de portas abertas.",
                     "children": [
                         {
                             "name": "Ataque de Força Bruta",
-                            "explanation": "Método criptoanalítico que tenta sistematicamente todas as combinações possíveis de senhas ou chaves até encontrar a correta.",
+                            "definition": "Método criptoanalítico que tenta sistematicamente todas as combinações possíveis de senhas ou chaves até encontrar a correta.",
                             "children": [
                                 {
                                     "name": "Variações de Força Bruta",
-                                    "explanation": "O Ataque de Dicionário é uma forma otimizada que utiliza uma lista predefinida de palavras comuns e senhas vazadas.",
+                                    "definition": "O Ataque de Dicionário é uma forma otimizada que utiliza uma lista predefinida de palavras comuns e senhas vazadas.",
                                     "children": []
                                 },
                                 {
                                     "name": "Impacto Principal Força Bruta",
-                                    "explanation": "Violação da Confidencialidade e Autenticidade, permitindo acesso não autorizado a contas e sistemas.",
+                                    "definition": "Violação da Confidencialidade e Autenticidade, permitindo acesso não autorizado a contas e sistemas.",
                                     "children": []
                                 },
                                 {
                                     "name": "Contramedidas Força Bruta",
-                                    "explanation": "Implementação de políticas de senha forte, bloqueio de conta após tentativas malsucedidas, uso de CAPTCHA e, principalmente, Autenticação Multifator (MFA).",
+                                    "definition": "Implementação de políticas de senha forte, bloqueio de conta após tentativas malsucedidas, uso de CAPTCHA e, principalmente, Autenticação Multifator (MFA).",
                                     "children": []
                                 }
                             ]
                         },
                         {
                             "name": "Varredura de Portas (Port Scanning)",
-                            "explanation": "Técnica de reconhecimento para sondar um servidor ou host em busca de portas abertas, identificando serviços e aplicações em execução para encontrar potenciais vetores de ataque.",
+                            "definition": "Técnica de reconhecimento para sondar um servidor ou host em busca de portas abertas, identificando serviços e aplicações em execução para encontrar potenciais vetores de ataque.",
                             "children": [
                                 {
                                     "name": "Técnicas Comuns Varredura",
-                                    "explanation": "Incluem TCP Connect Scan (conexão TCP completa, detectável) e TCP SYN Scan (envia SYN, não completa handshake, mais furtivo).",
+                                    "definition": "Incluem TCP Connect Scan (conexão TCP completa, detectável) e TCP SYN Scan (envia SYN, não completa handshake, mais furtivo).",
                                     "children": []
                                 },
                                 {
                                     "name": "Ferramenta Padrão",
-                                    "explanation": "Nmap é a ferramenta mais conhecida para realizar varreduras de portas.",
+                                    "definition": "Nmap é a ferramenta mais conhecida para realizar varreduras de portas.",
                                     "children": []
                                 },
                                 {
                                     "name": "Contramedidas Varredura",
-                                    "explanation": "Configuração de firewalls para descartar pacotes em portas fechadas e uso de Sistemas de Detecção de Intrusão (IDS) para identificar padrões de varredura.",
+                                    "definition": "Configuração de firewalls para descartar pacotes em portas fechadas e uso de Sistemas de Detecção de Intrusão (IDS) para identificar padrões de varredura.",
                                     "children": []
                                 }
                             ]
                         },
                         {
                             "name": "Foco CEBRASPE Força Bruta e Portas",
-                            "explanation": "Pontos importantes para exames, como a MFA como defesa robusta contra Força Bruta, a Varredura de Portas como fase de reconhecimento (não um ataque direto) e a furtividade do SYN Scan por não completar o handshake.",
+                            "definition": "Pontos importantes para exames, como a MFA como defesa robusta contra Força Bruta, a Varredura de Portas como fase de reconhecimento (não um ataque direto) e a furtividade do SYN Scan por não completar o handshake.",
                             "children": []
                         }
                     ]
                 },
                 {
                     "name": "Decepção, Falsificação, Interceptação",
-                    "explanation": "Categoria de ataques que exploram a confiança e utilizam técnicas de engano, falsificação de identidade ou interceptação de comunicação para comprometer a segurança.",
+                    "definition": "Categoria de ataques que exploram a confiança e utilizam técnicas de engano, falsificação de identidade ou interceptação de comunicação para comprometer a segurança.",
                     "children": [
                         {
                             "name": "Phishing",
-                            "explanation": "Ataque de engenharia social, geralmente por e-mail, que engana a vítima para revelar informações sensíveis (credenciais) ou executar código malicioso, usando mensagens e páginas falsas que se passam por entidades legítimas.",
+                            "definition": "Ataque de engenharia social, geralmente por e-mail, que engana a vítima para revelar informações sensíveis (credenciais) ou executar código malicioso, usando mensagens e páginas falsas que se passam por entidades legítimas.",
                             "children": [
                                 {
                                     "name": "Spear Phishing",
-                                    "explanation": "Variante direcionada e personalizada para um indivíduo ou organização específica, aumentando a credibilidade e chance de sucesso.",
+                                    "definition": "Variante direcionada e personalizada para um indivíduo ou organização específica, aumentando a credibilidade e chance de sucesso.",
                                     "children": []
                                 }
                             ]
                         },
                         {
                             "name": "Eavesdropping (Interceptação Passiva)",
-                            "explanation": "Ato de monitorar secretamente a comunicação entre duas partes em uma rede para obter informações. É um ataque passivo que viola a confidencialidade e ocorre frequentemente em redes Wi-Fi públicas.",
+                            "definition": "Ato de monitorar secretamente a comunicação entre duas partes em uma rede para obter informações. É um ataque passivo que viola a confidencialidade e ocorre frequentemente em redes Wi-Fi públicas.",
                             "children": [
                                 {
                                     "name": "Contramedida Eavesdropping",
-                                    "explanation": "Criptografia é a principal contramedida, tornando dados interceptados ilegíveis através de protocolos como TLS (HTTPS) e VPNs.",
+                                    "definition": "Criptografia é a principal contramedida, tornando dados interceptados ilegíveis através de protocolos como TLS (HTTPS) e VPNs.",
                                     "children": []
                                 }
                             ]
                         },
                         {
                             "name": "DNS Spoofing",
-                            "explanation": "Ataque que introduz dados falsos no cache de um servidor DNS, fazendo-o retornar um endereço IP incorreto (malicioso) para um nome de domínio legítimo, redirecionando usuários para sites falsos.",
+                            "definition": "Ataque que introduz dados falsos no cache de um servidor DNS, fazendo-o retornar um endereço IP incorreto (malicioso) para um nome de domínio legítimo, redirecionando usuários para sites falsos.",
                             "children": [
                                 {
                                     "name": "Contramedida DNS Spoofing",
-                                    "explanation": "DNSSEC (Domain Name System Security Extensions) utiliza assinaturas digitais para garantir autenticidade e integridade das respostas DNS.",
+                                    "definition": "DNSSEC (Domain Name System Security Extensions) utiliza assinaturas digitais para garantir autenticidade e integridade das respostas DNS.",
                                     "children": []
                                 }
                             ]
                         },
                         {
                             "name": "Foco CEBRASPE Decepção/Interc.",
-                            "explanation": "Pontos importantes para exames, como o Phishing como engenharia social, a criptografia como defesa eficaz contra Eavesdropping (firewall é incorreto) e a diferença entre DNS Spoofing (infraestrutura) e Phishing (link malicioso) no redirecionamento para sites falsos.",
+                            "definition": "Pontos importantes para exames, como o Phishing como engenharia social, a criptografia como defesa eficaz contra Eavesdropping (firewall é incorreto) e a diferença entre DNS Spoofing (infraestrutura) e Phishing (link malicioso) no redirecionamento para sites falsos.",
                             "children": []
                         }
                     ]
@@ -429,18 +429,18 @@
             if (level === 0) {
                 // Adiciona o título principal como H1 no Markdown
                 markdown += `# ${data.name}\n\n`;
-                markdown += `${data.explanation}\n\n`;
+                markdown += `${data.definition}\n\n`;
                 markdown += `---\n\n`;
             } else if (level === 1) {
                 markdown += `${headingPrefix} ${data.name}\n\n`;
-                markdown += `${data.explanation}\n\n`;
+                markdown += `${data.definition}\n\n`;
             } else if (level === 2) {
                 markdown += `${headingPrefix} ${data.name}\n\n`;
-                markdown += `${data.explanation}\n\n`;
+                markdown += `${data.definition}\n\n`;
             } else if (level === 3) {
-                markdown += `* **${data.name}**: ${data.explanation}\n`;
+                markdown += `* **${data.name}**: ${data.definition}\n`;
             } else {
-                markdown += `    * **${data.name}**: ${data.explanation}\n`;
+                markdown += `    * **${data.name}**: ${data.definition}\n`;
             }
 
             if (data.children && data.children.length > 0) {
