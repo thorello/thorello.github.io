@@ -241,6 +241,17 @@ class MindMapViewer {
                 this.recalculateMap();
             });
         }
+
+        // NEW: Event listener for the "New Map" button
+        const newMapButton = document.getElementById('new-map-button');
+        if (newMapButton) {
+            newMapButton.addEventListener('click', () => {
+                // Clear the current mind map data from localStorage
+                localStorage.removeItem('mindMapData');
+                // Reload the default mind map
+                this._loadDefaultMindMapData();
+            });
+        }
     }
 
     _createVersionInfo() {
@@ -1071,6 +1082,28 @@ class MindMapViewer {
         this.drawMindMap();
     }
 
+    /**
+     * Loads the default mind map data from mindmap.json.
+     * This function is now a method of the class.
+     */
+    _loadDefaultMindMapData() {
+        fetch('mindmap.json')
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                this.data = data; // Update the instance's data
+                localStorage.setItem('mindMapData', JSON.stringify(this.data)); // Save to localStorage
+                this.drawMindMap(); // Redraw the map with new data
+                this.closeSidebar(); // Optionally close sidebar when loading new map
+            })
+            .catch(error => {
+                console.error('Erro ao carregar os dados do mapa mental padrão:', error);
+                this.container.innerHTML = '<p style="color: red;">Erro ao carregar o mapa mental.</p>';
+            });
+    }
+
     // --- LOOP DE ANIMAÇÃO ---
     animate() {
         requestAnimationFrame(this.animate.bind(this));
@@ -1092,29 +1125,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storedData) {
         try {
             const data = JSON.parse(storedData);
-            localStorage.setItem('mindMapData', JSON.stringify(data));
+            // Pass the initial data to the MindMapViewer constructor
             new MindMapViewer(mindmapContainer, data);
         } catch (error) {
             console.error('Falha ao parsear os dados do mapa mental do localStorage:', error);
-            loadDefaultMindMap();
+            // If parsing fails, load default
+            const viewer = new MindMapViewer(mindmapContainer, {}); // Initialize with empty data for now
+            viewer._loadDefaultMindMapData();
         }
     } else {
-        loadDefaultMindMap();
-    }
-
-    function loadDefaultMindMap() {
-        fetch('mindmap.json')
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                localStorage.setItem('mindMapData', JSON.stringify(data));
-                new MindMapViewer(mindmapContainer, data);
-            })
-            .catch(error => {
-                console.error('Erro ao carregar os dados do mapa mental padrão:', error);
-                mindmapContainer.innerHTML = '<p style="color: red;">Erro ao carregar o mapa mental.</p>';
-            });
+        // If no stored data, load default
+        const viewer = new MindMapViewer(mindmapContainer, {}); // Initialize with empty data for now
+        viewer._loadDefaultMindMapData();
     }
 });
