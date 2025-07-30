@@ -779,6 +779,11 @@ class MindMapViewer {
         if (this.isPopUpOpen) return; // Prevent interaction if popup is open
         event.preventDefault();
 
+        // If it's a multi-touch gesture (potential pinch), immediately set isConsideredClick to false
+        if (event.touches.length > 1) {
+            this.isConsideredClick = false;
+        }
+
         if (this.isConsideredClick && event.touches.length === 1) {
             const moveDistance = Math.hypot(
                 event.touches[0].clientX - this.initialPointerCoords.x,
@@ -806,8 +811,9 @@ class MindMapViewer {
             this.camera.position.x -= deltaX * panSpeed;
             this.camera.position.y += deltaY * panSpeed;
             this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
-        } else if (this._isPinching && event.touches.length === 2) {
-            this.isConsideredClick = false;
+        } else if (event.touches.length === 2) { // Changed condition to specifically check for 2 touches for pinching
+            this._isPinching = true; // Ensure pinching flag is set when 2 touches are active
+            this.isConsideredClick = false; // Definitely not a click if pinching
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             const currentPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
@@ -828,7 +834,8 @@ class MindMapViewer {
     _onTouchEnd(event) {
         if (this.isPopUpOpen) return; // Prevent interaction if popup is open
 
-        if (this.isConsideredClick && !this._isPinching) {
+        // Only consider a click if it was a single touch and not a pinch
+        if (this.isConsideredClick && !this._isPinching && event.touches.length === 0) { // Check event.touches.length for actual end of touch
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
             let clickedNode = null;
@@ -859,8 +866,8 @@ class MindMapViewer {
         }
         this.isDraggingNode = false;
         this.isPanning = false;
-        this._isPinching = false;
-        this.isConsideredClick = true;
+        this._isPinching = false; // Reset pinching flag
+        this.isConsideredClick = true; // Reset for next interaction
     }
 
     // --- Sidebar and Editing Methods ---
