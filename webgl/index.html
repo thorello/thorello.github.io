@@ -52,6 +52,13 @@
             pointer-events: none;
             clip-path: none;
             background-image: none;
+
+            /* NEW: Flexbox para distribuir o conteúdo */
+            display: flex;
+            flex-direction: column;
+            /* Empilha os itens verticalmente */
+            justify-content: space-between;
+            /* Empurra o conteúdo para o topo e os botões para baixo */
         }
 
         #popUp.open {
@@ -60,7 +67,7 @@
             pointer-events: auto;
             padding-left: 25px;
             padding-right: 25px;
-            padding-bottom: 10px;
+            /* padding-bottom: 10px; Removido, o footer lida com o espaçamento */
         }
 
         #popUp h2 {
@@ -91,12 +98,12 @@
 
         #popUp-close {
             position: absolute;
-            top: 15px;
+            top: 6px;
             right: 15px;
             background: none;
             border: none;
             font-family: 'Roboto', sans-serif;
-            font-size: 28px;
+            font-size: 40px;
             color: #888888;
             cursor: pointer;
             z-index: 1001;
@@ -229,6 +236,36 @@
             background-color: #5a6268;
         }
 
+        /* NEW: Container para os botões da popup para empurrá-los para o fundo */
+        #popUp-buttons-container {
+            display: flex;
+            flex-direction: column;
+            /* Empilha os botões verticalmente */
+            gap: 15px;
+            /* Espaçamento entre os botões */
+            margin-top: auto;
+            /* Empurra este contêiner para o fundo */
+            padding-top: 20px;
+            /* Adiciona um padding acima dos botões */
+            border-top: 1px solid #eee;
+            /* Opcional: Uma linha sutil acima dos botões */
+            padding-bottom: 10px;
+            /* Padding no final da popup */
+        }
+
+        /* Ajustes para os botões existentes dentro do novo contêiner */
+        #add-node-button,
+        #ai-new-map-button-popUp,
+        #add-children-with-ai-button {
+            margin: 0 auto;
+            /* Centraliza os botões individualmente dentro do contêiner flex */
+            width: 100%;
+            /* Faz os botões preencherem a largura do contêiner */
+            max-width: 250px;
+            /* Opcional: Define uma largura máxima para telas maiores */
+        }
+
+
         /* --- Add Node Button (inside popUp) --- */
         #add-node-button {
             background-color: #3498db;
@@ -242,8 +279,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s;
-            margin: 30px auto 0 auto;
-            /* Centraliza o botão e adiciona margem superior */
+            /* margin: 30px auto 0 auto; Centraliza o botão e adiciona margem superior - REMOVIDO pelo novo container */
             display: block;
             /* Garante que o margin: auto funcione para centralizar */
             width: fit-content;
@@ -423,8 +459,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s;
-            margin: 15px auto 0 auto;
-            /* Ajuste a margem para separar dos outros botões */
+            /* margin: 15px auto 0 auto; Ajuste a margem para separar dos outros botões - REMOVIDO pelo novo container */
             display: block;
             width: fit-content;
             font-weight: normal;
@@ -450,10 +485,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s;
-            margin: 15px auto 0 auto;
-            display: block;
-            width: fit-content;
-            font-weight: normal;
+            /* margin: 15px auto 0 auto; display: block; width: fit-content; font-weight: normal; - REMOVIDO pelo novo container */
         }
 
         #add-children-with-ai-button:hover {
@@ -580,6 +612,23 @@
                 font-size: 12px;
                 width: 100%;
             }
+
+            /* NOVO: Ajustes para os botões no mobile */
+            #popUp-buttons-container {
+                padding-top: 15px;
+                /* Menos padding no mobile */
+                padding-bottom: 5px;
+            }
+
+            #add-node-button,
+            #ai-new-map-button-popUp,
+            #add-children-with-ai-button {
+                padding: 12px;
+                /* Aumenta o tamanho dos botões para facilitar o toque */
+                font-size: 1.1em;
+                width: 90%;
+                /* Ajusta a largura para mobile */
+            }
         }
     </style>
 </head>
@@ -620,9 +669,8 @@
             </div>
         </div>
 
-        <button id="add-node-button" title="Adicionar Novo Nó">Adicionar Filho</button>
-
-        <div id="ai-buttons-container">
+        <div id="popUp-buttons-container">
+            <button id="add-node-button" title="Adicionar Novo Nó">Adicionar Filho</button>
             <button id="ai-new-map-button-popUp" style="display: none;">Novo Mapa Mental com IA</button>
             <button id="add-children-with-ai-button" style="display: none;">Adicionar nodes com IA</button>
         </div>
