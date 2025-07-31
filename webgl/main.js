@@ -309,7 +309,44 @@ class MindMapViewer {
         }
     }
 
-    // --- Node and Link Creation/Update Logic ---
+    generateAndAssignIds(data) {
+        /**
+         * Função recursiva para percorrer a árvore e atribuir IDs.
+         * @param {object} node O nó atual da árvore.
+         * @param {string|null} parentId O ID do nó pai.
+         */
+        function assignIdRecursively(node, parentId = null) {
+            // Se o nó não tiver filhos, não há mais nada a fazer.
+            if (!node.children) {
+                return;
+            }
+
+            node.children.forEach((child, index) => {
+                // O ID é a combinação do ID do pai com o índice atual + 1.
+                // Se não houver pai (nó raiz), o ID é apenas o índice + 1.
+                const newId = parentId ? `${parentId}.${index + 1}` : (index + 1).toString();
+
+                // Atribui o novo ID ao nó filho.
+                child.id = newId;
+
+                // Chama a função recursivamente para os filhos deste nó.
+                assignIdRecursively(child, newId);
+            });
+        }
+
+        // Inicia a atribuição de IDs a partir dos filhos do nó raiz.
+        // O nó raiz em si não recebe um ID, como sua função original.
+        assignIdRecursively(data);
+
+        return data;
+    }
+
+    /**
+         * Cria a malha (mesh) para um nó do mapa mental, incluindo o retângulo, o texto e, opcionalmente, o manipulador de arrastar.
+         * @param {object} d3Node - O objeto de nó da hierarquia D3.
+         * @param {number} direction - A direção do nó (-1 para esquerda, 1 para direita, 0 para o nó raiz).
+         * @returns {Promise<THREE.Group>}
+         */
     _createNodeMesh(d3Node, direction) {
         return new Promise(resolve => {
             const nodeGroup = new THREE.Group();
@@ -321,7 +358,9 @@ class MindMapViewer {
 
             const nodeColor = isRootNode ? rootNodeColor : CONFIG.nodeColors.length > 0 ? CONFIG.nodeColors.slice().reverse()[d3Node.depth] : 0xFFFFFF;
             const textColor = isRootNode ? rootTextColor : CONFIG.textColor;
+            const idColor = isRootNode ? rootTextColor : 0x888888; // Cor para o ID, um cinza mais claro
 
+            // 1. Cria a malha de texto para o nome do nó (a partir do código original)
             const textMesh = new Text();
             textMesh.text = d3Node.data.name;
             textMesh.fontSize = CONFIG.font.size;
@@ -333,41 +372,59 @@ class MindMapViewer {
             textMesh.name = 'nodeTextMesh';
 
             textMesh.sync(() => {
-                const rectWidth = CONFIG.FIXED_NODE_WIDTH;
-                const rectHeight = CONFIG.FIXED_NODE_HEIGHT;
+                // 2. Cria a malha de texto para o ID
+                const idTextMesh = new Text();
+                // AQUI ESTÁ A ALTERAÇÃO
+                idTextMesh.text = d3Node.data.id !== undefined ? d3Node.data.id : '';
+                idTextMesh.fontSize = CONFIG.font.size * 0.7; // Tamanho menor para o ID
+                idTextMesh.color = idColor;
+                idTextMesh.position.z = 0.1;
+                idTextMesh.anchorX = 'left';
+                idTextMesh.anchorY = 'top';
+                idTextMesh.name = 'nodeIdMesh';
 
-                const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
-                const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
+                idTextMesh.sync(() => {
+                    const rectWidth = CONFIG.FIXED_NODE_WIDTH;
+                    const rectHeight = CONFIG.FIXED_NODE_HEIGHT;
 
-                const rectMesh = new THREE.Mesh(rectGeo, rectMat);
-                rectMesh.name = 'nodeRectMesh';
-                nodeGroup.add(rectMesh);
+                    const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
+                    const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
 
-                if (!isRootNode) {
-                    const edges = new THREE.EdgesGeometry(rectGeo);
-                    const lineMat = new THREE.LineBasicMaterial({ color: 0xCCCCCC, linewidth: 2 });
-                    const wireframe = new THREE.LineSegments(edges, lineMat);
-                    nodeGroup.add(wireframe);
-                }
+                    const rectMesh = new THREE.Mesh(rectGeo, rectMat);
+                    rectMesh.name = 'nodeRectMesh';
+                    nodeGroup.add(rectMesh);
 
-                textMesh.position.x = 0;
+                    if (!isRootNode) {
+                        const edges = new THREE.EdgesGeometry(rectGeo);
+                        const lineMat = new THREE.LineBasicMaterial({ color: 0xCCCCCC, linewidth: 2 });
+                        const wireframe = new THREE.LineSegments(edges, lineMat);
+                        nodeGroup.add(wireframe);
+                    }
 
-                nodeGroup.add(textMesh);
-                nodeGroup.userData.nodeWidth = rectWidth;
-                nodeGroup.userData.nodeHeight = rectHeight;
+                    // 3. Posiciona o texto do nome e o texto do ID
+                    textMesh.position.x = 0;
+                    // Ajusta a posição do ID para o canto superior esquerdo
+                    idTextMesh.position.x = -rectWidth / 2 + CONFIG.padding.x / 2;
+                    idTextMesh.position.y = rectHeight / 2 - CONFIG.padding.y / 2;
 
-                if (direction !== 0) {
-                    const handleGeo = new THREE.CircleGeometry(CONFIG.dragHandleRadius, 32);
-                    const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.6 });
-                    const handleMesh = new THREE.Mesh(handleGeo, handleMat);
-                    handleMesh.position.set((rectWidth / 2) * direction, 0, 0.2);
-                    handleMesh.userData = { isDragHandle: true, nodeGroup };
-                    this.dragHandles.push(handleMesh);
-                    nodeGroup.add(handleMesh);
-                }
+                    nodeGroup.add(textMesh);
+                    nodeGroup.add(idTextMesh);
+                    nodeGroup.userData.nodeWidth = rectWidth;
+                    nodeGroup.userData.nodeHeight = rectHeight;
 
-                this.nodeMap.set(d3Node, nodeGroup);
-                resolve(nodeGroup);
+                    if (direction !== 0) {
+                        const handleGeo = new THREE.CircleGeometry(CONFIG.dragHandleRadius, 32);
+                        const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.6 });
+                        const handleMesh = new THREE.Mesh(handleGeo, handleMat);
+                        handleMesh.position.set((rectWidth / 2) * direction, 0, 0.2);
+                        handleMesh.userData = { isDragHandle: true, nodeGroup };
+                        this.dragHandles.push(handleMesh);
+                        nodeGroup.add(handleMesh);
+                    }
+
+                    this.nodeMap.set(d3Node, nodeGroup);
+                    resolve(nodeGroup);
+                });
             });
         });
     }
@@ -509,6 +566,11 @@ class MindMapViewer {
         this.nodeMap.clear();
         this.linkObjects = [];
         this.dragHandles = [];
+
+        // NEW: Garante que todos os nós tenham um ID antes de criar a hierarquia.
+        if (this.data) {
+            this.data = this.generateAndAssignIds(this.data);
+        }
 
         this.d3RootNode = hierarchy(this.data);
         const d3Links = this.d3RootNode.links();
