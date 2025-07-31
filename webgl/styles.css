@@ -94,6 +94,8 @@ canvas {
     padding-right: 25px;
     padding-bottom: 10px;
     padding-top: 50px;
+    display: grid;
+    grid-template-rows: 70px auto auto;
 }
 
 #popUp h2,
@@ -439,7 +441,7 @@ canvas {
     border-top: 1px solid #eee;
     margin-bottom: 10px;
 
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 /* Estilo para todos os botões de ação dentro da popup */
@@ -447,9 +449,9 @@ canvas {
     background-color: transparent;
     border: 2px solid var(--title-border-color);
     color: var(--title-border-color);
-    font-size: 1.5em;
-    width: 50px;
-    height: 50px;
+    font-size: 1.2em;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
