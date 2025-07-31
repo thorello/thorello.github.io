@@ -711,11 +711,6 @@ class MindMapViewer {
     /**
      * Foca a câmera no próximo nó da sequência, ordenando por ID.
      */
-    /**
-     * Foca a câmera no próximo nó da sequência, ordenando por ID.
-     * A sequência começa a partir do nó que está atualmente destacado (highlighted).
-     */
-    // Substitua o método focusNextNode() existente por este novo
     focusNextNode() {
         if (!this.d3RootNode) {
             console.warn("Nenhum mapa mental para focar.");
@@ -744,7 +739,6 @@ class MindMapViewer {
         const nextNodeGroup = this.nodeMap.get(nextD3Node);
 
         if (nextNodeGroup) {
-            // Remove o destaque do nó anterior, se existir
             if (this.highlightedNode) {
                 const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
                 const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
@@ -756,7 +750,6 @@ class MindMapViewer {
 
             this._focusCameraOnNode(nextNodeGroup);
 
-            // Atualiza o nó destacado e a linha para o novo nó
             this.currentSelectedD3Node = nextD3Node;
             this.highlightedNode = nextNodeGroup;
             const lineMesh = nextNodeGroup.children.find(child => child.name === 'nodeWireframe');
@@ -765,14 +758,15 @@ class MindMapViewer {
                 this.highlightedLine = lineMesh;
             }
 
-            // Atualiza o rodapé com a nova informação do nó
             const nodeId = nextD3Node.data.id || '';
             const nodeName = nextD3Node.data.name || '';
             this.nodeInfoFooter.textContent = `${nodeName}`;
             this.nodeInfoFooter.classList.add('visible');
 
-            // Note: A chamada this.openPopUp() foi removida daqui.
-            // O pop-up só será aberto com um clique/toque manual.
+            // **Correção:** Se o pop-up estiver aberto, atualize-o para o novo nó.
+            if (this.isPopUpOpen) {
+                this.openPopUp(nextD3Node.data.name, nextD3Node.data.definition || 'Nenhuma explicação disponível.');
+            }
         }
     }
 
@@ -807,7 +801,6 @@ class MindMapViewer {
         const previousNodeGroup = this.nodeMap.get(previousD3Node);
 
         if (previousNodeGroup) {
-            // Remove o destaque do nó anterior, se existir
             if (this.highlightedNode) {
                 const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
                 const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
@@ -819,7 +812,6 @@ class MindMapViewer {
 
             this._focusCameraOnNode(previousNodeGroup);
 
-            // Atualiza o nó destacado e a linha para o novo nó
             this.currentSelectedD3Node = previousD3Node;
             this.highlightedNode = previousNodeGroup;
             const lineMesh = previousNodeGroup.children.find(child => child.name === 'nodeWireframe');
@@ -828,13 +820,18 @@ class MindMapViewer {
                 this.highlightedLine = lineMesh;
             }
 
-            // Atualiza o rodapé com a nova informação do nó
             const nodeId = previousD3Node.data.id || '';
             const nodeName = previousD3Node.data.name || '';
             this.nodeInfoFooter.textContent = `${nodeName}`;
             this.nodeInfoFooter.classList.add('visible');
+
+            // **Correção:** Se o pop-up estiver aberto, atualize-o para o novo nó.
+            if (this.isPopUpOpen) {
+                this.openPopUp(previousD3Node.data.name, previousD3Node.data.definition || 'Nenhuma explicação disponível.');
+            }
         }
     }
+
 
     /**
      * Focuses the camera on a specific node.
