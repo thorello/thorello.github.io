@@ -950,6 +950,30 @@
             transform: scale(1);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
+
+        /* Novo estilo para o rodapé de informações do nó */
+        #node-info-footer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Open Sans', sans-serif;
+            font-size: 0.9em;
+            border-radius: 5px;
+            z-index: 100;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        #node-info-footer.visible {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 </head>
 
@@ -1043,6 +1067,8 @@
     <button id="focus-next-node-button" class="focus-button">
         <i class="fas fa-arrow-right"></i>
     </button>
+
+    <div id="node-info-footer"></div>
 
     <div id="mindmap-container"></div>
 

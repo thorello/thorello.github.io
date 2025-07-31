@@ -5,7 +5,7 @@ import { exportMindMapToPDF } from './pdfExport.js';
 import { exportMindMapToJson } from './jsonExport.js';
 import { importMindMapFromJson } from './jsonImport.js';
 import './menuHandler.js';
-import { promptBase } from './prompts.js'; // Import the promptBase
+import { promptBase } from './prompts.js';
 
 const APP_VERSION = 'v2.0.0';
 
@@ -18,6 +18,7 @@ const CONFIG = {
     linkColor: 0x4B5563,
     dragHandleColor: 0x111827,
     textColor: 0x111827,
+    highlightColor: 0xFFC107, // Cor do destaque (amarelo)
     font: {
         size: 16,
         characterWidth: 0.5,
@@ -69,13 +70,12 @@ class MindMapViewer {
         this.container = container;
         this.data = data;
         this.addNodeButton = document.getElementById('add-node-button');
-        this.aiNewMapButton = document.getElementById('ai-new-map-button-popUp'); // Renomeado para consistência
-        this.addChildrenWithAIButton = document.getElementById('add-children-with-ai-button'); // Novo botão
-        this.deleteNodeButton = document.getElementById('delete-node-button'); // Novo botão
-        this.loadingOverlay = document.getElementById('loading-overlay'); // Novo: Overlay de carregamento
-        this.loadingSpinner = document.getElementById('loading-spinner'); // Novo: Spinner de carregamento
+        this.aiNewMapButton = document.getElementById('ai-new-map-button-popUp');
+        this.addChildrenWithAIButton = document.getElementById('add-children-with-ai-button');
+        this.deleteNodeButton = document.getElementById('delete-node-button');
+        this.loadingOverlay = document.getElementById('loading-overlay');
+        this.loadingSpinner = document.getElementById('loading-spinner');
         this.focusNextNodeButton = document.getElementById('focus-next-node-button');
-
 
         // --- State Variables ---
         this.nodeMap = new Map();
@@ -86,9 +86,10 @@ class MindMapViewer {
         this.isDraggingNode = false;
         this.initialIntersectionPoint = new THREE.Vector3();
         this.d3RootNode = null;
-        this.currentSelectedD3Node = null; // For popUp
-        this.focusedNodeIndex = 0; // Para rastrear o nó atualmente focado
-
+        this.currentSelectedD3Node = null;
+        this.focusedNodeIndex = 0;
+        this.highlightedNode = null;
+        this.highlightedLine = null;
 
         // --- Camera Control State ---
         this.isPanning = false;
@@ -120,7 +121,6 @@ class MindMapViewer {
         this.copyPromptButton = document.getElementById('copy-prompt-button');
         this.isPromptGeneratorPopUpOpen = false;
 
-
         // --- Sidebar Editing Elements ---
         this.titleSection = document.getElementById('title-section');
         this.popUpTitle = document.getElementById('popUp-title');
@@ -135,6 +135,9 @@ class MindMapViewer {
         this.editContentBtn = document.getElementById('edit-content-btn');
         this.saveContentBtn = document.getElementById('save-content-btn');
         this.cancelContentBtn = document.getElementById('cancel-content-btn');
+
+        // --- New Bottom Info Element ---
+        this.nodeInfoFooter = document.getElementById('node-info-footer');
 
         this._initScene();
         this._initEventListeners();
@@ -293,8 +296,8 @@ class MindMapViewer {
         const newMapButton = document.getElementById('new-map-button');
         if (newMapButton) {
             newMapButton.addEventListener('click', () => {
-                localStorage.removeItem('mindMapData'); // Clear local storage for a fresh start
-                this._loadMindMapFromFile('new_mindmap.json'); // Load from new_mindmap.json
+                localStorage.removeItem('mindMapData');
+                this._loadMindMapFromFile('new_mindmap.json');
             });
         }
 
@@ -302,8 +305,8 @@ class MindMapViewer {
         const loadManualMapButton = document.getElementById('load-manual-map-button');
         if (loadManualMapButton) {
             loadManualMapButton.addEventListener('click', () => {
-                localStorage.removeItem('mindMapData'); // Clear local storage
-                this._loadMindMapFromFile('mindmap.json'); // Load from mindmap.json
+                localStorage.removeItem('mindMapData');
+                this._loadMindMapFromFile('mindmap.json');
             });
         }
     }
@@ -318,34 +321,17 @@ class MindMapViewer {
     }
 
     generateAndAssignIds(data) {
-        /**
-         * Função recursiva para percorrer a árvore e atribuir IDs.
-         * @param {object} node O nó atual da árvore.
-         * @param {string|null} parentId O ID do nó pai.
-         */
         function assignIdRecursively(node, parentId = null) {
-            // Se o nó não tiver filhos, não há mais nada a fazer.
             if (!node.children) {
                 return;
             }
-
             node.children.forEach((child, index) => {
-                // O ID é a combinação do ID do pai com o índice atual + 1.
-                // Se não houver pai (nó raiz), o ID é apenas o índice + 1.
                 const newId = parentId ? `${parentId}.${index + 1}` : (index + 1).toString();
-
-                // Atribui o novo ID ao nó filho.
                 child.id = newId;
-
-                // Chama a função recursivamente para os filhos deste nó.
                 assignIdRecursively(child, newId);
             });
         }
-
-        // Inicia a atribuição de IDs a partir dos filhos do nó raiz.
-        // O nó raiz em si não recebe um ID, como sua função original.
         assignIdRecursively(data);
-
         return data;
     }
 
@@ -366,7 +352,7 @@ class MindMapViewer {
 
             const nodeColor = isRootNode ? rootNodeColor : CONFIG.nodeColors.length > 0 ? CONFIG.nodeColors.slice().reverse()[d3Node.depth] : 0xFFFFFF;
             const textColor = isRootNode ? rootTextColor : CONFIG.textColor;
-            const idColor = isRootNode ? rootTextColor : 0x888888; // Cor para o ID, um cinza mais claro
+            const idColor = isRootNode ? rootTextColor : 0x888888;
 
             // 1. Cria a malha de texto para o nome do nó (a partir do código original)
             const textMesh = new Text();
@@ -382,9 +368,8 @@ class MindMapViewer {
             textMesh.sync(() => {
                 // 2. Cria a malha de texto para o ID
                 const idTextMesh = new Text();
-                // AQUI ESTÁ A ALTERAÇÃO
                 idTextMesh.text = d3Node.data.id !== undefined ? d3Node.data.id : '';
-                idTextMesh.fontSize = CONFIG.font.size * 0.7; // Tamanho menor para o ID
+                idTextMesh.fontSize = CONFIG.font.size * 0.7;
                 idTextMesh.color = idColor;
                 idTextMesh.position.z = 0.1;
                 idTextMesh.anchorX = 'left';
@@ -406,12 +391,12 @@ class MindMapViewer {
                         const edges = new THREE.EdgesGeometry(rectGeo);
                         const lineMat = new THREE.LineBasicMaterial({ color: 0xCCCCCC, linewidth: 2 });
                         const wireframe = new THREE.LineSegments(edges, lineMat);
+                        wireframe.name = 'nodeWireframe';
                         nodeGroup.add(wireframe);
                     }
 
                     // 3. Posiciona o texto do nome e o texto do ID
                     textMesh.position.x = 0;
-                    // Ajusta a posição do ID para o canto superior esquerdo
                     idTextMesh.position.x = -rectWidth / 2 + CONFIG.padding.x / 2;
                     idTextMesh.position.y = rectHeight / 2 - CONFIG.padding.y / 2;
 
@@ -575,7 +560,6 @@ class MindMapViewer {
         this.linkObjects = [];
         this.dragHandles = [];
 
-        // NEW: Garante que todos os nós tenham um ID antes de criar a hierarquia.
         if (this.data) {
             this.data = this.generateAndAssignIds(this.data);
         }
@@ -716,7 +700,6 @@ class MindMapViewer {
             return;
         }
 
-        // 1. Obter e ordenar todos os nós por ID
         const allNodes = Array.from(this.nodeMap.keys());
         allNodes.sort((a, b) => {
             const idA = a.data.id || '0';
@@ -734,7 +717,6 @@ class MindMapViewer {
             return 0;
         });
 
-        // 2. Incrementar o índice e ciclar de volta para 0 se necessário
         this.focusedNodeIndex = (this.focusedNodeIndex + 1) % allNodes.length;
         const nextD3Node = allNodes[this.focusedNodeIndex];
         const nextNodeGroup = this.nodeMap.get(nextD3Node);
@@ -801,7 +783,7 @@ class MindMapViewer {
     }
 
     _onMouseDown(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return; // Prevent interaction if popup is open
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
         this.isConsideredClick = true;
         this.initialPointerCoords.set(event.clientX, event.clientY);
@@ -828,7 +810,7 @@ class MindMapViewer {
     }
 
     _onMouseMove(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return; // Prevent interaction if popup is open
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
         if (this.isConsideredClick && (this.isDraggingNode || this.isPanning)) {
             const moveDistance = Math.hypot(
@@ -861,7 +843,7 @@ class MindMapViewer {
     }
 
     _onMouseUp(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return; // Prevent interaction if popup is open
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
         if (this.isConsideredClick && !this.isDraggingNode) {
             this.mouse.copy(this._getPointerCoordinates(event));
@@ -883,10 +865,38 @@ class MindMapViewer {
                 }
                 if (clickedNode) break;
             }
+
+            // Limpar o destaque do nó anterior, se houver
+            if (this.highlightedNode) {
+                const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
+                const originalColor = isRootNode ? 0xCCCCCC : 0xCCCCCC;
+                this.highlightedLine.material.color.set(originalColor);
+                this.highlightedNode = null;
+                this.highlightedLine = null;
+            }
+
             if (clickedNode) {
                 const d3Node = clickedNode.userData.d3Node;
                 this.currentSelectedD3Node = d3Node;
-                this.openPopUp(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
+
+                // Destacar o nó
+                const lineMesh = clickedNode.children.find(child => child.name === 'nodeWireframe');
+                if (lineMesh) {
+                    lineMesh.material.color.set(CONFIG.highlightColor);
+                    this.highlightedNode = clickedNode;
+                    this.highlightedLine = lineMesh;
+                }
+
+                // Exibir o texto no rodapé
+                const nodeId = d3Node.data.id || '';
+                const nodeName = d3Node.data.name || '';
+                this.nodeInfoFooter.textContent = `ID: ${nodeId} | Nome: ${nodeName}`;
+                this.nodeInfoFooter.classList.add('visible');
+
+                this.openPopUp(nodeName, d3Node.data.definition || 'Nenhuma explicação disponível.');
+            } else {
+                // Esconder o rodapé se não houver nó clicado
+                this.nodeInfoFooter.classList.remove('visible');
             }
         }
 
@@ -904,11 +914,11 @@ class MindMapViewer {
         this.isConsideredClick = true;
     }
 
+
     _onTouchStart(event) {
         event.preventDefault();
         if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
-        // Limpa qualquer timeout pendente ao iniciar um novo toque
         if (this.tapTimeout) {
             clearTimeout(this.tapTimeout);
             this.tapTimeout = null;
@@ -940,7 +950,7 @@ class MindMapViewer {
             this.isDraggingNode = false;
             this.isPanning = false;
             this._isPinching = true;
-            this.isConsideredClick = false; // Definitivamente não é um clique se for pinch
+            this.isConsideredClick = false;
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             this.initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
@@ -957,14 +967,13 @@ class MindMapViewer {
         event.preventDefault();
         if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
-        // Se houver qualquer movimento ou mais de um dedo, cancela o "click"
         if (this.tapTimeout) {
             clearTimeout(this.tapTimeout);
             this.tapTimeout = null;
         }
         if (event.touches.length > 1) {
             this.isConsideredClick = false;
-            this._isPinching = true; // Garante que a flag de pinch está ativa
+            this._isPinching = true;
         }
 
         if (this.isConsideredClick && event.touches.length === 1) {
@@ -1015,24 +1024,19 @@ class MindMapViewer {
     _onTouchEnd(event) {
         if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
-        // Se ainda houver toques ativos (por exemplo, um dedo levantado de dois)
         if (event.touches.length > 0) {
-            // Não faz nada ainda, esperando a finalização completa do gesto
             return;
         }
 
-        // Se um pinch-zoom foi detectado, não abre o popup
         if (this._isPinching) {
             this.isDraggingNode = false;
             this.isPanning = false;
             this._isPinching = false;
-            this.isConsideredClick = true; // Reset para a próxima interação
+            this.isConsideredClick = true;
             return;
         }
 
-        // Se foi considerado um clique e não um pinch, agenda a abertura do popup
         if (this.isConsideredClick) {
-            // Pequeno delay (ex: 200ms) para dar tempo para um segundo toque iniciar (no caso de double-tap ou pinch)
             this.tapTimeout = setTimeout(() => {
                 this.raycaster.setFromCamera(this.mouse, this.camera);
                 const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
@@ -1048,13 +1052,39 @@ class MindMapViewer {
                     }
                     if (clickedNode) break;
                 }
+
+                if (this.highlightedNode) {
+                    const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
+                    const originalColor = isRootNode ? 0xCCCCCC : 0xCCCCCC;
+                    this.highlightedLine.material.color.set(originalColor);
+                    this.highlightedNode = null;
+                    this.highlightedLine = null;
+                }
+
                 if (clickedNode && !clickedNode.userData.isDragHandle) {
                     const d3Node = clickedNode.userData.d3Node;
                     this.currentSelectedD3Node = d3Node;
+
+                    // Destacar o nó
+                    const lineMesh = clickedNode.children.find(child => child.name === 'nodeWireframe');
+                    if (lineMesh) {
+                        lineMesh.material.color.set(CONFIG.highlightColor);
+                        this.highlightedNode = clickedNode;
+                        this.highlightedLine = lineMesh;
+                    }
+
+                    // Exibir o texto no rodapé
+                    const nodeId = d3Node.data.id || '';
+                    const nodeName = d3Node.data.name || '';
+                    this.nodeInfoFooter.textContent = `ID: ${nodeId} | Nome: ${nodeName}`;
+                    this.nodeInfoFooter.classList.add('visible');
+
                     this.openPopUp(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
+                } else {
+                    this.nodeInfoFooter.classList.remove('visible');
                 }
-                this.tapTimeout = null; // Limpa o timer após a execução
-            }, 200); // 200 milissegundos de delay. Você pode ajustar este valor.
+                this.tapTimeout = null;
+            }, 200);
         }
 
         if (this.isDraggingNode && this.selectedNode) {
@@ -1067,7 +1097,6 @@ class MindMapViewer {
         }
         this.isDraggingNode = false;
         this.isPanning = false;
-        // _isPinching já é resetado acima se for um pinch
         this.isConsideredClick = true;
     }
 
@@ -1089,23 +1118,17 @@ class MindMapViewer {
             this.addNodeButton.style.display = 'block';
         }
 
-        // Lógica de exibição dos botões de IA
         if (this.currentSelectedD3Node) {
-            // "Novo Mapa Mental com IA" (apenas para o nó raiz)
             if (this.currentSelectedD3Node.depth === 0) {
                 if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'block';
-                if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'block'; // Esconde o outro botão
-                // Esconde o botão de excluir para o nó raiz
+                if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'block';
                 if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'none';
             } else {
-                // "Adicionar nodes com IA" (para todos os outros nós)
-                if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none'; // Esconde o outro botão
+                if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none';
                 if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'block';
-                // Mostra o botão de excluir para nós que não são raiz
                 if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'block';
             }
         } else {
-            // Se nenhum nó estiver selecionado, esconde ambos
             if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none';
             if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'none';
             if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'none';
@@ -1122,17 +1145,16 @@ class MindMapViewer {
         if (this.addNodeButton) {
             this.addNodeButton.style.display = 'none';
         }
-        // Esconde ambos os botões de IA ao fechar o popup
         if (this.aiNewMapButton) {
             this.aiNewMapButton.style.display = 'none';
         }
         if (this.addChildrenWithAIButton) {
             this.addChildrenWithAIButton.style.display = 'none';
         }
-        // Esconde o botão de excluir ao fechar o popup
         if (this.deleteNodeButton) {
             this.deleteNodeButton.style.display = 'none';
         }
+        // A lógica de limpar o highlight e o rodapé foi movida para _onMouseUp() e deleteSelectedNode().
     }
 
     // JSON Paste PopUp Methods
@@ -1140,7 +1162,7 @@ class MindMapViewer {
         if (!this.jsonPastePopUp) return;
         this.jsonPastePopUp.classList.add('open');
         this.isJsonPastePopUpOpen = true;
-        this.jsonPasteTextarea.value = ''; // Clear previous content
+        this.jsonPasteTextarea.value = '';
     }
 
     closeJsonPastePopUp() {
@@ -1173,7 +1195,7 @@ class MindMapViewer {
         if (!this.promptGeneratorPopUp) return;
         this.promptGeneratorPopUp.classList.add('open');
         this.isPromptGeneratorPopUpOpen = true;
-        this.promptInputTextarea.value = ''; // Clear previous content
+        this.promptInputTextarea.value = '';
     }
 
     closePromptGeneratorPopUp() {
@@ -1189,7 +1211,7 @@ class MindMapViewer {
         try {
             await navigator.clipboard.writeText(fullPrompt);
             alert('Prompt copiado para a área de transferência!');
-            this.closePromptGeneratorPopUp(); // Close after copying
+            this.closePromptGeneratorPopUp();
         } catch (err) {
             console.error('Falha ao copiar o prompt: ', err);
             alert('Erro ao copiar o prompt. Por favor, copie manualmente.');
@@ -1317,24 +1339,22 @@ class MindMapViewer {
      */
     async addChildrenWithAI() {
         if (!this.currentSelectedD3Node || this.currentSelectedD3Node.depth === 0) {
-            // This check is still valid for initial click, but the nulling happens later.
             alert('Por favor, selecione um nó (não o nó principal) para adicionar filhos com IA.');
             return;
         }
 
-        // Store the currentSelectedD3Node data BEFORE closing the popup
-        const selectedD3NodeToProcess = this.currentSelectedD3Node; // Store reference
+        const selectedD3NodeToProcess = this.currentSelectedD3Node;
         const nodeContent = {
             name: selectedD3NodeToProcess.data.name,
             definition: selectedD3NodeToProcess.data.definition || '',
         };
 
-        this.closePopUp(); // Close the popup immediately
-        this.showLoadingOverlay(true); // Show the loading overlay
+        this.closePopUp();
+        this.showLoadingOverlay(true);
 
-        const API_KEY = localStorage.getItem('geminiApiKey'); // Pega a chave da API do localStorage
+        const API_KEY = localStorage.getItem('geminiApiKey');
         if (!API_KEY) {
-            this.showLoadingOverlay(false); // Esconde o overlay se não houver chave
+            this.showLoadingOverlay(false);
             alert('Por favor, insira sua chave de API do Google AI Studio na página de criação de novo mapa com IA (acessível pelo nó principal ou menu superior).');
             return;
         }
@@ -1370,10 +1390,8 @@ class MindMapViewer {
             const data = await response.json();
             let resultText = data.candidates[0].content.parts[0].text;
 
-            // Tentar extrair o JSON puro, removendo marcações de código se presentes
             let parsedJson;
             try {
-                // Remove potenciais `json ou ``` de início e fim
                 resultText = resultText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
                 parsedJson = JSON.parse(resultText);
             } catch (parseError) {
@@ -1403,7 +1421,6 @@ class MindMapViewer {
                 throw new Error('A resposta da IA não é um array JSON válido de nós filhos.');
             }
 
-            // Add new children to the stored D3 node, not this.currentSelectedD3Node
             if (!selectedD3NodeToProcess.data.children) {
                 selectedD3NodeToProcess.data.children = [];
             }
@@ -1412,19 +1429,19 @@ class MindMapViewer {
                     selectedD3NodeToProcess.data.children.push({
                         name: newChild.name,
                         definition: newChild.definition,
-                        children: [] // New nodes start with no children
+                        children: []
                     });
                 }
             });
 
-            await this.recalculateMap(); // Redraw the map to include new nodes
+            await this.recalculateMap();
             alert('Novos nós adicionados com sucesso pela IA!');
 
         } catch (error) {
             console.error('Erro ao adicionar nós com IA:', error);
             alert(`Ocorreu um erro ao gerar novos nós com IA: ${error.message}.`);
         } finally {
-            this.showLoadingOverlay(false); // Hide the loading overlay
+            this.showLoadingOverlay(false);
         }
     }
 
@@ -1483,19 +1500,25 @@ class MindMapViewer {
         const parentD3Node = d3NodeToDelete.parent;
 
         if (parentD3Node && parentD3Node.data.children) {
-            // Remove o nó do array de filhos do pai
             parentD3Node.data.children = parentD3Node.data.children.filter(
                 child => child !== d3NodeToDelete.data
             );
 
-            // Se o nó excluído era o último filho, remove o array de children para evitar nós vazios
             if (parentD3Node.data.children.length === 0) {
                 delete parentD3Node.data.children;
             }
         }
 
         this.closePopUp();
-        // Chama recalculateMap para limpar as posições persistidas e redesenhar
+        // O highlight e o rodapé serão limpos na próxima vez que o usuário interagir, mas
+        // é uma boa prática limpá-los agora que o nó não existe mais.
+        if (this.highlightedNode) {
+            this.highlightedLine.material.color.set(0xCCCCCC);
+            this.highlightedNode = null;
+            this.highlightedLine = null;
+        }
+        this.nodeInfoFooter.classList.remove('visible');
+
         await this.recalculateMap();
         alert('Nó e seus filhos excluídos com sucesso.');
     }
@@ -1538,18 +1561,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const storedData = localStorage.getItem('mindMapData');
-    const viewer = new MindMapViewer(mindmapContainer, {}); // Initialize with empty data
+    const viewer = new MindMapViewer(mindmapContainer, {});
 
     if (storedData) {
         try {
             const data = JSON.parse(storedData);
-            viewer.data = data; // Assign loaded data
+            viewer.data = data;
             viewer.drawMindMap();
         } catch (error) {
             console.error('Failed to parse mind map data from localStorage:', error);
-            viewer._loadMindMapFromFile('mindmap.json'); // Fallback to default if localStorage is corrupt
+            viewer._loadMindMapFromFile('mindmap.json');
         }
     } else {
-        viewer._loadMindMapFromFile('mindmap.json'); // Load default on first visit or no stored data
+        viewer._loadMindMapFromFile('mindmap.json');
     }
 });
