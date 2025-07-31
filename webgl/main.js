@@ -54,6 +54,7 @@ class MindMapViewer {
         this.loadingSpinner = document.getElementById('loading-spinner');
         this.focusNextNodeButton = document.getElementById('focus-next-node-button');
         this.focusPreviousNodeButton = document.getElementById('focus-previous-node-button');
+        this.copyAIPromptButton = document.getElementById('copy-ai-prompt-button');
 
         // --- State Variables ---
         this.nodeMap = new Map();
@@ -214,6 +215,12 @@ class MindMapViewer {
         if (this.addChildrenWithAIButton) {
             this.addChildrenWithAIButton.addEventListener('click', this.addChildrenWithAI.bind(this));
         }
+
+        // Novo: Event Listener para o botão 'Copiar Prompt para IA'
+        if (this.copyAIPromptButton) {
+            this.copyAIPromptButton.addEventListener('click', this.copyAIPrompt.bind(this));
+        }
+
         // Novo: Event Listener para o botão 'Novo Mapa Mental com IA'
         if (this.aiNewMapButton) {
             this.aiNewMapButton.addEventListener('click', () => {
@@ -1271,15 +1278,18 @@ class MindMapViewer {
             if (this.currentSelectedD3Node.depth === 0) {
                 if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'block';
                 if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'block';
+                if (this.copyAIPromptButton) this.copyAIPromptButton.style.display = 'none';
                 if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'none';
             } else {
                 if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none';
                 if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'block';
+                if (this.copyAIPromptButton) this.copyAIPromptButton.style.display = 'block';
                 if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'block';
             }
         } else {
             if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none';
             if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'none';
+            if (this.copyAIPromptButton) this.copyAIPromptButton.style.display = 'none';
             if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'none';
         }
     }
@@ -1299,6 +1309,9 @@ class MindMapViewer {
         }
         if (this.addChildrenWithAIButton) {
             this.addChildrenWithAIButton.style.display = 'none';
+        }
+        if (this.copyAIPromptButton) {
+            this.copyAIPromptButton.style.display = 'none';
         }
         if (this.deleteNodeButton) {
             this.deleteNodeButton.style.display = 'none';
@@ -1361,6 +1374,39 @@ class MindMapViewer {
             await navigator.clipboard.writeText(fullPrompt);
             alert('Prompt copiado para a área de transferência!');
             this.closePromptGeneratorPopUp();
+        } catch (err) {
+            console.error('Falha ao copiar o prompt: ', err);
+            alert('Erro ao copiar o prompt. Por favor, copie manualmente.');
+        }
+    }
+
+    async copyAIPrompt() {
+        if (!this.currentSelectedD3Node) {
+            alert('Por favor, selecione um nó para gerar o prompt.');
+            return;
+        }
+
+        const selectedD3NodeToProcess = this.currentSelectedD3Node;
+        const nodeContent = {
+            name: selectedD3NodeToProcess.data.name,
+            definition: selectedD3NodeToProcess.data.definition || '',
+        };
+
+        const geminiPrompt = `Dada a seguinte informação de um nó de mapa mental:
+Nome: "${nodeContent.name}"
+Definição: "${nodeContent.definition}"
+
+Por favor, gere um array JSON de até 5 nós filhos relacionados a este conteúdo. Cada nó filho deve ter um "name" (título curto) e uma "definition" (breve explicação). O idioma deve ser português.
+A estrutura deve ser estritamente:
+[
+    { "name": "Nome do Nó Filho 1", "definition": "Breve explicação do nó filho 1." },
+    { "name": "Nome do Nó Filho 2", "definition": "Breve explicação do nó filho 2." }
+]
+Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou formatação de markdown (como \`\`\`json).`;
+
+        try {
+            await navigator.clipboard.writeText(geminiPrompt);
+            alert('Prompt copiado para a área de transferência!');
         } catch (err) {
             console.error('Falha ao copiar o prompt: ', err);
             alert('Erro ao copiar o prompt. Por favor, copie manualmente.');
