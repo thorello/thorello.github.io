@@ -831,7 +831,7 @@ class MindMapViewer {
             // Atualiza o rodapé com a nova informação do nó
             const nodeId = previousD3Node.data.id || '';
             const nodeName = previousD3Node.data.name || '';
-            this.nodeInfoFooter.textContent = `ID: ${nodeId} | Nome: ${nodeName}`;
+            this.nodeInfoFooter.textContent = `${nodeName}`;
             this.nodeInfoFooter.classList.add('visible');
         }
     }
