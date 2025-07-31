@@ -76,6 +76,7 @@ class MindMapViewer {
         this.loadingOverlay = document.getElementById('loading-overlay');
         this.loadingSpinner = document.getElementById('loading-spinner');
         this.focusNextNodeButton = document.getElementById('focus-next-node-button');
+        this.focusPreviousNodeButton = document.getElementById('focus-previous-node-button');
 
         // --- State Variables ---
         this.nodeMap = new Map();
@@ -189,6 +190,10 @@ class MindMapViewer {
 
         if (this.focusNextNodeButton) {
             this.focusNextNodeButton.addEventListener('click', this.focusNextNode.bind(this));
+        }
+
+        if (this.focusPreviousNodeButton) {
+            this.focusPreviousNodeButton.addEventListener('click', this.focusPreviousNode.bind(this));
         }
 
         // JSON Paste PopUp Event Listeners
@@ -756,6 +761,66 @@ class MindMapViewer {
 
             // Note: A chamada this.openPopUp() foi removida daqui.
             // O pop-up só será aberto com um clique/toque manual.
+        }
+    }
+
+    /**
+     * Foca a câmera no nó anterior da sequência, ordenando por ID.
+     */
+    focusPreviousNode() {
+        if (!this.d3RootNode) {
+            console.warn("Nenhum mapa mental para focar.");
+            return;
+        }
+
+        const allNodes = Array.from(this.nodeMap.keys());
+        allNodes.sort((a, b) => {
+            const idA = a.data.id || '0';
+            const idB = b.data.id || '0';
+            const partsA = idA.split('.').map(Number);
+            const partsB = idB.split('.').map(Number);
+
+            for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+                const valA = partsA[i] || 0;
+                const valB = partsB[i] || 0;
+                if (valA !== valB) {
+                    return valA - valB;
+                }
+            }
+            return 0;
+        });
+
+        this.focusedNodeIndex = (this.focusedNodeIndex - 1 + allNodes.length) % allNodes.length;
+        const previousD3Node = allNodes[this.focusedNodeIndex];
+        const previousNodeGroup = this.nodeMap.get(previousD3Node);
+
+        if (previousNodeGroup) {
+            // Remove o destaque do nó anterior, se existir
+            if (this.highlightedNode) {
+                const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
+                const originalColor = isRootNode ? 0x3498db : 0xCCCCCC;
+                const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
+                if (lineMesh) {
+                    lineMesh.material.color.set(originalColor);
+                }
+            }
+
+            this._focusCameraOnNode(previousNodeGroup);
+
+            // Atualiza o nó destacado e a linha para o novo nó
+            this.currentSelectedD3Node = previousD3Node;
+            this.highlightedNode = previousNodeGroup;
+            const lineMesh = previousNodeGroup.children.find(child => child.name === 'nodeWireframe');
+            if (lineMesh) {
+                lineMesh.material.color.set(CONFIG.highlightColor);
+                this.highlightedLine = lineMesh;
+            }
+
+            // Atualiza o rodapé com a nova informação do nó
+            const nodeId = previousD3Node.data.id || '';
+            const nodeName = previousD3Node.data.name || '';
+            this.nodeInfoFooter.textContent = `ID: ${nodeId} | Nome: ${nodeName}`;
+            this.nodeInfoFooter.classList.add('visible');
         }
     }
 

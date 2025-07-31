@@ -922,8 +922,6 @@
             position: fixed;
             bottom: 20px;
             /* Ajusta a posição vertical */
-            right: 20px;
-            /* Ajusta a posição horizontal */
             z-index: 1000;
             background-color: #3498db;
             color: white;
@@ -938,6 +936,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* NOVO: Estilo para o botão anterior */
+        #focus-previous-node-button {
+            right: 80px;
+            /* Posiciona à esquerda do botão de próximo */
+        }
+
+        /* NOVO: Estilo para o botão próximo */
+        #focus-next-node-button {
+            right: 20px;
         }
 
         .focus-button:hover {
@@ -1064,6 +1073,9 @@
         </div>
     </div>
 
+    <button id="focus-previous-node-button" class="focus-button">
+        <i class="fas fa-arrow-left"></i>
+    </button>
     <button id="focus-next-node-button" class="focus-button">
         <i class="fas fa-arrow-right"></i>
     </button>
