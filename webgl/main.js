@@ -768,7 +768,7 @@ class MindMapViewer {
             // Atualiza o rodapé com a nova informação do nó
             const nodeId = nextD3Node.data.id || '';
             const nodeName = nextD3Node.data.name || '';
-            this.nodeInfoFooter.textContent = `ID: ${nodeId} | Nome: ${nodeName}`;
+            this.nodeInfoFooter.textContent = `${nodeName}`;
             this.nodeInfoFooter.classList.add('visible');
 
             // Note: A chamada this.openPopUp() foi removida daqui.
