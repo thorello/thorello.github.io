@@ -1092,6 +1092,17 @@ class MindMapViewer {
             const touch2 = event.touches[1];
             this.initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
             this.initialPinchZoom = this.camera.zoom;
+
+            // Calcular o centro do pinch em coordenadas de tela
+            const pinchCenterX = (touch1.clientX + touch2.clientX) / 2;
+            const pinchCenterY = (touch1.clientY + touch2.clientY) / 2;
+
+            // Converter o centro do pinch para coordenadas do mundo e salvar
+            this.mouse.set(
+                (pinchCenterX / this.renderer.domElement.clientWidth) * 2 - 1,
+                -(pinchCenterY / this.renderer.domElement.clientHeight) * 2 + 1
+            );
+            this.pinchCenterWorld.copy(new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera));
         }
     }
 
@@ -1099,14 +1110,13 @@ class MindMapViewer {
         event.preventDefault();
         if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
-        // Se houver qualquer movimento ou mais de um dedo, cancela o "click"
         if (this.tapTimeout) {
             clearTimeout(this.tapTimeout);
             this.tapTimeout = null;
         }
         if (event.touches.length > 1) {
             this.isConsideredClick = false;
-            this._isPinching = true; // Garante que a flag de pinch está ativa
+            this._isPinching = true;
         }
 
         if (this.isConsideredClick && event.touches.length === 1) {
@@ -1144,11 +1154,17 @@ class MindMapViewer {
             newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
             this.camera.zoom = newZoom;
             this.camera.updateProjectionMatrix();
+
+            // Calcular a nova posição do centro do pinch no mundo com o novo zoom
+            const pinchCenterX = (touch1.clientX + touch2.clientX) / 2;
+            const pinchCenterY = (touch1.clientY + touch2.clientY) / 2;
             this.mouse.set(
-                ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
-                -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
+                (pinchCenterX / this.renderer.domElement.clientWidth) * 2 - 1,
+                -(pinchCenterY / this.renderer.domElement.clientHeight) * 2 + 1
             );
             const currentPinchCenterWorld = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
+
+            // Ajustar a posição da câmera para manter o ponto de pinch no mesmo lugar
             const panDelta = new THREE.Vector3().subVectors(this.pinchCenterWorld, currentPinchCenterWorld);
             this.camera.position.add(panDelta);
         }
