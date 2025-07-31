@@ -95,7 +95,8 @@ canvas {
     padding-bottom: 10px;
     padding-top: 50px;
     display: grid;
-    grid-template-rows: 70px auto auto;
+    grid-template-rows: 90px auto auto;
+    place-items: start start;
 }
 
 #popUp h2,
