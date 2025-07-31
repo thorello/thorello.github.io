@@ -21,7 +21,7 @@ export const lightTheme = {
     borderRadius: 6,
     dragHandleRadius: 6,
     zoom: {
-        speed: 1,
+        speed: 0.2,
         min: 0.05,
         max: 8,
     },
