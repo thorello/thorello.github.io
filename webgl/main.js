@@ -74,6 +74,8 @@ class MindMapViewer {
         this.deleteNodeButton = document.getElementById('delete-node-button'); // Novo botão
         this.loadingOverlay = document.getElementById('loading-overlay'); // Novo: Overlay de carregamento
         this.loadingSpinner = document.getElementById('loading-spinner'); // Novo: Spinner de carregamento
+        this.focusNextNodeButton = document.getElementById('focus-next-node-button');
+
 
         // --- State Variables ---
         this.nodeMap = new Map();
@@ -85,6 +87,8 @@ class MindMapViewer {
         this.initialIntersectionPoint = new THREE.Vector3();
         this.d3RootNode = null;
         this.currentSelectedD3Node = null; // For popUp
+        this.focusedNodeIndex = 0; // Para rastrear o nó atualmente focado
+
 
         // --- Camera Control State ---
         this.isPanning = false;
@@ -178,6 +182,10 @@ class MindMapViewer {
 
         if (this.popUpCloseButton) {
             this.popUpCloseButton.addEventListener('click', this.closePopUp.bind(this));
+        }
+
+        if (this.focusNextNodeButton) {
+            this.focusNextNodeButton.addEventListener('click', this.focusNextNode.bind(this));
         }
 
         // JSON Paste PopUp Event Listeners
@@ -696,6 +704,43 @@ class MindMapViewer {
         const rootNodeGroup = this.nodeMap.get(this.d3RootNode);
         if (rootNodeGroup) {
             this._focusCameraOnNode(rootNodeGroup);
+        }
+    }
+
+    /**
+     * Foca a câmera no próximo nó da sequência, ordenando por ID.
+     */
+    focusNextNode() {
+        if (!this.d3RootNode) {
+            console.warn("Nenhum mapa mental para focar.");
+            return;
+        }
+
+        // 1. Obter e ordenar todos os nós por ID
+        const allNodes = Array.from(this.nodeMap.keys());
+        allNodes.sort((a, b) => {
+            const idA = a.data.id || '0';
+            const idB = b.data.id || '0';
+            const partsA = idA.split('.').map(Number);
+            const partsB = idB.split('.').map(Number);
+
+            for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+                const valA = partsA[i] || 0;
+                const valB = partsB[i] || 0;
+                if (valA !== valB) {
+                    return valA - valB;
+                }
+            }
+            return 0;
+        });
+
+        // 2. Incrementar o índice e ciclar de volta para 0 se necessário
+        this.focusedNodeIndex = (this.focusedNodeIndex + 1) % allNodes.length;
+        const nextD3Node = allNodes[this.focusedNodeIndex];
+        const nextNodeGroup = this.nodeMap.get(nextD3Node);
+
+        if (nextNodeGroup) {
+            this._focusCameraOnNode(nextNodeGroup);
         }
     }
 
