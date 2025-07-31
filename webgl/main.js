@@ -853,20 +853,25 @@ class MindMapViewer {
         this.camera.position.y = targetPosition.y;
         this.camera.position.z = 250;
 
+        // Se você mudou para zoom ortográfico, o 'camera.zoom' deve ser 1
+        // mas a posição pode ser ajustada para centralizar o nó.
         this.camera.zoom = 1;
         this.camera.updateProjectionMatrix();
     }
 
     // --- Event Handlers ---
     _onWindowResize() {
-        this.camera.left = window.innerWidth / -2;
-        this.camera.right = window.innerWidth / 2;
-        this.camera.top = window.innerHeight / 2;
-        this.camera.bottom = window.innerHeight / -2;
+        const aspect = window.innerWidth / window.innerHeight;
+        this.camera.left = -this.camera.right;
+        this.camera.bottom = -this.camera.top;
+        if (window.innerWidth / window.innerHeight > 1) {
+            this.camera.left = this.camera.right / aspect;
+        } else {
+            this.camera.top = this.camera.bottom * aspect;
+        }
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
-
     _getPointerCoordinates(event) {
         const clientX = event.touches ? event.touches[0].clientX : event.clientX;
         const clientY = event.touches ? event.touches[0].clientY : event.clientY;
@@ -882,11 +887,26 @@ class MindMapViewer {
 
         this.mouse.copy(this._getPointerCoordinates(event));
         const worldPosBeforeZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
-        const zoomExponent = event.deltaY * -0.01 * CONFIG.zoom.speed;
-        let newZoom = this.camera.zoom * Math.pow(2, zoomExponent);
-        newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
-        this.camera.zoom = newZoom;
+
+        const zoomFactor = Math.pow(0.9, -event.deltaY * 0.01 * CONFIG.zoom.speed);
+
+        let newWidth = (this.camera.right - this.camera.left) * zoomFactor;
+        const newHeight = (this.camera.top - this.camera.bottom) * zoomFactor;
+
+        const minWidth = window.innerWidth / CONFIG.zoom.max;
+        const maxWidth = window.innerWidth / CONFIG.zoom.min;
+
+        if (newWidth < minWidth || newWidth > maxWidth) {
+            return;
+        }
+
+        this.camera.left = -newWidth / 2;
+        this.camera.right = newWidth / 2;
+        this.camera.top = newHeight / 2;
+        this.camera.bottom = -newHeight / 2;
+
         this.camera.updateProjectionMatrix();
+
         const worldPosAfterZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
         const panDelta = new THREE.Vector3().subVectors(worldPosBeforeZoom, worldPosAfterZoom);
         this.camera.position.add(panDelta);
@@ -945,7 +965,8 @@ class MindMapViewer {
         } else if (this.isPanning) {
             const deltaX = event.clientX - this.lastPointerPosition.x;
             const deltaY = event.clientY - this.lastPointerPosition.y;
-            const panSpeed = 1 / this.camera.zoom;
+            const currentZoom = (this.camera.right - this.camera.left) / window.innerWidth;
+            const panSpeed = currentZoom;
             this.camera.position.x -= deltaX * panSpeed;
             this.camera.position.y += deltaY * panSpeed;
             this.lastPointerPosition.set(event.clientX, event.clientY);
@@ -1089,7 +1110,7 @@ class MindMapViewer {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             this.initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-            this.initialPinchZoom = this.camera.zoom;
+            this.initialPinchZoom = (this.camera.right - this.camera.left) / window.innerWidth;
             this.mouse.set(
                 ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
                 -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
@@ -1134,7 +1155,8 @@ class MindMapViewer {
         } else if (this.isPanning && event.touches.length === 1) {
             const deltaX = event.touches[0].clientX - this.lastPointerPosition.x;
             const deltaY = event.touches[0].clientY - this.lastPointerPosition.y;
-            const panSpeed = 1 / this.camera.zoom;
+            const currentZoom = (this.camera.right - this.camera.left) / window.innerWidth;
+            const panSpeed = currentZoom;
             this.camera.position.x -= deltaX * panSpeed;
             this.camera.position.y += deltaY * panSpeed;
             this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
@@ -1142,10 +1164,27 @@ class MindMapViewer {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             const currentPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-            let newZoom = this.initialPinchZoom * (currentPinchDistance / this.initialPinchDistance);
-            newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
-            this.camera.zoom = newZoom;
+            const zoomRatio = currentPinchDistance / this.initialPinchDistance;
+
+            const currentWidth = this.camera.right - this.camera.left;
+            const currentHeight = this.camera.top - this.camera.bottom;
+
+            const newWidth = currentWidth / zoomRatio;
+            const newHeight = currentHeight / zoomRatio;
+
+            const minWidth = window.innerWidth / CONFIG.zoom.max;
+            const maxWidth = window.innerWidth / CONFIG.zoom.min;
+            if (newWidth < minWidth || newWidth > maxWidth) {
+                return;
+            }
+
+            this.camera.left = -newWidth / 2;
+            this.camera.right = newWidth / 2;
+            this.camera.top = newHeight / 2;
+            this.camera.bottom = -newHeight / 2;
+
             this.camera.updateProjectionMatrix();
+
             this.mouse.set(
                 ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
                 -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
