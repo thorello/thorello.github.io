@@ -519,11 +519,9 @@ canvas {
     position: absolute;
     top: calc(100% + 5px);
     right: 0;
-    background-color: var(--menu-bg-color);
-    border-radius: 5px;
-    box-shadow: var(--menu-box-shadow);
+    background-color: transparent;
     padding: 10px;
-    transform-origin: top right;
+    transform-origin: top down;
     transform: scale(0.95);
     opacity: 0;
     visibility: hidden;
