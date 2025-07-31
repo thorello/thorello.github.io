@@ -987,7 +987,7 @@ class MindMapViewer {
             // "Novo Mapa Mental com IA" (apenas para o nó raiz)
             if (this.currentSelectedD3Node.depth === 0) {
                 if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'block';
-                if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'none'; // Esconde o outro botão
+                if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'block'; // Esconde o outro botão
                 // Esconde o botão de excluir para o nó raiz
                 if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'none';
             } else {
