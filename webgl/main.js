@@ -861,14 +861,10 @@ class MindMapViewer {
 
     // --- Event Handlers ---
     _onWindowResize() {
-        const aspect = window.innerWidth / window.innerHeight;
-        this.camera.left = -this.camera.right;
-        this.camera.bottom = -this.camera.top;
-        if (window.innerWidth / window.innerHeight > 1) {
-            this.camera.left = this.camera.right / aspect;
-        } else {
-            this.camera.top = this.camera.bottom * aspect;
-        }
+        this.camera.left = -window.innerWidth / 2;
+        this.camera.right = window.innerWidth / 2;
+        this.camera.top = window.innerHeight / 2;
+        this.camera.bottom = -window.innerHeight / 2;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
@@ -890,20 +886,9 @@ class MindMapViewer {
 
         const zoomFactor = Math.pow(0.9, -event.deltaY * 0.01 * CONFIG.zoom.speed);
 
-        let newWidth = (this.camera.right - this.camera.left) * zoomFactor;
-        const newHeight = (this.camera.top - this.camera.bottom) * zoomFactor;
-
-        const minWidth = window.innerWidth / CONFIG.zoom.max;
-        const maxWidth = window.innerWidth / CONFIG.zoom.min;
-
-        if (newWidth < minWidth || newWidth > maxWidth) {
-            return;
-        }
-
-        this.camera.left = -newWidth / 2;
-        this.camera.right = newWidth / 2;
-        this.camera.top = newHeight / 2;
-        this.camera.bottom = -newHeight / 2;
+        let newZoom = this.camera.zoom * zoomFactor;
+        newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
+        this.camera.zoom = newZoom;
 
         this.camera.updateProjectionMatrix();
 
@@ -1110,12 +1095,7 @@ class MindMapViewer {
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             this.initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-            this.initialPinchZoom = (this.camera.right - this.camera.left) / window.innerWidth;
-            this.mouse.set(
-                ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
-                -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
-            );
-            this.pinchCenterWorld.set(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
+            this.initialPinchZoom = this.camera.zoom;
         }
     }
 
@@ -1127,12 +1107,38 @@ class MindMapViewer {
             clearTimeout(this.tapTimeout);
             this.tapTimeout = null;
         }
-        if (event.touches.length > 1) {
+
+        if (event.touches.length === 2) {
             this.isConsideredClick = false;
             this._isPinching = true;
-        }
 
-        if (this.isConsideredClick && event.touches.length === 1) {
+            const touch1 = event.touches[0];
+            const touch2 = event.touches[1];
+            const currentPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+
+            const pinchCenterScreenX = (touch1.clientX + touch2.clientX) / 2;
+            const pinchCenterScreenY = (touch1.clientY + touch2.clientY) / 2;
+
+            this.mouse.set(
+                (pinchCenterScreenX / window.innerWidth) * 2 - 1,
+                -(pinchCenterScreenY / window.innerHeight) * 2 + 1
+            );
+            const worldPosBeforeZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
+
+            const zoomFactor = this.initialPinchDistance / currentPinchDistance;
+            let newZoom = this.initialPinchZoom * zoomFactor;
+
+            newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
+
+            this.camera.zoom = newZoom;
+            this.camera.updateProjectionMatrix();
+
+            const worldPosAfterZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
+
+            const panDelta = worldPosAfterZoom.sub(worldPosBeforeZoom);
+            this.camera.position.sub(panDelta);
+
+        } else if (this.isConsideredClick && event.touches.length === 1) {
             const moveDistance = Math.hypot(
                 event.touches[0].clientX - this.initialPointerCoords.x,
                 event.touches[0].clientY - this.initialPointerCoords.y
@@ -1160,38 +1166,6 @@ class MindMapViewer {
             this.camera.position.x -= deltaX * panSpeed;
             this.camera.position.y += deltaY * panSpeed;
             this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
-        } else if (this._isPinching && event.touches.length === 2) {
-            const touch1 = event.touches[0];
-            const touch2 = event.touches[1];
-            const currentPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-            const zoomRatio = currentPinchDistance / this.initialPinchDistance;
-
-            const currentWidth = this.camera.right - this.camera.left;
-            const currentHeight = this.camera.top - this.camera.bottom;
-
-            const newWidth = currentWidth / zoomRatio;
-            const newHeight = currentHeight / zoomRatio;
-
-            const minWidth = window.innerWidth / CONFIG.zoom.max;
-            const maxWidth = window.innerWidth / CONFIG.zoom.min;
-            if (newWidth < minWidth || newWidth > maxWidth) {
-                return;
-            }
-
-            this.camera.left = -newWidth / 2;
-            this.camera.right = newWidth / 2;
-            this.camera.top = newHeight / 2;
-            this.camera.bottom = -newHeight / 2;
-
-            this.camera.updateProjectionMatrix();
-
-            this.mouse.set(
-                ((touch1.clientX + touch2.clientX) / 2 / this.renderer.domElement.clientWidth) * 2 - 1,
-                -((touch1.clientY + touch2.clientY) / 2 / this.renderer.domElement.clientHeight) * 2 + 1
-            );
-            const currentPinchCenterWorld = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
-            const panDelta = new THREE.Vector3().subVectors(this.pinchCenterWorld, currentPinchCenterWorld);
-            this.camera.position.add(panDelta);
         }
     }
 
