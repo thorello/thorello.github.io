@@ -694,6 +694,11 @@ class MindMapViewer {
     /**
      * Foca a câmera no próximo nó da sequência, ordenando por ID.
      */
+    /**
+     * Foca a câmera no próximo nó da sequência, ordenando por ID.
+     * A sequência começa a partir do nó que está atualmente destacado (highlighted).
+     */
+    // Substitua o método focusNextNode() existente por este novo
     focusNextNode() {
         if (!this.d3RootNode) {
             console.warn("Nenhum mapa mental para focar.");
@@ -722,7 +727,35 @@ class MindMapViewer {
         const nextNodeGroup = this.nodeMap.get(nextD3Node);
 
         if (nextNodeGroup) {
+            // Remove o destaque do nó anterior, se existir
+            if (this.highlightedNode) {
+                const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
+                const originalColor = isRootNode ? 0x3498db : 0xCCCCCC;
+                const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
+                if (lineMesh) {
+                    lineMesh.material.color.set(originalColor);
+                }
+            }
+
             this._focusCameraOnNode(nextNodeGroup);
+
+            // Atualiza o nó destacado e a linha para o novo nó
+            this.currentSelectedD3Node = nextD3Node;
+            this.highlightedNode = nextNodeGroup;
+            const lineMesh = nextNodeGroup.children.find(child => child.name === 'nodeWireframe');
+            if (lineMesh) {
+                lineMesh.material.color.set(CONFIG.highlightColor);
+                this.highlightedLine = lineMesh;
+            }
+
+            // Atualiza o rodapé com a nova informação do nó
+            const nodeId = nextD3Node.data.id || '';
+            const nodeName = nextD3Node.data.name || '';
+            this.nodeInfoFooter.textContent = `ID: ${nodeId} | Nome: ${nodeName}`;
+            this.nodeInfoFooter.classList.add('visible');
+
+            // Note: A chamada this.openPopUp() foi removida daqui.
+            // O pop-up só será aberto com um clique/toque manual.
         }
     }
 
@@ -869,8 +902,11 @@ class MindMapViewer {
             // Limpar o destaque do nó anterior, se houver
             if (this.highlightedNode) {
                 const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                const originalColor = isRootNode ? 0xCCCCCC : 0xCCCCCC;
-                this.highlightedLine.material.color.set(originalColor);
+                const originalColor = isRootNode ? 0x3498db : 0xCCCCCC;
+                const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
+                if (lineMesh) {
+                    lineMesh.material.color.set(originalColor);
+                }
                 this.highlightedNode = null;
                 this.highlightedLine = null;
             }
@@ -878,6 +914,29 @@ class MindMapViewer {
             if (clickedNode) {
                 const d3Node = clickedNode.userData.d3Node;
                 this.currentSelectedD3Node = d3Node;
+
+                // --- NOVA LÓGICA: Sincroniza o índice do nó focado com o nó clicado ---
+                const allNodes = Array.from(this.nodeMap.keys());
+                allNodes.sort((a, b) => {
+                    const idA = a.data.id || '0';
+                    const idB = b.data.id || '0';
+                    const partsA = idA.split('.').map(Number);
+                    const partsB = idB.split('.').map(Number);
+
+                    for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+                        const valA = partsA[i] || 0;
+                        const valB = partsB[i] || 0;
+                        if (valA !== valB) {
+                            return valA - valB;
+                        }
+                    }
+                    return 0;
+                });
+                const clickedIndex = allNodes.findIndex(node => node === d3Node);
+                if (clickedIndex !== -1) {
+                    this.focusedNodeIndex = clickedIndex;
+                }
+                // --- FIM DA NOVA LÓGICA ---
 
                 // Destacar o nó
                 const lineMesh = clickedNode.children.find(child => child.name === 'nodeWireframe');
@@ -913,7 +972,6 @@ class MindMapViewer {
         this.isPanning = false;
         this.isConsideredClick = true;
     }
-
 
     _onTouchStart(event) {
         event.preventDefault();
@@ -1053,10 +1111,14 @@ class MindMapViewer {
                     if (clickedNode) break;
                 }
 
+                // Limpar o destaque do nó anterior, se houver
                 if (this.highlightedNode) {
                     const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                    const originalColor = isRootNode ? 0xCCCCCC : 0xCCCCCC;
-                    this.highlightedLine.material.color.set(originalColor);
+                    const originalColor = isRootNode ? 0x3498db : 0xCCCCCC;
+                    const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
+                    if (lineMesh) {
+                        lineMesh.material.color.set(originalColor);
+                    }
                     this.highlightedNode = null;
                     this.highlightedLine = null;
                 }
@@ -1064,6 +1126,29 @@ class MindMapViewer {
                 if (clickedNode && !clickedNode.userData.isDragHandle) {
                     const d3Node = clickedNode.userData.d3Node;
                     this.currentSelectedD3Node = d3Node;
+
+                    // --- NOVA LÓGICA PARA MOBILE: Sincroniza o índice do nó focado com o nó tocado ---
+                    const allNodes = Array.from(this.nodeMap.keys());
+                    allNodes.sort((a, b) => {
+                        const idA = a.data.id || '0';
+                        const idB = b.data.id || '0';
+                        const partsA = idA.split('.').map(Number);
+                        const partsB = idB.split('.').map(Number);
+
+                        for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+                            const valA = partsA[i] || 0;
+                            const valB = partsB[i] || 0;
+                            if (valA !== valB) {
+                                return valA - valB;
+                            }
+                        }
+                        return 0;
+                    });
+                    const clickedIndex = allNodes.findIndex(node => node === d3Node);
+                    if (clickedIndex !== -1) {
+                        this.focusedNodeIndex = clickedIndex;
+                    }
+                    // --- FIM DA NOVA LÓGICA ---
 
                     // Destacar o nó
                     const lineMesh = clickedNode.children.find(child => child.name === 'nodeWireframe');
