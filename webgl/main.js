@@ -799,8 +799,8 @@ class MindMapViewer {
     }
 
     _onTouchStart(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
         event.preventDefault();
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
         // Limpa qualquer timeout pendente ao iniciar um novo toque
         if (this.tapTimeout) {
@@ -848,8 +848,8 @@ class MindMapViewer {
     }
 
     _onTouchMove(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
         event.preventDefault();
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
 
         // Se houver qualquer movimento ou mais de um dedo, cancela o "click"
         if (this.tapTimeout) {
