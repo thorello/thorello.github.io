@@ -7,36 +7,13 @@ import { importMindMapFromJson } from './jsonImport.js';
 import './menuHandler.js';
 import { promptBase } from './prompts.js';
 
+// --- Importa o tema desejado ---
+import { darkTheme, lightTheme } from './theme.js';
+
 const APP_VERSION = 'v2.0.0';
 
-// --- 1. Centralized Configuration (Light Theme) ---
-const CONFIG = {
-    backgroundColor: 0xF4F4F5,
-    nodeColors: [
-        0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF
-    ],
-    linkColor: 0x4B5563,
-    dragHandleColor: 0x111827,
-    textColor: 0x111827,
-    highlightColor: 0xFFC107, // Cor do destaque (amarelo)
-    font: {
-        size: 16,
-        characterWidth: 0.5,
-    },
-    padding: { x: 30, y: 10 },
-    borderRadius: 6,
-    dragHandleRadius: 6,
-    zoom: {
-        speed: 0.2,
-        min: 0.05,
-        max: 8,
-    },
-    horizontalNodePadding: 0,
-    verticalNodeSpacing: 80,
-    depth1HorizontalOffset: 80,
-    FIXED_NODE_CHARACTER_LIMIT: 35,
-    FIXED_NODE_HEIGHT_MULTIPLIER: 2.5,
-};
+// Use o tema importado como sua configuração
+const CONFIG = lightTheme;
 
 CONFIG.FIXED_NODE_WIDTH = (CONFIG.font.size * CONFIG.font.characterWidth * CONFIG.FIXED_NODE_CHARACTER_LIMIT) + (CONFIG.padding.x * 2);
 CONFIG.FIXED_NODE_HEIGHT = (CONFIG.font.size * CONFIG.FIXED_NODE_HEIGHT_MULTIPLIER) + (CONFIG.padding.y * 2);
@@ -341,23 +318,45 @@ class MindMapViewer {
     }
 
     /**
-         * Cria a malha (mesh) para um nó do mapa mental, incluindo o retângulo, o texto e, opcionalmente, o manipulador de arrastar.
-         * @param {object} d3Node - O objeto de nó da hierarquia D3.
-         * @param {number} direction - A direção do nó (-1 para esquerda, 1 para direita, 0 para o nó raiz).
-         * @returns {Promise<THREE.Group>}
-         */
+     * Creates rounded rectangle geometry.
+     * @param {number} width - Rectangle width.
+     * @param {number} height - Rectangle height.
+     * @param {number} radius - Corner radius.
+     * @returns {THREE.ShapeGeometry}
+     */
+    createRoundedRectGeometry(width, height, radius) {
+        const shape = new THREE.Shape();
+        const x = -width / 2, y = -height / 2;
+
+        shape.moveTo(x + radius, y);
+        shape.lineTo(x + width - radius, y);
+        shape.quadraticCurveTo(x + width, y, x + width, y + radius);
+        shape.lineTo(x + width, y + height - radius);
+        shape.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        shape.lineTo(x + radius, y + height);
+        shape.quadraticCurveTo(x, y + height, x, y + height - radius);
+        shape.lineTo(x, y + radius);
+        shape.quadraticCurveTo(x, y, x + radius, y);
+
+        return new THREE.ShapeGeometry(shape);
+    }
+
+    /**
+     * Cria a malha (mesh) para um nó do mapa mental, incluindo o retângulo, o texto e, opcionalmente, o manipulador de arrastar.
+     * @param {object} d3Node - O objeto de nó da hierarquia D3.
+     * @param {number} direction - A direção do nó (-1 para esquerda, 1 para direita, 0 para o nó raiz).
+     * @returns {Promise<THREE.Group>}
+     */
     _createNodeMesh(d3Node, direction) {
         return new Promise(resolve => {
             const nodeGroup = new THREE.Group();
             nodeGroup.userData = { d3Node: d3Node, isNode: true, direction: direction };
 
             const isRootNode = d3Node.depth === 0;
-            const rootNodeColor = 0x3498db;
-            const rootTextColor = 0xFFFFFF;
 
-            const nodeColor = isRootNode ? rootNodeColor : CONFIG.nodeColors.length > 0 ? CONFIG.nodeColors.slice().reverse()[d3Node.depth] : 0xFFFFFF;
-            const textColor = isRootNode ? rootTextColor : CONFIG.textColor;
-            const idColor = isRootNode ? rootTextColor : 0x888888;
+            const nodeColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.nodeColors.length > 0 ? CONFIG.nodeColors.slice().reverse()[d3Node.depth] : 0xFFFFFF;
+            const textColor = isRootNode ? CONFIG.rootTextColor : CONFIG.textColor;
+            const idColor = isRootNode ? CONFIG.rootTextColor : 0x888888;
 
             // 1. Cria a malha de texto para o nome do nó (a partir do código original)
             const textMesh = new Text();
@@ -394,7 +393,7 @@ class MindMapViewer {
 
                     if (!isRootNode) {
                         const edges = new THREE.EdgesGeometry(rectGeo);
-                        const lineMat = new THREE.LineBasicMaterial({ color: 0xCCCCCC, linewidth: 2 });
+                        const lineMat = new THREE.LineBasicMaterial({ color: CONFIG.wireframeColor, linewidth: 2 });
                         const wireframe = new THREE.LineSegments(edges, lineMat);
                         wireframe.name = 'nodeWireframe';
                         nodeGroup.add(wireframe);
@@ -735,7 +734,7 @@ class MindMapViewer {
             // Remove o destaque do nó anterior, se existir
             if (this.highlightedNode) {
                 const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                const originalColor = isRootNode ? 0x3498db : 0xCCCCCC;
+                const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
                 const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
                 if (lineMesh) {
                     lineMesh.material.color.set(originalColor);
@@ -798,7 +797,7 @@ class MindMapViewer {
             // Remove o destaque do nó anterior, se existir
             if (this.highlightedNode) {
                 const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                const originalColor = isRootNode ? 0x3498db : 0xCCCCCC;
+                const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
                 const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
                 if (lineMesh) {
                     lineMesh.material.color.set(originalColor);
@@ -967,7 +966,7 @@ class MindMapViewer {
             // Limpar o destaque do nó anterior, se houver
             if (this.highlightedNode) {
                 const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                const originalColor = isRootNode ? 0x3498db : 0xCCCCCC;
+                const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
                 const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
                 if (lineMesh) {
                     lineMesh.material.color.set(originalColor);
@@ -1179,7 +1178,7 @@ class MindMapViewer {
                 // Limpar o destaque do nó anterior, se houver
                 if (this.highlightedNode) {
                     const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                    const originalColor = isRootNode ? 0x3498db : 0xCCCCCC;
+                    const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
                     const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
                     if (lineMesh) {
                         lineMesh.material.color.set(originalColor);
@@ -1663,7 +1662,7 @@ class MindMapViewer {
         // O highlight e o rodapé serão limpos na próxima vez que o usuário interagir, mas
         // é uma boa prática limpá-los agora que o nó não existe mais.
         if (this.highlightedNode) {
-            this.highlightedLine.material.color.set(0xCCCCCC);
+            this.highlightedLine.material.color.set(CONFIG.wireframeColor);
             this.highlightedNode = null;
             this.highlightedLine = null;
         }
