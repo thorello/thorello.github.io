@@ -1131,7 +1131,7 @@ class MindMapViewer {
             const worldPosBeforeZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
 
             // Calcula o novo fator de zoom com base na distância da pinça
-            const zoomFactor = this.initialPinchDistance / currentPinchDistance;
+            const zoomFactor = currentPinchDistance / this.initialPinchDistance;
             let newZoom = this.initialPinchZoom * zoomFactor;
 
             // Limita o zoom para evitar valores extremos
