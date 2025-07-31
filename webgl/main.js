@@ -136,7 +136,6 @@ class MindMapViewer {
         this._initEventListeners();
         this._createVersionInfo();
 
-        this.drawMindMap();
         this.animate();
     }
 
