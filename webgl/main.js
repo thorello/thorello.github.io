@@ -55,6 +55,7 @@ class MindMapViewer {
         this.focusNextNodeButton = document.getElementById('focus-next-node-button');
         this.focusPreviousNodeButton = document.getElementById('focus-previous-node-button');
         this.copyAIPromptButton = document.getElementById('copy-ai-prompt-button');
+        this.pasteJsonFromClipboardButton = document.getElementById('paste-json-from-clipboard-button');
 
         // --- State Variables ---
         this.nodeMap = new Map();
@@ -219,6 +220,11 @@ class MindMapViewer {
         // Novo: Event Listener para o botão 'Copiar Prompt para IA'
         if (this.copyAIPromptButton) {
             this.copyAIPromptButton.addEventListener('click', this.copyAIPrompt.bind(this));
+        }
+
+        // Novo: Event Listener para o botão 'Colar JSON e Criar Nós'
+        if (this.pasteJsonFromClipboardButton) {
+            this.pasteJsonFromClipboardButton.addEventListener('click', this.pasteJsonAndCreateChildren.bind(this));
         }
 
         // Novo: Event Listener para o botão 'Novo Mapa Mental com IA'
@@ -1279,17 +1285,20 @@ class MindMapViewer {
                 if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'block';
                 if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'block';
                 if (this.copyAIPromptButton) this.copyAIPromptButton.style.display = 'none';
+                if (this.pasteJsonFromClipboardButton) this.pasteJsonFromClipboardButton.style.display = 'none';
                 if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'none';
             } else {
                 if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none';
                 if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'block';
                 if (this.copyAIPromptButton) this.copyAIPromptButton.style.display = 'block';
+                if (this.pasteJsonFromClipboardButton) this.pasteJsonFromClipboardButton.style.display = 'block';
                 if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'block';
             }
         } else {
             if (this.aiNewMapButton) this.aiNewMapButton.style.display = 'none';
             if (this.addChildrenWithAIButton) this.addChildrenWithAIButton.style.display = 'none';
             if (this.copyAIPromptButton) this.copyAIPromptButton.style.display = 'none';
+            if (this.pasteJsonFromClipboardButton) this.pasteJsonFromClipboardButton.style.display = 'none';
             if (this.deleteNodeButton) this.deleteNodeButton.style.display = 'none';
         }
     }
@@ -1312,6 +1321,9 @@ class MindMapViewer {
         }
         if (this.copyAIPromptButton) {
             this.copyAIPromptButton.style.display = 'none';
+        }
+        if (this.pasteJsonFromClipboardButton) {
+            this.pasteJsonFromClipboardButton.style.display = 'none';
         }
         if (this.deleteNodeButton) {
             this.deleteNodeButton.style.display = 'none';
@@ -1410,6 +1422,83 @@ Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou forma
         } catch (err) {
             console.error('Falha ao copiar o prompt: ', err);
             alert('Erro ao copiar o prompt. Por favor, copie manualmente.');
+        }
+    }
+
+    async pasteJsonAndCreateChildren() {
+        if (!this.currentSelectedD3Node) {
+            alert('Por favor, selecione um nó para adicionar os filhos.');
+            return;
+        }
+
+        const selectedD3NodeToProcess = this.currentSelectedD3Node;
+
+        try {
+            const clipboardText = await navigator.clipboard.readText();
+            if (!clipboardText) {
+                alert('A área de transferência está vazia ou o conteúdo não é texto.');
+                return;
+            }
+
+            let parsedJson;
+            try {
+                parsedJson = JSON.parse(clipboardText);
+            } catch (parseError) {
+                console.warn("Falha ao parsear JSON diretamente, tentando extrair entre chaves/colchetes.", parseError);
+                let resultText = clipboardText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
+                const firstChar = resultText.indexOf('{');
+                const firstArrayChar = resultText.indexOf('[');
+                let startIndex = -1;
+                let endIndex = -1;
+
+                if (firstArrayChar !== -1 && (firstChar === -1 || firstArrayChar < firstChar)) {
+                    startIndex = firstArrayChar;
+                    endIndex = resultText.lastIndexOf(']');
+                } else if (firstChar !== -1) {
+                    startIndex = firstChar;
+                    endIndex = resultText.lastIndexOf('}');
+                }
+
+                if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+                    resultText = resultText.substring(startIndex, endIndex + 1);
+                    parsedJson = JSON.parse(resultText);
+                } else {
+                    throw new Error('Não foi possível extrair um JSON válido da área de transferência.');
+                }
+            }
+
+            if (!Array.isArray(parsedJson)) {
+                throw new Error('O conteúdo colado não é um array JSON válido.');
+            }
+
+            if (!selectedD3NodeToProcess.data.children) {
+                selectedD3NodeToProcess.data.children = [];
+            }
+
+            parsedJson.forEach(newChild => {
+                if (newChild.name && newChild.definition) {
+                    selectedD3NodeToProcess.data.children.push({
+                        name: newChild.name,
+                        definition: newChild.definition,
+                        children: []
+                    });
+                } else {
+                    console.warn('Objeto JSON inválido encontrado, pulando:', newChild);
+                }
+            });
+
+            if (parsedJson.length === 0) {
+                alert('A área de transferência contém um JSON válido, mas nenhum nó foi criado.');
+                return;
+            }
+
+            await this.recalculateMap();
+            alert('Nós adicionados com sucesso a partir da área de transferência!');
+            this.closePopUp();
+
+        } catch (error) {
+            console.error('Erro ao colar e criar nós:', error);
+            alert(`Ocorreu um erro ao colar o conteúdo da área de transferência: ${error.message}.`);
         }
     }
 

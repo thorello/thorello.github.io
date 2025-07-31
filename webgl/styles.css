@@ -259,7 +259,7 @@ canvas {
 #popUp-buttons-container {
     place-self: end end;
     display: flex;
-    width: 200px;
+    width: auto;
     flex-direction: row;
     gap: 15px;
     margin-top: auto;
