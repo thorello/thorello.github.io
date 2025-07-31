@@ -884,7 +884,8 @@ class MindMapViewer {
         this.mouse.copy(this._getPointerCoordinates(event));
         const worldPosBeforeZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
 
-        const zoomFactor = Math.pow(0.9, -event.deltaY * 0.01 * CONFIG.zoom.speed);
+        // Lógica alterada para inverter a direção do zoom. Removido o '-'.
+        const zoomFactor = Math.pow(0.9, event.deltaY * 0.01 * CONFIG.zoom.speed);
 
         let newZoom = this.camera.zoom * zoomFactor;
         newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
@@ -1108,47 +1109,65 @@ class MindMapViewer {
             this.tapTimeout = null;
         }
 
+        // Pinch-to-zoom com dois dedos
         if (event.touches.length === 2) {
             this.isConsideredClick = false;
             this._isPinching = true;
+            this.isPanning = false; // Desativa o pan de um dedo enquanto estiver pinçando
 
             const touch1 = event.touches[0];
             const touch2 = event.touches[1];
             const currentPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
 
+            // Calcula a posição do centro do pinch na tela
             const pinchCenterScreenX = (touch1.clientX + touch2.clientX) / 2;
             const pinchCenterScreenY = (touch1.clientY + touch2.clientY) / 2;
 
+            // Mapeia o ponto central do pinch para coordenadas WebGL antes do zoom
             this.mouse.set(
                 (pinchCenterScreenX / window.innerWidth) * 2 - 1,
-                -(pinchCenterScreenY / window.innerHeight) * 2 + 1
+                -((pinchCenterScreenY / window.innerHeight) * 2 - 1)
             );
             const worldPosBeforeZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
 
+            // Calcula o novo fator de zoom com base na distância da pinça
             const zoomFactor = this.initialPinchDistance / currentPinchDistance;
             let newZoom = this.initialPinchZoom * zoomFactor;
 
+            // Limita o zoom para evitar valores extremos
             newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
 
+            // Aplica o novo zoom na câmera
             this.camera.zoom = newZoom;
             this.camera.updateProjectionMatrix();
 
+            // Mapeia o mesmo ponto central do pinch para coordenadas WebGL depois do zoom
             const worldPosAfterZoom = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
 
+            // Calcula o delta de pan e move a câmera para manter o ponto central do pinch fixo
             const panDelta = worldPosAfterZoom.sub(worldPosBeforeZoom);
             this.camera.position.sub(panDelta);
 
-        } else if (this.isConsideredClick && event.touches.length === 1) {
-            const moveDistance = Math.hypot(
-                event.touches[0].clientX - this.initialPointerCoords.x,
-                event.touches[0].clientY - this.initialPointerCoords.y
-            );
-            if (moveDistance > this.tapThreshold) {
-                this.isConsideredClick = false;
-            }
         }
+        // Pan com um dedo
+        else if (this.isPanning && event.touches.length === 1) {
+            this.isConsideredClick = false;
 
-        if (this.isDraggingNode && this.selectedNode) {
+            const deltaX = event.touches[0].clientX - this.lastPointerPosition.x;
+            const deltaY = event.touches[0].clientY - this.lastPointerPosition.y;
+
+            // O panSpeed é ajustado com base no zoom atual da câmera
+            const panSpeed = (this.camera.right - this.camera.left) / window.innerWidth;
+
+            this.camera.position.x -= deltaX * panSpeed;
+            this.camera.position.y += deltaY * panSpeed;
+
+            this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
+        }
+        // Lógica para arrastar o nó
+        else if (this.isDraggingNode && this.selectedNode) {
+            this.isConsideredClick = false;
+
             this.mouse.copy(this._getPointerCoordinates(event));
             this.raycaster.setFromCamera(this.mouse, this.camera);
             const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -1158,14 +1177,6 @@ class MindMapViewer {
             this._moveSubtree(this.selectedNode, delta);
             this.initialIntersectionPoint.copy(currentIntersectionPoint);
             this.updateLinks();
-        } else if (this.isPanning && event.touches.length === 1) {
-            const deltaX = event.touches[0].clientX - this.lastPointerPosition.x;
-            const deltaY = event.touches[0].clientY - this.lastPointerPosition.y;
-            const currentZoom = (this.camera.right - this.camera.left) / window.innerWidth;
-            const panSpeed = currentZoom;
-            this.camera.position.x -= deltaX * panSpeed;
-            this.camera.position.y += deltaY * panSpeed;
-            this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
         }
     }
 
