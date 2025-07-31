@@ -7,16 +7,34 @@
     <title>Gerador e Renderizador de Markdown</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        /* ------------------------------ */
+        /* VARIÁVEIS GLOBAIS DE ESTILO  */
+        /* ------------------------------ */
         :root {
             --primary-color: #007bff;
             --secondary-color: #6c757d;
+            --secondary-heading-color: #2881a7;
+            /* Cor para subtítulos H2 */
+            --tertiary-heading-color: #343a40;
+            /* Cor para subtítulos H3+ */
             --background-light: #f8f9fa;
             --background-dark: #ffffff;
             --text-color: #343a40;
             --border-color: #e9ecef;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            /* Novas variáveis para o tema escuro */
+            --dark-background-body: #2d2d2d;
+            --dark-background-container: #263442;
+            --dark-text-color: #cacaca;
+            --dark-border-color: #56555b;
+            --dark-primary-heading-color: #64b5f6;
+            --dark-secondary-heading-color: #4fc3f7;
+            --dark-tertiary-heading-color: #b0bec5;
         }
 
+        /* ------------------------------ */
+        /* ESTILOS GERAIS DO BODY */
+        /* ------------------------------ */
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
@@ -28,41 +46,68 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        /* ------------------------------ */
+        /* ESTILOS DO TEMA ESCURO (NOVO) */
+        /* ------------------------------ */
+        body.dark-theme {
+            background-color: var(--dark-background-body);
+            color: var(--dark-text-color);
+        }
+
+        body.dark-theme .container {
+            background-color: var(--dark-background-container);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-theme #markdown-output {
+            background-color: var(--dark-background-container);
+            border-color: var(--dark-border-color);
+            color: var(--dark-text-color);
+        }
+
+        body.dark-theme #markdown-output h1 {
+            color: var(--dark-primary-heading-color);
+        }
+
+        body.dark-theme #markdown-output h2 {
+            color: var(--dark-secondary-heading-color);
+        }
+
+        body.dark-theme #markdown-output h3,
+        body.dark-theme #markdown-output h4,
+        body.dark-theme #markdown-output h5,
+        body.dark-theme #markdown-output h6 {
+            color: var(--dark-tertiary-heading-color);
+        }
+
+        body.dark-theme #markdown-output hr {
+            background: var(--dark-border-color);
+        }
+
+        /* Botões do tema escuro para manter a legibilidade */
+        body.dark-theme button {
+            background-color: #34495e;
+        }
+
+        body.dark-theme button:hover {
+            background-color: #2c3e50;
+        }
+
+        /* ------------------------------ */
+        /* ESTILOS DOS CONTROLES */
+        /* ------------------------------ */
         .button-container {
             display: flex;
             justify-content: center;
             gap: 15px;
-            /* Espaço entre os botões */
             margin-bottom: 30px;
             flex-wrap: wrap;
             width: 100%;
             max-width: 960px;
-            /* Align with container max-width */
         }
-
-        .container {
-            width: 100%;
-            max-width: 960px;
-            background-color: var(--background-dark);
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            padding: 30px;
-            margin-bottom: 20px;
-            /* Removido o h1 daqui */
-        }
-
-        /* Os estilos para h1 agora são aplicados via #markdown-output h1 */
-        #markdown-output h1 {
-            color: var(--primary-color);
-            text-align: left;
-            margin-top: 0;
-            /* Ajuste para o primeiro título dentro do card */
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-
 
         button {
             padding: 12px 25px;
@@ -93,6 +138,20 @@
             transform: translateY(0);
         }
 
+        /* ------------------------------ */
+        /* ESTILOS DA ÁREA DE CONTEÚDO */
+        /* ------------------------------ */
+        .container {
+            width: 100%;
+            max-width: 960px;
+            background-color: var(--background-dark);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+
         #markdown-output {
             border: 1px solid var(--border-color);
             padding: 80px;
@@ -100,15 +159,32 @@
             border-radius: 8px;
             min-height: 200px;
             overflow-x: auto;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
-        /* Estilos para o conteúdo Markdown renderizado (mantidos e ajustados) */
-        #markdown-output h2,
+        /* ------------------------------ */
+        /* ESTILOS DO MARKDOWN RENDERIZADO */
+        /* ------------------------------ */
+        #markdown-output h1 {
+            color: var(--primary-color);
+            text-align: left;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        #markdown-output h2 {
+            color: var(--secondary-heading-color);
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            font-weight: 600;
+        }
+
         #markdown-output h3,
         #markdown-output h4,
         #markdown-output h5,
         #markdown-output h6 {
-            color: var(--primary-color);
+            color: var(--tertiary-heading-color);
             margin-top: 1.5em;
             margin-bottom: 0.5em;
             font-weight: 600;
@@ -116,7 +192,6 @@
 
         #markdown-output p {
             margin-bottom: 1em;
-
         }
 
         #markdown-output ul {
@@ -146,7 +221,9 @@
             margin: 2em 0;
         }
 
-        /* Responsividade básica */
+        /* ------------------------------ */
+        /* MEDIA QUERIES (RESPONSIVO) */
+        /* ------------------------------ */
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -186,15 +263,34 @@
             }
         }
 
-        /* --- ESTILOS DE IMPRESSÃO OTIMIZADOS --- */
+        /* ------------------------------ */
+        /* ESTILOS PARA IMPRESSÃO */
+        /* ------------------------------ */
         @media print {
             body {
                 background-color: #fff;
-                /* Adiciona padding para criar margens no PDF */
                 padding: 2cm;
                 margin: 0;
                 font-size: 12pt;
-                /* Tamanho de fonte ideal para leitura de documentos */
+            }
+
+            /* Garante que o tema escuro não afete a impressão */
+            body.dark-theme {
+                background-color: #fff;
+                color: #000;
+            }
+
+            body.dark-theme .container,
+            body.dark-theme #markdown-output {
+                background-color: #fff;
+                color: #000;
+                border-color: #000;
+            }
+
+            body.dark-theme #markdown-output h1,
+            body.dark-theme #markdown-output h2,
+            body.dark-theme #markdown-output h3 {
+                color: #000;
             }
 
             .container {
@@ -206,19 +302,14 @@
                 width: 100%;
             }
 
-            /* Oculta APENAS o container dos botões na impressão */
             .button-container {
                 display: none;
             }
 
-            /* Garante que o H1 seja exibido e estilizado para impressão */
             #markdown-output h1 {
                 display: block;
-                /* Garante que o título seja visível */
                 color: #000;
-                /* Título em preto para impressão */
                 text-align: left;
-                /* Alinhamento padrão para documentos */
                 font-size: 24pt;
                 margin-bottom: 1.5cm;
             }
@@ -228,10 +319,8 @@
                 padding: 0;
                 min-height: unset;
                 overflow: visible;
-                /* Garante que todo o conteúdo seja impresso */
             }
 
-            /* Ajusta o tamanho dos subtítulos para melhor hierarquia no PDF */
             #markdown-output h2 {
                 font-size: 18pt;
                 color: #333;
@@ -245,7 +334,6 @@
             a:link:after,
             a:visited:after {
                 content: "";
-                /* Remove a exibição da URL dos links no PDF */
             }
         }
     </style>
@@ -254,8 +342,8 @@
 
 <body>
     <div class="button-container">
-        <!-- <button onclick="generateAndDisplayMarkdown()">Gerar e Exibir Markdown</button> -->
         <button id="export-pdf-btn">Exportar PDF</button>
+        <button id="theme-toggle-btn">Alternar Tema</button>
     </div>
 
     <div class="container">
@@ -267,147 +355,111 @@
         let jsonData = {
             "name": "Ataques a Redes",
             "definition": "Visão geral dos principais ataques a redes, incluindo Negação de Serviço, Força Bruta, Varredura de Portas, Decepção, Falsificação e Interceptação, com suas definições, variações, impactos e contramedidas.",
-            "children": [
-                {
-                    "name": "Negação de Serviço (DoS/DDoS)",
-                    "definition": "Ataques que visam tornar um recurso de computação indisponível para usuários legítimos, sem roubar informações. Podem ser DoS (fonte única) ou DDoS (múltiplas fontes distribuídas geograficamente, usando botnets).",
-                    "children": [
-                        {
-                            "name": "Categorias de Ataques DoS/DDoS",
-                            "definition": "Tipos de ataques de negação de serviço baseados na forma como consomem recursos do alvo.",
-                            "children": [
-                                {
-                                    "name": "Ataques de Volume",
-                                    "definition": "Inundam a largura de banda da rede do alvo com tráfego massivo, como UDP Flood e ICMP Flood.",
-                                    "children": []
-                                },
-                                {
-                                    "name": "Ataques de Protocolo",
-                                    "definition": "Consomem recursos de servidores ou equipamentos de rede explorando vulnerabilidades em protocolos, como SYN Flood, que deixa conexões TCP semiabertas.",
-                                    "children": []
-                                },
-                                {
-                                    "name": "Ataques à Camada de Aplicação",
-                                    "definition": "Direcionados a aplicações específicas, enviando requisições que parecem legítimas para consumir intensivamente CPU e memória do servidor, como HTTP Flood.",
-                                    "children": []
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Impacto Principal DoS/DDoS",
-                            "definition": "Violação do princípio da Disponibilidade, impedindo que usuários legítimos acessem os serviços.",
-                            "children": []
-                        },
-                        {
-                            "name": "Contramedidas DoS/DDoS",
-                            "definition": "Estratégias para mitigar ataques de negação de serviço, incluindo firewalls, Sistemas de Prevenção de Intrusão (IPS), limitação de taxa (rate limiting) e serviços especializados de mitigação anti-DDoS com scrubbing centers.",
-                            "children": []
-                        },
-                        {
-                            "name": "Foco CEBRASPE DoS/DDoS",
-                            "definition": "Pontos importantes para exames, como a diferença entre DoS (uma fonte) e DDoS (múltiplas fontes), o objetivo primordial de esgotar recursos (não roubar dados) e o SYN Flood como ataque de protocolo clássico.",
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "name": "Força Bruta e Varredura de Portas",
-                    "definition": "Ataques focados na descoberta de credenciais ou na identificação de vulnerabilidades em sistemas através do reconhecimento de portas abertas.",
-                    "children": [
-                        {
-                            "name": "Ataque de Força Bruta",
-                            "definition": "Método criptoanalítico que tenta sistematicamente todas as combinações possíveis de senhas ou chaves até encontrar a correta.",
-                            "children": [
-                                {
-                                    "name": "Variações de Força Bruta",
-                                    "definition": "O Ataque de Dicionário é uma forma otimizada que utiliza uma lista predefinida de palavras comuns e senhas vazadas.",
-                                    "children": []
-                                },
-                                {
-                                    "name": "Impacto Principal Força Bruta",
-                                    "definition": "Violação da Confidencialidade e Autenticidade, permitindo acesso não autorizado a contas e sistemas.",
-                                    "children": []
-                                },
-                                {
-                                    "name": "Contramedidas Força Bruta",
-                                    "definition": "Implementação de políticas de senha forte, bloqueio de conta após tentativas malsucedidas, uso de CAPTCHA e, principalmente, Autenticação Multifator (MFA).",
-                                    "children": []
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Varredura de Portas (Port Scanning)",
-                            "definition": "Técnica de reconhecimento para sondar um servidor ou host em busca de portas abertas, identificando serviços e aplicações em execução para encontrar potenciais vetores de ataque.",
-                            "children": [
-                                {
-                                    "name": "Técnicas Comuns Varredura",
-                                    "definition": "Incluem TCP Connect Scan (conexão TCP completa, detectável) e TCP SYN Scan (envia SYN, não completa handshake, mais furtivo).",
-                                    "children": []
-                                },
-                                {
-                                    "name": "Ferramenta Padrão",
-                                    "definition": "Nmap é a ferramenta mais conhecida para realizar varreduras de portas.",
-                                    "children": []
-                                },
-                                {
-                                    "name": "Contramedidas Varredura",
-                                    "definition": "Configuração de firewalls para descartar pacotes em portas fechadas e uso de Sistemas de Detecção de Intrusão (IDS) para identificar padrões de varredura.",
-                                    "children": []
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Foco CEBRASPE Força Bruta e Portas",
-                            "definition": "Pontos importantes para exames, como a MFA como defesa robusta contra Força Bruta, a Varredura de Portas como fase de reconhecimento (não um ataque direto) e a furtividade do SYN Scan por não completar o handshake.",
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "name": "Decepção, Falsificação, Interceptação",
-                    "definition": "Categoria de ataques que exploram a confiança e utilizam técnicas de engano, falsificação de identidade ou interceptação de comunicação para comprometer a segurança.",
-                    "children": [
-                        {
-                            "name": "Phishing",
-                            "definition": "Ataque de engenharia social, geralmente por e-mail, que engana a vítima para revelar informações sensíveis (credenciais) ou executar código malicioso, usando mensagens e páginas falsas que se passam por entidades legítimas.",
-                            "children": [
-                                {
-                                    "name": "Spear Phishing",
-                                    "definition": "Variante direcionada e personalizada para um indivíduo ou organização específica, aumentando a credibilidade e chance de sucesso.",
-                                    "children": []
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Eavesdropping (Interceptação Passiva)",
-                            "definition": "Ato de monitorar secretamente a comunicação entre duas partes em uma rede para obter informações. É um ataque passivo que viola a confidencialidade e ocorre frequentemente em redes Wi-Fi públicas.",
-                            "children": [
-                                {
-                                    "name": "Contramedida Eavesdropping",
-                                    "definition": "Criptografia é a principal contramedida, tornando dados interceptados ilegíveis através de protocolos como TLS (HTTPS) e VPNs.",
-                                    "children": []
-                                }
-                            ]
-                        },
-                        {
-                            "name": "DNS Spoofing",
-                            "definition": "Ataque que introduz dados falsos no cache de um servidor DNS, fazendo-o retornar um endereço IP incorreto (malicioso) para um nome de domínio legítimo, redirecionando usuários para sites falsos.",
-                            "children": [
-                                {
-                                    "name": "Contramedida DNS Spoofing",
-                                    "definition": "DNSSEC (Domain Name System Security Extensions) utiliza assinaturas digitais para garantir autenticidade e integridade das respostas DNS.",
-                                    "children": []
-                                }
-                            ]
-                        },
-                        {
-                            "name": "Foco CEBRASPE Decepção/Interc.",
-                            "definition": "Pontos importantes para exames, como o Phishing como engenharia social, a criptografia como defesa eficaz contra Eavesdropping (firewall é incorreto) e a diferença entre DNS Spoofing (infraestrutura) e Phishing (link malicioso) no redirecionamento para sites falsos.",
-                            "children": []
-                        }
-                    ]
-                }
-            ]
+            "children": [{
+                "name": "Negação de Serviço (DoS/DDoS)",
+                "definition": "Ataques que visam tornar um recurso de computação indisponível para usuários legítimos, sem roubar informações. Podem ser DoS (fonte única) ou DDoS (múltiplas fontes distribuídas geograficamente, usando botnets).",
+                "children": [{
+                    "name": "Categorias de Ataques DoS/DDoS",
+                    "definition": "Tipos de ataques de negação de serviço baseados na forma como consomem recursos do alvo.",
+                    "children": [{
+                        "name": "Ataques de Volume",
+                        "definition": "Inundam a largura de banda da rede do alvo com tráfego massivo, como UDP Flood e ICMP Flood.",
+                        "children": []
+                    }, {
+                        "name": "Ataques de Protocolo",
+                        "definition": "Consomem recursos de servidores ou equipamentos de rede explorando vulnerabilidades em protocolos, como SYN Flood, que deixa conexões TCP semiabertas.",
+                        "children": []
+                    }, {
+                        "name": "Ataques à Camada de Aplicação",
+                        "definition": "Direcionados a aplicações específicas, enviando requisições que parecem legítimas para consumir intensivamente CPU e memória do servidor, como HTTP Flood.",
+                        "children": []
+                    }]
+                }, {
+                    "name": "Impacto Principal DoS/DDoS",
+                    "definition": "Violação do princípio da Disponibilidade, impedindo que usuários legítimos acessem os serviços.",
+                    "children": []
+                }, {
+                    "name": "Contramedidas DoS/DDoS",
+                    "definition": "Estratégias para mitigar ataques de negação de serviço, incluindo firewalls, Sistemas de Prevenção de Intrusão (IPS), limitação de taxa (rate limiting) e serviços especializados de mitigação anti-DDoS com scrubbing centers.",
+                    "children": []
+                }, {
+                    "name": "Foco CEBRASPE DoS/DDoS",
+                    "definition": "Pontos importantes para exames, como a diferença entre DoS (uma fonte) e DDoS (múltiplas fontes), o objetivo primordial de esgotar recursos (não roubar dados) e o SYN Flood como ataque de protocolo clássico.",
+                    "children": []
+                }]
+            }, {
+                "name": "Força Bruta e Varredura de Portas",
+                "definition": "Ataques focados na descoberta de credenciais ou na identificação de vulnerabilidades em sistemas através do reconhecimento de portas abertas.",
+                "children": [{
+                    "name": "Ataque de Força Bruta",
+                    "definition": "Método criptoanalítico que tenta sistematicamente todas as combinações possíveis de senhas ou chaves até encontrar a correta.",
+                    "children": [{
+                        "name": "Variações de Força Bruta",
+                        "definition": "O Ataque de Dicionário é uma forma otimizada que utiliza uma lista predefinida de palavras comuns e senhas vazadas.",
+                        "children": []
+                    }, {
+                        "name": "Impacto Principal Força Bruta",
+                        "definition": "Violação da Confidencialidade e Autenticidade, permitindo acesso não autorizado a contas e sistemas.",
+                        "children": []
+                    }, {
+                        "name": "Contramedidas Força Bruta",
+                        "definition": "Implementação de políticas de senha forte, bloqueio de conta após tentativas malsucedidas, uso de CAPTCHA e, principalmente, Autenticação Multifactor (MFA).",
+                        "children": []
+                    }]
+                }, {
+                    "name": "Varredura de Portas (Port Scanning)",
+                    "definition": "Técnica de reconhecimento para sondar um servidor ou host em busca de portas abertas, identificando serviços e aplicações em execução para encontrar potenciais vetores de ataque.",
+                    "children": [{
+                        "name": "Técnicas Comuns Varredura",
+                        "definition": "Incluem TCP Connect Scan (conexão TCP completa, detectável) e TCP SYN Scan (envia SYN, não completa handshake, mais furtivo).",
+                        "children": []
+                    }, {
+                        "name": "Ferramenta Padrão",
+                        "definition": "Nmap é a ferramenta mais conhecida para realizar varreduras de portas.",
+                        "children": []
+                    }, {
+                        "name": "Contramedidas Varredura",
+                        "definition": "Configuração de firewalls para descartar pacotes em portas fechadas e uso de Sistemas de Detecção de Intrusão (IDS) para identificar padrões de varredura.",
+                        "children": []
+                    }]
+                }, {
+                    "name": "Foco CEBRASPE Força Bruta e Portas",
+                    "definition": "Pontos importantes para exames, como a MFA como defesa robusta contra Força Bruta, a Varredura de Portas como fase de reconhecimento (não um ataque direto) e a furtividade do SYN Scan por não completar o handshake.",
+                    "children": []
+                }]
+            }, {
+                "name": "Decepção, Falsificação, Interceptação",
+                "definition": "Categoria de ataques que exploram a confiança e utilizam técnicas de engano, falsificação de identidade ou interceptação de comunicação para comprometer a segurança.",
+                "children": [{
+                    "name": "Phishing",
+                    "definition": "Ataque de engenharia social, geralmente por e-mail, que engana a vítima para revelar informações sensíveis (credenciais) ou executar código malicioso, usando mensagens e páginas falsas que se passam por entidades legítimas.",
+                    "children": [{
+                        "name": "Spear Phishing",
+                        "definition": "Variante direcionada e personalizada para um indivíduo ou organização específica, aumentando a credibilidade e chance de sucesso.",
+                        "children": []
+                    }]
+                }, {
+                    "name": "Eavesdropping (Interceptação Passiva)",
+                    "definition": "Ato de monitorar secretamente a comunicação entre duas partes em uma rede para obter informações. É um ataque passivo que viola a confidencialidade e ocorre frequentemente em redes Wi-Fi públicas.",
+                    "children": [{
+                        "name": "Contramedida Eavesdropping",
+                        "definition": "Criptografia é a principal contramedida, tornando dados interceptados ilegíveis através de protocolos como TLS (HTTPS) e VPNs.",
+                        "children": []
+                    }]
+                }, {
+                    "name": "DNS Spoofing",
+                    "definition": "Ataque que introduz dados falsos no cache de um servidor DNS, fazendo-o retornar um endereço IP incorreto (malicioso) para um nome de domínio legítimo, redirecionando usuários para sites falsos.",
+                    "children": [{
+                        "name": "Contramedida DNS Spoofing",
+                        "definition": "DNSSEC (Domain Name System Security Extensions) utiliza assinaturas digitais para garantir autenticidade e integridade das respostas DNS.",
+                        "children": []
+                    }]
+                }, {
+                    "name": "Foco CEBRASPE Decepção/Interc.",
+                    "definition": "Pontos importantes para exames, como o Phishing como engenharia social, a criptografia como defesa eficaz contra Eavesdropping (firewall é incorreto) e a diferença entre DNS Spoofing (infraestrutura) e Phishing (link malicioso) no redirecionamento para sites falsos.",
+                    "children": []
+                }]
+            }]
         };
 
         // NOVO: Tenta carregar os dados do sessionStorage primeiro
@@ -473,8 +525,12 @@
             }
         });
 
+        // NOVO: Event listener para o botão de tema
+        document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+        });
+
         // Chama a função para gerar e exibir o Markdown quando a página carrega
-        // Isso garante que o conteúdo seja exibido automaticamente se houver dados do sessionStorage
         document.addEventListener('DOMContentLoaded', generateAndDisplayMarkdown);
     </script>
 </body>
