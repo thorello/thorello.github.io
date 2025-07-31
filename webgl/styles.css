@@ -110,10 +110,6 @@ canvas {
     transition: color 0.5s ease;
 }
 
-#popUp h2::after {
-    content: none;
-}
-
 #popUp p {
     line-height: 1.8;
     color: var(--paragraph-color);
@@ -180,11 +176,6 @@ canvas {
 
 .edit-btn:hover {
     color: var(--edit-btn-hover-color);
-}
-
-.edit-btn svg,
-.edit-btn img {
-    display: none;
 }
 
 .edit-view {
@@ -269,7 +260,24 @@ canvas {
 #add-node-button,
 #ai-new-map-button-popUp,
 #add-children-with-ai-button,
-#delete-node-button,
+#delete-node-button {
+    background-color: var(--menu-button-bg);
+    color: var(--menu-button-text-color);
+    border: none;
+    padding: 12px 12px;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0 auto;
+    width: fit-content;
+    max-width: 250px;
+}
+
 #json-paste-import-button,
 #copy-prompt-button {
     background-color: var(--menu-button-bg);
@@ -289,10 +297,19 @@ canvas {
     max-width: 250px;
 }
 
+
 #add-node-button span,
 #ai-new-map-button-popUp span,
 #add-children-with-ai-button span,
-#delete-node-button span,
+#delete-node-button span {
+    transition: opacity 0.2s ease, width 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
 #json-paste-import-button span,
 #copy-prompt-button span {
     transition: opacity 0.2s ease, width 0.2s ease;
@@ -582,29 +599,6 @@ canvas {
     display: none;
 }
 
-/* Back Button (top left) */
-#back-button {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 100;
-    background-color: var(--cancel-btn-bg);
-    border: none;
-    color: white;
-    padding: 8px 16px;
-    font-family: 'Open Sans', sans-serif;
-    font-size: 14px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, box-shadow 0.3s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-#back-button:hover {
-    background-color: var(--cancel-btn-hover-bg);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
 /* Loading overlay styles */
 #loading-overlay {
     position: fixed;
@@ -734,30 +728,6 @@ canvas {
         padding: 0;
     }
 
-    #back-button {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-        gap: 5px;
-        top: 5px;
-        right: 5px;
-    }
-
-    .action-buttons button,
-    .action-buttons label {
-        padding: 6px 10px;
-        font-size: 12px;
-        width: 100%;
-    }
-
-    #popUp-buttons-container {
-        padding-top: 15px;
-        padding-bottom: 5px;
-    }
-
     #add-node-button,
     #ai-new-map-button-popUp,
     #add-children-with-ai-button,
@@ -789,6 +759,32 @@ canvas {
     #json-paste-import-button:hover span,
     #copy-prompt-button:hover span {
         padding-left: 10px;
+    }
+
+    #popUp-buttons-container {
+        padding-top: 15px;
+        padding-bottom: 5px;
+    }
+
+    .focus-button {
+        bottom: 20px;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    #focus-previous-node-button {
+        right: 60px;
+    }
+
+    #focus-next-node-button {
+        right: 10px;
+    }
+
+    #node-info-footer {
+        padding: 6px 12px;
+        font-size: 0.8em;
+        bottom: 10px;
     }
 }
 
