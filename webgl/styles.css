@@ -308,6 +308,11 @@ canvas {
 }
 
 
+/* Adiciona a classe para botões que devem ser ocultos */
+.hidden-button {
+    display: none;
+}
+
 #add-node-button span,
 #ai-new-map-button-popUp span,
 #add-children-with-ai-button span,
