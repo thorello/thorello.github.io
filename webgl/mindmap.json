@@ -1,118 +1,133 @@
 {
     "name": "Comece Aqui",
-    "definition": "Este documento lista as funcionalidades da aplicação de mapa mental, cobrindo navegação, edição de nós, uso da IA e o menu de ações, com base nos arquivos da aplicação.",
+    "definition": "Este é o seu guia interativo para aprender a usar todas as ferramentas incríveis que preparamos para você. Clique nos próximos nós para explorar e se tornar um mestre dos mapas mentais!",
     "children": [
         {
-            "name": "Navegação e Edição",
-            "definition": "Ações de interação e modificação de nós.",
+            "name": "Explorando seu Mapa Mental",
+            "definition": "Navegar pelas suas ideias é o primeiro passo. Veja como é fácil visualizar e se mover pelo seu mapa.",
             "children": [
                 {
-                    "name": "Controles de Visualização",
-                    "definition": "Navegação e organização do mapa.",
-                    "children": [
-                        {
-                            "name": "Zoom",
-                            "definition": "Controlado pela roda do mouse ou pelo movimento de 'pinça' em telas de toque.",
-                            "children": []
-                        },
-                        {
-                            "name": "Mover (Pan)",
-                            "definition": "Controlado pelo clique e arrasto em áreas vazias da tela com o mouse ou um dedo em telas de toque.",
-                            "children": []
-                        },
-                        {
-                            "name": "Arrastar Nós",
-                            "definition": "O nó e todos os seus filhos podem ser arrastados ao clicar e mover o círculo cinza ao lado do nó. As posições são salvas automaticamente.",
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "name": "Pop-up de Edição",
-                    "definition": "Janela de detalhes e edição de nós.",
-                    "children": [
-                        {
-                            "name": "Abertura",
-                            "definition": "Abre ao clicar em qualquer nó, exibindo seu 'Nome' e 'Explicação'.",
-                            "children": []
-                        },
-                        {
-                            "name": "Edição",
-                            "definition": "Permite editar o 'Nome' e a 'Explicação' do nó através de um ícone de lápis. As mudanças são salvas ao clicar em 'Salvar'.",
-                            "children": []
-                        },
-                        {
-                            "name": "Estrutura",
-                            "definition": "É possível adicionar um novo nó filho ou excluir o nó atual e seus filhos. O nó principal não pode ser excluído.",
-                            "children": []
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "Inteligência Artificial (IA)",
-            "definition": "Ferramentas que usam o modelo 'gemini-1.5-flash-latest' da Google para gerar conteúdo.",
-            "children": [
-                {
-                    "name": "Criação de Mapa com IA",
-                    "definition": "A partir de uma chave de API, um texto ou uma URL, a IA analisa o conteúdo e gera um mapa mental hierárquico em formato JSON. O prompt da IA exige nomes de nós com no máximo 35 caracteres, definições completas e todo o texto em português do Brasil. A busca de conteúdo via URL utiliza um proxy para contornar problemas de CORS e extrai apenas o texto principal da página.",
+                    "name": "Dando Zoom (Aproximar/Afastar)",
+                    "definition": "Use a rodinha do mouse ou o gesto de pinça no seu celular para ver seu mapa mais de perto ou ter uma visão geral de longe.",
                     "children": []
                 },
                 {
-                    "name": "Expansão com IA",
-                    "definition": "É possível adicionar nós filhos a partir de um nó secundário. A IA analisa o conteúdo do nó pai e sugere automaticamente novos nós filhos.",
+                    "name": "Movendo o Mapa (Arrastar)",
+                    "definition": "Clique em uma área vazia e arraste com o mouse para mover o mapa inteiro. Assim, você pode explorar todos os cantos das suas ideias.",
                     "children": []
                 },
                 {
-                    "name": "Gerenciamento da Chave de API",
-                    "definition": "A chave de API é inserida em uma página dedicada, é salva no 'localStorage' do navegador e pode ser colada a partir da área de transferência.",
+                    "name": "Focando em Ideias (Setas)",
+                    "definition": "Use os botões de seta para a esquerda e para a direita para pular de uma ideia para a outra, focando no que é importante no momento.",
                     "children": []
                 }
             ]
         },
         {
-            "name": "Menu de Ações",
-            "definition": "Opções de gerenciamento do mapa mental. O menu abre com um clique e fecha ao clicar fora ou em um item da lista.",
+            "name": "Criando e Editando suas Ideias",
+            "definition": "Aprenda a adicionar, modificar e organizar os blocos de informação (que chamamos de 'nós') do seu mapa.",
             "children": [
                 {
-                    "name": "Importar Mapa",
-                    "definition": "Carrega um arquivo JSON do computador do usuário, valida a presença da propriedade 'name' e salva o conteúdo no 'localStorage' para renderização.",
+                    "name": "Editar uma Ideia",
+                    "definition": "Para alterar o texto de uma ideia, basta clicar sobre ela. Uma janela de edição se abrirá para você escrever.",
                     "children": []
                 },
                 {
-                    "name": "Salvar Mapa",
-                    "definition": "Exporta o mapa atual como um arquivo 'mindmap_data.json'. Os dados são recuperados do 'localStorage' do navegador e convertidos para uma string JSON formatada com 2 espaços de indentação.",
+                    "name": "Salvar suas Alterações",
+                    "definition": "Após editar, clique no botão 'Salvar' na janela de edição para que suas mudanças não sejam perdidas.",
                     "children": []
                 },
                 {
-                    "name": "Exportar PDF",
-                    "definition": "Cria um documento PDF do mapa usando a biblioteca `jsPDF`. A exportação é feita em formato A4 (paisagem) e as cores dos links são suavizadas para uma melhor visualização.",
+                    "name": "Adicionar uma Nova Ideia",
+                    "definition": "Dentro da janela de edição, clique em 'Adicionar Filho' para criar uma nova ideia conectada à atual. É assim que seu mapa cresce!",
                     "children": []
                 },
                 {
-                    "name": "Criar Relatório (Markdown)",
-                    "definition": "Transforma o mapa em um texto estruturado em Markdown, usando a biblioteca `marked.js` para renderização. A página de relatório também oferece opções para alternar o tema e exportar para PDF.",
+                    "name": "Organizar e Mover Ideias",
+                    "definition": "Clique no círculo cinza ao lado de uma ideia e arraste-a para onde quiser. Todas as ideias conectadas a ela se moverão juntas.",
                     "children": []
                 },
                 {
-                    "name": "Recalcular Mapa",
-                    "definition": "Organiza automaticamente todos os nós do mapa, desconsiderando as posições arrastadas manualmente.",
+                    "name": "Excluir uma Ideia",
+                    "definition": "Na janela de edição, o botão 'Excluir Nó' apaga a ideia. Cuidado, pois tudo que estiver conectado a ela também será removido!",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "Use a Magia da Inteligência Artificial!",
+            "definition": "Não sabe por onde começar? Deixe que nosso assistente de IA crie um mapa mental para você a partir de qualquer texto ou link.",
+            "children": [
+                {
+                    "name": "Ir para a página da IA",
+                    "definition": "No menu principal, encontre a opção que te leva para a página de 'Criação com IA'.",
                     "children": []
                 },
                 {
-                    "name": "Novo Mapa",
-                    "definition": "Inicia um mapa mental vazio, carregando uma estrutura padrão sem dados anteriores.",
+                    "name": "Inserir o Conteúdo",
+                    "definition": "Na página da IA, você pode colar um texto inteiro ou simplesmente colocar o link de um site que você quer resumir.",
                     "children": []
                 },
                 {
-                    "name": "Manual",
-                    "definition": "Recarrega o mapa mental de instruções padrão a partir do arquivo 'mindmap.json'.",
+                    "name": "Processar",
+                    "definition": "Com o texto ou link no lugar, clique no botão 'Processar'. A IA vai ler tudo e organizar as informações para você. Isso pode levar alguns segundos.",
                     "children": []
                 },
                 {
-                    "name": "Alternar Tema",
-                    "definition": "Muda o esquema de cores da aplicação entre o tema claro (`lightTheme`) e o tema escuro (`darkTheme`), conforme definido no arquivo `theme.js`.",
+                    "name": "Criar seu Mapa!",
+                    "definition": "Após a análise, o botão 'Criar Mapa Mental' aparecerá. Clique nele e seu novo mapa, já estruturado, será exibido na tela principal!",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "Salvando e Compartilhando",
+            "definition": "Veja como guardar seu trabalho e mostrá-lo para outras pessoas em diferentes formatos.",
+            "children": [
+                {
+                    "name": "Salvar seu Projeto",
+                    "definition": "Use o botão 'Salvar Mapa' no menu para baixar um arquivo do seu projeto. Assim, você pode continuar trabalhando nele mais tarde.",
+                    "children": []
+                },
+                {
+                    "name": "Carregar um Projeto Salvo",
+                    "definition": "Use o botão 'Importar Mapa' no menu para abrir um arquivo de mapa que você salvou anteriormente no seu computador.",
+                    "children": []
+                },
+                {
+                    "name": "Exportar para PDF",
+                    "definition": "Quer imprimir ou enviar uma foto do seu mapa? Use o botão 'Exportar PDF' no menu para criar um arquivo PDF, fácil de compartilhar.",
+                    "children": []
+                },
+                {
+                    "name": "Criar um Relatório de Texto",
+                    "definition": "O botão 'Criar Relatório' transforma seu mapa visual em um documento de texto organizado, ótimo para estudos ou apresentações.",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "name": "Outras Ferramentas Úteis",
+            "definition": "Conheça outras opções do menu que podem facilitar seu trabalho e personalizar sua experiência.",
+            "children": [
+                {
+                    "name": "Começar um Mapa do Zero",
+                    "definition": "O botão 'Novo Mapa' limpa a tela e te dá uma folha em branco para começar um novo projeto quando quiser.",
+                    "children": []
+                },
+                {
+                    "name": "Reorganizar a Bagunça",
+                    "definition": "Seu mapa ficou desorganizado? O botão 'Recalcular Mapa' arruma tudo automaticamente, voltando ao layout padrão.",
+                    "children": []
+                },
+                {
+                    "name": "Mudar as Cores (Tema)",
+                    "definition": "Prefere um visual mais escuro para trabalhar? O botão 'Alternar Tema' muda as cores da aplicação para o seu conforto visual.",
+                    "children": []
+                },
+                {
+                    "name": "Ver este Manual de Ajuda",
+                    "definition": "Perdido? O botão 'Manual' abre este guia de ajuda a qualquer momento para você consultar.",
                     "children": []
                 }
             ]
