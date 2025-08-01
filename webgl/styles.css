@@ -443,7 +443,7 @@ canvas {
 
 /* Estilo para todos os botões de ação dentro da popup */
 #popUp-buttons-container button {
-    background-color: transparent;
+    background-color: white;
     border: 2px solid var(--title-border-color);
     color: var(--title-border-color);
     font-size: 1.2em;
@@ -499,12 +499,12 @@ canvas {
 #menu-content {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     position: absolute;
     top: calc(100% + 5px);
     right: 0;
-    background-color: transparent;
-    padding: 10px;
+    background-color: rgb(255, 255, 255);
+    padding: 4px;
     transform-origin: top down;
     transform: scale(0.95);
     opacity: 0;
