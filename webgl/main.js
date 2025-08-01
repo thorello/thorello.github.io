@@ -152,21 +152,28 @@ class MindMapViewer {
 
     _initEventListeners() {
         window.addEventListener('resize', this._onWindowResize.bind(this));
-        // Mouse Events
-        this.renderer.domElement.addEventListener('mousedown', this._onMouseDown.bind(this));
-        this.renderer.domElement.addEventListener('mousemove', this._onMouseMove.bind(this));
-        this.renderer.domElement.addEventListener('mouseup', this._onMouseUp.bind(this));
-        this.renderer.domElement.addEventListener('wheel', this._onMouseWheel.bind(this), { passive: false });
 
-        // Touch Events
-        this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
-        this.renderer.domElement.addEventListener('touchmove', (event) => {
-            event.preventDefault();
-            this._onTouchMove(event);
-        }, { passive: false });
-        this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
+        // Detecta se é um dispositivo móvel usando a user agent string
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
 
+        if (isMobile) {
+            // Eventos de Toque
+            this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
+            this.renderer.domElement.addEventListener('touchmove', (event) => {
+                event.preventDefault();
+                this._onTouchMove(event);
+            }, { passive: false });
+            this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
+        } else {
+            // Eventos de Mouse (para desktop)
+            this.renderer.domElement.addEventListener('mousedown', this._onMouseDown.bind(this));
+            this.renderer.domElement.addEventListener('mousemove', this._onMouseMove.bind(this));
+            this.renderer.domElement.addEventListener('mouseup', this._onMouseUp.bind(this));
+            this.renderer.domElement.addEventListener('wheel', this._onMouseWheel.bind(this), { passive: false });
+        }
 
+        // Os ouvintes de eventos da interface (botões, popups, etc.) são mantidos,
+        // pois são independentes do tipo de dispositivo.
         if (this.popUpCloseButton) {
             this.popUpCloseButton.addEventListener('click', this.closePopUp.bind(this));
         }
@@ -179,7 +186,6 @@ class MindMapViewer {
             this.focusPreviousNodeButton.addEventListener('click', this.focusPreviousNode.bind(this));
         }
 
-        // JSON Paste PopUp Event Listeners
         if (this.jsonPastePopUpCloseButton) {
             this.jsonPastePopUpCloseButton.addEventListener('click', this.closeJsonPastePopUp.bind(this));
         }
@@ -195,7 +201,6 @@ class MindMapViewer {
             });
         }
 
-        // NEW Prompt Generator PopUp Event Listeners
         if (this.promptGeneratorPopUpCloseButton) {
             this.promptGeneratorPopUpCloseButton.addEventListener('click', this.closePromptGeneratorPopUp.bind(this));
         }
@@ -211,40 +216,32 @@ class MindMapViewer {
             });
         }
 
-
         if (this.addNodeButton) {
             this.addNodeButton.addEventListener('click', this.addChildNode.bind(this));
         }
 
-        // Novo: Event Listener para o botão 'Adicionar nodes com IA'
         if (this.addChildrenWithAIButton) {
             this.addChildrenWithAIButton.addEventListener('click', this.addChildrenWithAI.bind(this));
         }
 
-        // Novo: Event Listener para o botão 'Copiar Prompt para IA'
         if (this.copyAIPromptButton) {
             this.copyAIPromptButton.addEventListener('click', this.copyAIPrompt.bind(this));
         }
 
-        // Novo: Event Listener para o botão 'Colar JSON e Criar Nós'
         if (this.pasteJsonFromClipboardButton) {
             this.pasteJsonFromClipboardButton.addEventListener('click', this.pasteJsonAndCreateChildren.bind(this));
         }
 
-        // Novo: Event Listener para o botão 'Novo Mapa Mental com IA'
         if (this.aiNewMapButton) {
             this.aiNewMapButton.addEventListener('click', () => {
                 window.location.href = 'api.html';
             });
         }
 
-        // Event Listener para o botão 'Excluir Nó'
         if (this.deleteNodeButton) {
             this.deleteNodeButton.addEventListener('click', this.deleteSelectedNode.bind(this));
         }
 
-
-        // --- New Edit Event Listeners ---
         this.editTitleBtn.addEventListener('click', () => this.toggleEditMode('title', true));
         this.saveTitleBtn.addEventListener('click', () => this.saveNodeChanges('title'));
         this.cancelTitleBtn.addEventListener('click', () => this.toggleEditMode('title', false));
@@ -291,7 +288,6 @@ class MindMapViewer {
             });
         }
 
-        // Modified: "Novo Mapa" button now loads new_mindmap.json
         const newMapButton = document.getElementById('new-map-button');
         if (newMapButton) {
             newMapButton.addEventListener('click', () => {
@@ -300,7 +296,6 @@ class MindMapViewer {
             });
         }
 
-        // NEW: "Manual" button to load mindmap.json
         const loadManualMapButton = document.getElementById('load-manual-map-button');
         if (loadManualMapButton) {
             loadManualMapButton.addEventListener('click', () => {
