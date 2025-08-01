@@ -364,12 +364,26 @@ class MindMapViewer {
 
             const isRootNode = d3Node.depth === 0;
 
-            const nodeColorsReversed = CONFIG.nodeColors.slice().reverse();
-            const nodeColor = isRootNode ? CONFIG.rootNodeColor : (nodeColorsReversed[d3Node.depth - 1] || 0xFFFFFF);
+            let nodeColor;
             const textColor = isRootNode ? CONFIG.rootTextColor : CONFIG.textColor;
             const idColor = isRootNode ? CONFIG.rootTextColor : 0x888888;
 
-            // 1. Cria a malha de texto para o nome do nó (a partir do código original)
+            if (isRootNode) {
+                nodeColor = CONFIG.rootNodeColor;
+            } else {
+                // Nova lógica para atribuir a cor da ramificação
+                const topLevelParent = d3Node.ancestors().find(d => d.depth === 1);
+                if (topLevelParent) {
+                    const parentIndex = this.d3RootNode.children.indexOf(topLevelParent);
+                    nodeColor = CONFIG.pastelBranchColors[parentIndex % CONFIG.pastelBranchColors.length];
+                } else {
+                    // fallback para outros nós (mesmo que a lógica D3 os atribua)
+                    const nodeColorsReversed = CONFIG.nodeColors.slice().reverse();
+                    nodeColor = nodeColorsReversed[d3Node.depth - 1] || 0xFFFFFF;
+                }
+            }
+
+            // 1. Cria a malha de texto para o nome do nó
             const textMesh = new Text();
             textMesh.text = d3Node.data.name;
             textMesh.fontSize = CONFIG.font.size;

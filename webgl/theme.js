@@ -1,6 +1,16 @@
 export const lightTheme = {
     // Cores
     backgroundColor: 0xF4F4F5,
+    // Paleta de cores pastel para as ramificações
+    pastelBranchColors: [
+        '#FFF2F5', // Rosa quase branco
+        '#FFFBF2', // Pêssego muito, muito claro
+        '#FFFFF2', // Amarelo pálido
+        '#F2FFF6', // Menta quase branco
+        '#F2FAFF', // Azul muito claro
+        '#F7F7FF', // Lavanda sutil
+        '#FFF5F8', // Rosa pálido
+    ],
     nodeColors: [
         0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF
     ],
