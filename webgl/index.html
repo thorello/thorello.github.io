@@ -15,40 +15,45 @@
     <div id="popUp">
         <button id="popUp-close">&times;</button>
 
-        <div id="title-section">
-            <div class="display-view">
-                <button id="edit-title-btn" class="edit-btn" title="Editar Título">
-                    <i class="material-icons">edit_square</i>
-                </button>
-                <h2 id="popUp-title"></h2>
-            </div>
-            <div class="edit-view">
-                <input type="text" id="popUp-title-input" />
-                <div class="edit-actions">
-                    <button id="save-title-btn" class="save-btn">Salvar</button>
-                    <button id="cancel-title-btn" class="cancel-btn">Cancelar</button>
+        <div class="title-content-container">
+            <div id="title-section">
+                <div class="display-view">
+                    <button id="edit-title-btn" class="edit-btn" title="Editar Título">
+                        <i class="material-icons">edit_square</i>
+                    </button>
+                    <h2 id="popUp-title"></h2>
+                </div>
+                <div class="edit-view">
+                    <input type="text" id="popUp-title-input" />
+                    <div class="edit-actions">
+                        <button id="save-title-btn" class="save-btn">Salvar</button>
+                        <button id="cancel-title-btn" class="cancel-btn">Cancelar</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div id="content-section">
-            <div class="display-view">
-                <button id="edit-content-btn" class="edit-btn" title="Editar Explicação">
-                    <i class="material-icons">edit_square</i>
-                </button>
-                <p id="popUp-content"></p>
-            </div>
-            <div class="edit-view">
-                <textarea id="popUp-content-input"></textarea>
-                <div class="edit-actions">
-                    <button id="save-content-btn" class="save-btn">Salvar</button>
-                    <button id="cancel-content-btn" class="cancel-btn">Cancelar</button>
+            <div id="content-section">
+                <div class="display-view">
+                    <button id="edit-content-btn" class="edit-btn" title="Editar Explicação">
+                        <i class="material-icons">edit_square</i>
+                    </button>
+                    <p id="popUp-content"></p>
+                </div>
+                <div class="edit-view">
+                    <textarea id="popUp-content-input"></textarea>
+                    <div class="edit-actions">
+                        <button id="save-content-btn" class="save-btn">Salvar</button>
+                        <button id="cancel-content-btn" class="cancel-btn">Cancelar</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div id="popUp-buttons-container" class="button-row">
-            <button id="add-node-button" title="Criar Nó"><i class="fas fa-plus"></i></button>
+
+            <button id="popUp-help-button" class="hidden-button" title="Ajuda"><i
+                    class="fas fa-circle-question"></i></button>
+
 
             <button id="ai-new-map-button-popUp" class="hidden-button" title="Novo Mapa com IA"><i
                     class="fas fa-brain"></i></button>
@@ -65,8 +70,7 @@
             <button id="add-children-with-ai-button" class="hidden-button" title="Criar Nós com IA"><i
                     class="fas fa-magic"></i></button>
 
-            <button id="popUp-help-button" class="hidden-button" title="Ajuda"><i
-                    class="fas fa-circle-question"></i></button>
+            <button id="add-node-button" title="Criar Nó"><i class="fas fa-plus"></i></button>
 
         </div>
 

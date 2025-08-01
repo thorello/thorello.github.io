@@ -95,14 +95,22 @@ canvas {
     pointer-events: auto;
 }
 
+.title-content-container {
+    display: grid;
+    grid-template-rows: auto auto;
+    row-gap: 12px;
+    place-items: start start;
+}
+
 #popUp.open {
     padding-left: 25px;
     padding-right: 25px;
     padding-bottom: 10px;
     padding-top: 50px;
-    display: grid;
-    grid-template-rows: 90px auto auto;
-    place-items: start start;
+
+    height: 70vh;
+    max-width: 90%;
+
 }
 
 #popUp h2,
@@ -114,7 +122,7 @@ canvas {
     margin-top: 0;
     border-bottom: 2px solid var(--title-border-color);
     padding-bottom: 15px;
-    margin-bottom: 25px;
+    margin-bottom: 0px !important;
     position: relative;
     transition: color 0.5s ease;
 }
@@ -685,6 +693,7 @@ canvas {
 }
 
 .help-text-container {
+    display: none;
     padding: 15px;
     border-top: 1px dashed var(--help-text-border);
     margin-top: 20px;
@@ -718,29 +727,42 @@ canvas {
 
 
 /* Responsive rules for mobile devices */
+/* Responsive rules for mobile devices */
 @media (max-width: 768px) {
 
     #popUp,
     #json-paste-popUp,
     #prompt-generator-popUp {
-        width: 90%;
-        height: 80%;
-        padding: 20px;
+        width: 90vw;
+        max-width: 90vw;
+        height: 70%;
+
+        padding-left: 6px !important;
+        padding-right: 12px !important;
         box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
         border-radius: 8px;
-        transform: translate(-50%, -50%) scale(0.95);
+        /* Modificação para esconder a pop-up fora da tela */
+        top: auto;
+        bottom: -100vh;
+        /* Esconde a pop-up abaixo da tela */
+        transform: translateX(-50%) scale(0.95);
+        transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), bottom 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
 
     #popUp.open,
     #json-paste-popUp.open,
     #prompt-generator-popUp.open {
-        transform: translate(-50%, -50%) scale(1);
+        /* Posição central quando a pop-up está aberta */
+        bottom: 50%;
+        transform: translate(-50%, 50%) scale(1);
+        padding-right: 12px !important;
     }
 
     #popUp h2,
     #json-paste-popUp h2,
     #prompt-generator-popUp h2 {
         font-size: 1.5em;
+        padding-right: 25px;
         border-bottom: 1px solid var(--title-border-color);
     }
 
