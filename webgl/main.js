@@ -487,7 +487,7 @@ class MindMapViewer {
             color: CONFIG.linkColor,
             linewidth: 2,
             transparent: true,
-            opacity: 0.8
+            opacity: 0.2
         });
 
         const curveObject = new THREE.Line(geometry, material);
