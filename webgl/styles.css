@@ -890,3 +890,22 @@ body.theme-dark {
     --node-info-footer-bg: rgba(249, 250, 251, 0.2);
     --node-info-footer-text: rgba(249, 250, 251, 0.9);
 }
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    touch-action: none;
+    overscroll-behavior: none;
+    position: fixed;
+    width: 100%;
+}
+
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    touch-action: none;
+}

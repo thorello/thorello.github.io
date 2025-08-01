@@ -160,20 +160,12 @@ class MindMapViewer {
 
         // Touch Events
         this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
-
-        let touchMoveQueued = false;
-
         this.renderer.domElement.addEventListener('touchmove', (event) => {
-            if (!touchMoveQueued) {
-                touchMoveQueued = true;
-                requestAnimationFrame(() => {
-                    this._onTouchMove(event);
-                    touchMoveQueued = false;
-                });
-            }
+            event.preventDefault();
+            this._onTouchMove(event);
         }, { passive: false });
-
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
+
 
         if (this.popUpCloseButton) {
             this.popUpCloseButton.addEventListener('click', this.closePopUp.bind(this));
@@ -322,8 +314,6 @@ class MindMapViewer {
         const versionElement = document.getElementById('version-info');
         if (versionElement) {
             versionElement.textContent = `Mind Map ${APP_VERSION}`;
-        } else {
-            console.warn("Element with id 'version-info' not found.");
         }
     }
 
@@ -379,7 +369,8 @@ class MindMapViewer {
 
             const isRootNode = d3Node.depth === 0;
 
-            const nodeColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.nodeColors.length > 0 ? CONFIG.nodeColors.slice().reverse()[d3Node.depth] : 0xFFFFFF;
+            const nodeColorsReversed = CONFIG.nodeColors.slice().reverse();
+            const nodeColor = isRootNode ? CONFIG.rootNodeColor : (nodeColorsReversed[d3Node.depth - 1] || 0xFFFFFF);
             const textColor = isRootNode ? CONFIG.rootTextColor : CONFIG.textColor;
             const idColor = isRootNode ? CONFIG.rootTextColor : 0x888888;
 
@@ -903,30 +894,7 @@ class MindMapViewer {
     }
 
     _onMouseDown(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
-
-        this.isConsideredClick = true;
-        this.initialPointerCoords.set(event.clientX, event.clientY);
-
-        this.mouse.copy(this._getPointerCoordinates(event));
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-        const intersects = this.raycaster.intersectObjects(this.dragHandles);
-
-        if (intersects.length > 0) {
-            const handle = intersects[0].object;
-            if (handle.userData.isDragHandle) {
-                this.selectedNode = handle.userData.nodeGroup;
-                this.isDraggingNode = true;
-                const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-                this.raycaster.ray.intersectPlane(plane, this.initialIntersectionPoint);
-                this.offset.copy(this.initialIntersectionPoint).sub(this.selectedNode.position);
-                this.isPanning = false;
-            }
-        } else {
-            this.isDraggingNode = false;
-            this.isPanning = true;
-            this.lastPointerPosition.set(event.clientX, event.clientY);
-        }
+        this._handleInteractionStart(event, event.clientX, event.clientY);
     }
 
     _onMouseMove(event) {
@@ -964,134 +932,17 @@ class MindMapViewer {
     }
 
     _onMouseUp(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
-
-        if (this.isConsideredClick && !this.isDraggingNode) {
-            this.mouse.copy(this._getPointerCoordinates(event));
-            this.raycaster.setFromCamera(this.mouse, this.camera);
-            const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
-            let clickedNode = null;
-            for (const intersect of intersects) {
-                let currentObject = intersect.object;
-                while (currentObject) {
-                    if (currentObject.userData.isDragHandle) {
-                        clickedNode = null;
-                        break;
-                    }
-                    if (currentObject.userData.isNode) {
-                        clickedNode = currentObject;
-                        break;
-                    }
-                    currentObject = currentObject.parent;
-                }
-                if (clickedNode) break;
-            }
-
-            // Limpar o destaque do nó anterior, se houver
-            if (this.highlightedNode) {
-                const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
-                const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
-                if (lineMesh) {
-                    lineMesh.material.color.set(originalColor);
-                }
-                this.highlightedNode = null;
-                this.highlightedLine = null;
-            }
-
-            if (clickedNode) {
-                const d3Node = clickedNode.userData.d3Node;
-                this.currentSelectedD3Node = d3Node;
-
-                // --- NOVA LÓGICA: Sincroniza o índice do nó focado com o nó clicado ---
-                const allNodes = Array.from(this.nodeMap.keys());
-                allNodes.sort((a, b) => {
-                    const idA = a.data.id || '0';
-                    const idB = b.data.id || '0';
-                    const partsA = idA.split('.').map(Number);
-                    const partsB = idB.split('.').map(Number);
-
-                    for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
-                        const valA = partsA[i] || 0;
-                        const valB = partsB[i] || 0;
-                        if (valA !== valB) {
-                            return valA - valB;
-                        }
-                    }
-                    return 0;
-                });
-                const clickedIndex = allNodes.findIndex(node => node === d3Node);
-                if (clickedIndex !== -1) {
-                    this.focusedNodeIndex = clickedIndex;
-                }
-                // --- FIM DA NOVA LÓGICA ---
-
-                // Destacar o nó
-                const lineMesh = clickedNode.children.find(child => child.name === 'nodeWireframe');
-                if (lineMesh) {
-                    lineMesh.material.color.set(CONFIG.highlightColor);
-                    this.highlightedNode = clickedNode;
-                    this.highlightedLine = lineMesh;
-                }
-
-                // Exibir o texto no rodapé
-                const nodeId = d3Node.data.id || '';
-                const nodeName = d3Node.data.name || '';
-                this.nodeInfoFooter.textContent = `${nodeName}`;
-                this.nodeInfoFooter.classList.add('visible');
-
-                this.openPopUp(nodeName, d3Node.data.definition || 'Nenhuma explicação disponível.');
-            } else {
-                // Esconder o rodapé se não houver nó clicado
-                this.nodeInfoFooter.classList.remove('visible');
-            }
-        }
-
-        if (this.isDraggingNode && this.selectedNode) {
-            const d3Node = this.selectedNode.userData.d3Node;
-            if (d3Node) {
-                d3Node.data.persistedX = this.selectedNode.position.x;
-                d3Node.data.persistedY = this.selectedNode.position.y;
-                localStorage.setItem('mindMapData', JSON.stringify(this.data));
-            }
-        }
-        this.selectedNode = null;
-        this.isDraggingNode = false;
-        this.isPanning = false;
-        this.isConsideredClick = true;
+        this._handleInteractionEnd();
     }
 
     _onTouchStart(event) {
         event.preventDefault();
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
-
-        if (this.tapTimeout) {
-            clearTimeout(this.tapTimeout);
-            this.tapTimeout = null;
-        }
-
-        this.isConsideredClick = true;
-        this.initialPointerCoords.set(event.touches[0].clientX, event.touches[0].clientY);
-
         if (event.touches.length === 1) {
-            this.mouse.copy(this._getPointerCoordinates(event));
-            this.raycaster.setFromCamera(this.mouse, this.camera);
-            const intersects = this.raycaster.intersectObjects(this.dragHandles);
-            if (intersects.length > 0) {
-                const handle = intersects[0].object;
-                if (handle.userData.isDragHandle) {
-                    this.selectedNode = handle.userData.nodeGroup;
-                    this.isDraggingNode = true;
-                    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-                    this.raycaster.ray.intersectPlane(plane, this.initialIntersectionPoint);
-                    this.offset.copy(this.initialIntersectionPoint).sub(this.selectedNode.position);
-                    this.isPanning = false;
-                }
-            } else {
-                this.isDraggingNode = false;
-                this.isPanning = true;
-                this.lastPointerPosition.set(event.touches[0].clientX, event.touches[0].clientY);
+            if (this.tapTimeout) {
+                clearTimeout(this.tapTimeout);
+                this.tapTimeout = null;
             }
+            this._handleInteractionStart(event, event.touches[0].clientX, event.touches[0].clientY);
         } else if (event.touches.length === 2) {
             this.isDraggingNode = false;
             this.isPanning = false;
@@ -1101,12 +952,8 @@ class MindMapViewer {
             const touch2 = event.touches[1];
             this.initialPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
             this.initialPinchZoom = this.camera.zoom;
-
-            // Calcular o centro do pinch em coordenadas de tela
             const pinchCenterX = (touch1.clientX + touch2.clientX) / 2;
             const pinchCenterY = (touch1.clientY + touch2.clientY) / 2;
-
-            // Converter o centro do pinch para coordenadas do mundo e salvar
             this.mouse.set(
                 (pinchCenterX / this.renderer.domElement.clientWidth) * 2 - 1,
                 -(pinchCenterY / this.renderer.domElement.clientHeight) * 2 + 1
@@ -1168,7 +1015,6 @@ class MindMapViewer {
 
             this.camera.updateProjectionMatrix();
 
-            // Calcular a nova posição do centro do pinch no mundo com o novo zoom
             const pinchCenterX = (touch1.clientX + touch2.clientX) / 2;
             const pinchCenterY = (touch1.clientY + touch2.clientY) / 2;
             this.mouse.set(
@@ -1177,19 +1023,13 @@ class MindMapViewer {
             );
             const currentPinchCenterWorld = new THREE.Vector3(this.mouse.x, this.mouse.y, 0).unproject(this.camera);
 
-            // Ajustar a posição da câmera para manter o ponto de pinch no mesmo lugar
             const panDelta = new THREE.Vector3().subVectors(this.pinchCenterWorld, currentPinchCenterWorld);
             this.camera.position.add(panDelta);
         }
     }
 
     _onTouchEnd(event) {
-        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
-
-        if (event.touches.length > 0) {
-            return;
-        }
-
+        if (event.touches.length > 0) return;
         if (this._isPinching) {
             this.isDraggingNode = false;
             this.isPanning = false;
@@ -1200,80 +1040,111 @@ class MindMapViewer {
 
         if (this.isConsideredClick) {
             this.tapTimeout = setTimeout(() => {
-                this.raycaster.setFromCamera(this.mouse, this.camera);
-                const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
-                let clickedNode = null;
-                for (const intersect of intersects) {
-                    let parent = intersect.object.parent;
-                    while (parent) {
-                        if (parent.userData.isNode) {
-                            clickedNode = parent;
-                            break;
-                        }
-                        parent = parent.parent;
-                    }
-                    if (clickedNode) break;
-                }
-
-                // Limpar o destaque do nó anterior, se houver
-                if (this.highlightedNode) {
-                    const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                    const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
-                    const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
-                    if (lineMesh) {
-                        lineMesh.material.color.set(originalColor);
-                    }
-                    this.highlightedNode = null;
-                    this.highlightedLine = null;
-                }
-
-                if (clickedNode && !clickedNode.userData.isDragHandle) {
-                    const d3Node = clickedNode.userData.d3Node;
-                    this.currentSelectedD3Node = d3Node;
-
-                    // --- NOVA LÓGICA PARA MOBILE: Sincroniza o índice do nó focado com o nó tocado ---
-                    const allNodes = Array.from(this.nodeMap.keys());
-                    allNodes.sort((a, b) => {
-                        const idA = a.data.id || '0';
-                        const idB = b.data.id || '0';
-                        const partsA = idA.split('.').map(Number);
-                        const partsB = idB.split('.').map(Number);
-
-                        for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
-                            const valA = partsA[i] || 0;
-                            const valB = partsB[i] || 0;
-                            if (valA !== valB) {
-                                return valA - valB;
-                            }
-                        }
-                        return 0;
-                    });
-                    const clickedIndex = allNodes.findIndex(node => node === d3Node);
-                    if (clickedIndex !== -1) {
-                        this.focusedNodeIndex = clickedIndex;
-                    }
-                    // --- FIM DA NOVA LÓGICA ---
-
-                    // Destacar o nó
-                    const lineMesh = clickedNode.children.find(child => child.name === 'nodeWireframe');
-                    if (lineMesh) {
-                        lineMesh.material.color.set(CONFIG.highlightColor);
-                        this.highlightedNode = clickedNode;
-                        this.highlightedLine = lineMesh;
-                    }
-
-                    // Exibir o texto no rodapé
-                    const nodeId = d3Node.data.id || '';
-                    const nodeName = d3Node.data.name || '';
-                    this.nodeInfoFooter.textContent = `${nodeName}`;
-                    this.nodeInfoFooter.classList.add('visible');
-
-                    this.openPopUp(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
-                } else {
-                    this.nodeInfoFooter.classList.remove('visible');
-                }
+                this._handleInteractionEnd();
                 this.tapTimeout = null;
             }, 200);
+        } else {
+            this._handleInteractionEnd();
+        }
+    }
+
+    _handleInteractionStart(event, clientX, clientY) {
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
+
+        this.isConsideredClick = true;
+        this.initialPointerCoords.set(clientX, clientY);
+
+        this.mouse.copy(this._getPointerCoordinates(event));
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        const intersects = this.raycaster.intersectObjects(this.dragHandles);
+
+        if (intersects.length > 0) {
+            const handle = intersects[0].object;
+            if (handle.userData.isDragHandle) {
+                this.selectedNode = handle.userData.nodeGroup;
+                this.isDraggingNode = true;
+                const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+                this.raycaster.ray.intersectPlane(plane, this.initialIntersectionPoint);
+                this.offset.copy(this.initialIntersectionPoint).sub(this.selectedNode.position);
+                this.isPanning = false;
+            }
+        } else {
+            this.isDraggingNode = false;
+            this.isPanning = true;
+            this.lastPointerPosition.set(clientX, clientY);
+        }
+    }
+
+    _handleInteractionEnd() {
+        if (this.isPopUpOpen || this.isJsonPastePopUpOpen || this.isPromptGeneratorPopUpOpen) return;
+
+        if (this.isConsideredClick && !this.isDraggingNode) {
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+            const intersects = this.raycaster.intersectObjects(this.mainGroup.children, true);
+            let clickedNode = null;
+            for (const intersect of intersects) {
+                let currentObject = intersect.object;
+                while (currentObject) {
+                    if (currentObject.userData.isDragHandle) {
+                        clickedNode = null;
+                        break;
+                    }
+                    if (currentObject.userData.isNode) {
+                        clickedNode = currentObject;
+                        break;
+                    }
+                    currentObject = currentObject.parent;
+                }
+                if (clickedNode) break;
+            }
+
+            // Limpar o destaque do nó anterior, se houver
+            if (this.highlightedNode) {
+                const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
+                const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
+                const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
+                if (lineMesh) {
+                    lineMesh.material.color.set(originalColor);
+                }
+                this.highlightedNode = null;
+                this.highlightedLine = null;
+            }
+
+            if (clickedNode) {
+                const d3Node = clickedNode.userData.d3Node;
+                this.currentSelectedD3Node = d3Node;
+
+                const allNodes = Array.from(this.nodeMap.keys());
+                allNodes.sort((a, b) => {
+                    const idA = a.data.id || '0';
+                    const idB = b.data.id || '0';
+                    const partsA = idA.split('.').map(Number);
+                    const partsB = idB.split('.').map(Number);
+                    for (let i = 0; i < Math.max(partsA.length, partsB.length); i++) {
+                        const valA = partsA[i] || 0;
+                        const valB = partsB[i] || 0;
+                        if (valA !== valB) return valA - valB;
+                    }
+                    return 0;
+                });
+                const clickedIndex = allNodes.findIndex(node => node === d3Node);
+                if (clickedIndex !== -1) this.focusedNodeIndex = clickedIndex;
+
+                const lineMesh = clickedNode.children.find(child => child.name === 'nodeWireframe');
+                if (lineMesh) {
+                    lineMesh.material.color.set(CONFIG.highlightColor);
+                    this.highlightedNode = clickedNode;
+                    this.highlightedLine = lineMesh;
+                }
+
+                const nodeName = d3Node.data.name || '';
+                this.nodeInfoFooter.textContent = `${nodeName}`;
+                this.nodeInfoFooter.classList.add('visible');
+
+                this.openPopUp(nodeName, d3Node.data.definition || 'Nenhuma explicação disponível.');
+            } else {
+                this.nodeInfoFooter.classList.remove('visible');
+            }
         }
 
         if (this.isDraggingNode && this.selectedNode) {
@@ -1284,11 +1155,11 @@ class MindMapViewer {
                 localStorage.setItem('mindMapData', JSON.stringify(this.data));
             }
         }
+        this.selectedNode = null;
         this.isDraggingNode = false;
         this.isPanning = false;
         this.isConsideredClick = true;
     }
-
 
     // --- Sidebar and Editing Methods ---
     openPopUp(title, content) {
@@ -1380,14 +1251,25 @@ class MindMapViewer {
         }
 
         try {
-            const parsedData = JSON.parse(jsonText);
+            let parsedData;
+            try {
+                parsedData = JSON.parse(jsonText);
+            } catch (parseError) {
+                console.warn("Falha ao parsear JSON diretamente, tentando extrair.", parseError);
+                const jsonMatch = jsonText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                if (jsonMatch && jsonMatch[0]) {
+                    parsedData = JSON.parse(jsonMatch[0]);
+                } else {
+                    throw new Error('Não foi possível extrair um JSON válido da área de transferência.');
+                }
+            }
             this.data = parsedData;
             this.drawMindMap();
             this.closeJsonPastePopUp();
             alert('Mapa mental importado com sucesso!');
         } catch (error) {
             console.error('Erro ao analisar JSON colado:', error);
-            alert('Erro: O texto colado não é um JSON válido. Por favor, verifique o formato.');
+            alert(`Erro: O texto colado não é um JSON válido. Por favor, verifique o formato. Detalhes: ${error.message}`);
         }
     }
 
@@ -1471,24 +1353,10 @@ Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou forma
             try {
                 parsedJson = JSON.parse(clipboardText);
             } catch (parseError) {
-                console.warn("Falha ao parsear JSON diretamente, tentando extrair entre chaves/colchetes.", parseError);
-                let resultText = clipboardText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
-                const firstChar = resultText.indexOf('{');
-                const firstArrayChar = resultText.indexOf('[');
-                let startIndex = -1;
-                let endIndex = -1;
-
-                if (firstArrayChar !== -1 && (firstChar === -1 || firstArrayChar < firstChar)) {
-                    startIndex = firstArrayChar;
-                    endIndex = resultText.lastIndexOf(']');
-                } else if (firstChar !== -1) {
-                    startIndex = firstChar;
-                    endIndex = resultText.lastIndexOf('}');
-                }
-
-                if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-                    resultText = resultText.substring(startIndex, endIndex + 1);
-                    parsedJson = JSON.parse(resultText);
+                console.warn("Falha ao parsear JSON diretamente, tentando extrair.", parseError);
+                const jsonMatch = clipboardText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                if (jsonMatch && jsonMatch[0]) {
+                    parsedJson = JSON.parse(jsonMatch[0]);
                 } else {
                     throw new Error('Não foi possível extrair um JSON válido da área de transferência.');
                 }
@@ -1706,23 +1574,10 @@ Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou forma
                 resultText = resultText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
                 parsedJson = JSON.parse(resultText);
             } catch (parseError) {
-                console.warn("Falha ao parsear JSON diretamente, tentando extrair entre chaves/colchetes.", parseError);
-                const firstChar = resultText.indexOf('{');
-                const firstArrayChar = resultText.indexOf('[');
-                let startIndex = -1;
-                let endIndex = -1;
-
-                if (firstArrayChar !== -1 && (firstChar === -1 || firstArrayChar < firstChar)) {
-                    startIndex = firstArrayChar;
-                    endIndex = resultText.lastIndexOf(']');
-                } else if (firstChar !== -1) {
-                    startIndex = firstChar;
-                    endIndex = resultText.lastIndexOf('}');
-                }
-
-                if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-                    resultText = resultText.substring(startIndex, endIndex + 1);
-                    parsedJson = JSON.parse(resultText);
+                console.warn("Falha ao parsear JSON diretamente, tentando extrair.", parseError);
+                const jsonMatch = resultText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                if (jsonMatch && jsonMatch[0]) {
+                    parsedJson = JSON.parse(jsonMatch[0]);
                 } else {
                     throw new Error('Não foi possível extrair um JSON válido da resposta da IA.');
                 }
@@ -1824,7 +1679,11 @@ Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou forma
         // O highlight e o rodapé serão limpos na próxima vez que o usuário interagir, mas
         // é uma boa prática limpá-los agora que o nó não existe mais.
         if (this.highlightedNode) {
-            this.highlightedLine.material.color.set(CONFIG.wireframeColor);
+            const originalColor = this.highlightedNode.userData.d3Node.depth === 0 ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
+            const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
+            if (lineMesh) {
+                lineMesh.material.color.set(originalColor);
+            }
             this.highlightedNode = null;
             this.highlightedLine = null;
         }
