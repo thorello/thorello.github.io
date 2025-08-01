@@ -37,6 +37,12 @@
     --focus-button-hover-bg: #2980b9;
     --node-info-footer-bg: rgba(0, 0, 0, 0.6);
     --node-info-footer-text: rgba(255, 255, 255, 0.7);
+    /* Cores do botão de ajuda e do contêiner de texto */
+    --help-button-bg: #95a5a6;
+    --help-button-hover-bg: #7f8c8d;
+    --help-text-bg: #ecf0f1;
+    --help-text-border: #bdc3c7;
+    --help-text-color: #2c3e50;
 }
 
 body {
@@ -263,7 +269,8 @@ canvas {
 #add-node-button,
 #ai-new-map-button-popUp,
 #add-children-with-ai-button,
-#delete-node-button {
+#delete-node-button,
+#popUp-help-button {
     background-color: var(--menu-button-bg);
     color: var(--menu-button-text-color);
     border: none;
@@ -304,7 +311,8 @@ canvas {
 #add-node-button span,
 #ai-new-map-button-popUp span,
 #add-children-with-ai-button span,
-#delete-node-button span {
+#delete-node-button span,
+#popUp-help-button span {
     transition: opacity 0.2s ease, width 0.2s ease;
     white-space: nowrap;
     overflow: hidden;
@@ -328,7 +336,8 @@ canvas {
 #add-children-with-ai-button i,
 #delete-node-button i,
 #json-paste-import-button i,
-#copy-prompt-button i {
+#copy-prompt-button i,
+#popUp-help-button i {
     font-size: 1.0em;
 }
 
@@ -337,7 +346,8 @@ canvas {
 #add-children-with-ai-button:hover,
 #delete-node-button:hover,
 #json-paste-import-button:hover,
-#copy-prompt-button:hover {
+#copy-prompt-button:hover,
+#popUp-help-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -347,7 +357,8 @@ canvas {
 #add-children-with-ai-button:hover span,
 #delete-node-button:hover span,
 #json-paste-import-button:hover span,
-#copy-prompt-button:hover span {
+#copy-prompt-button:hover span,
+#popUp-help-button:hover span {
     opacity: 1;
     width: auto;
     max-width: 200px;
@@ -359,51 +370,6 @@ canvas {
 #add-node-button {
     background-color: #3498db;
 }
-
-#add-node-button:hover {
-    background-color: #2980b9;
-}
-
-#add-children-with-ai-button {
-    background-color: #00a86b;
-}
-
-#add-children-with-ai-button:hover {
-    background-color: #008f5d;
-}
-
-#ai-new-map-button-popUp {
-    background-color: #6f42c1;
-}
-
-#ai-new-map-button-popUp:hover {
-    background-color: #5a359c;
-}
-
-#delete-node-button {
-    background-color: #dc3545;
-}
-
-#delete-node-button:hover {
-    background-color: #c82333;
-}
-
-#json-paste-import-button {
-    background-color: #28a745;
-}
-
-#json-paste-import-button:hover {
-    background-color: #218838;
-}
-
-#copy-prompt-button {
-    background-color: #6c757d;
-}
-
-#copy-prompt-button:hover {
-    background-color: #5a6268;
-}
-
 
 /* Custom scrollbar styling */
 #popUp::-webkit-scrollbar,
@@ -692,6 +658,60 @@ canvas {
     color: var(--text-color);
 }
 
+/* Help Button and Text Container */
+.help-button {
+    background-color: var(--help-button-bg) !important;
+    color: white !important;
+    border: none !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s, transform 0.2s !important;
+    padding: 0 !important;
+}
+
+.help-button:hover {
+    background-color: var(--help-button-hover-bg) !important;
+    transform: scale(1.05) !important;
+}
+
+.help-text-container {
+    padding: 15px;
+    border-top: 1px dashed var(--help-text-border);
+    margin-top: 20px;
+    background-color: var(--help-text-bg);
+    border-radius: 6px;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.4s ease-out, max-height 0.4s ease-out;
+}
+
+.help-text-container.show {
+    opacity: 1;
+    max-height: 500px;
+}
+
+.help-text-container h3 {
+    margin-top: 0;
+    font-family: 'Roboto', sans-serif;
+    color: var(--help-text-color);
+    font-size: 1.2em;
+    border-bottom: 1px solid var(--help-text-border);
+    padding-bottom: 5px;
+}
+
+.help-text-container p {
+    margin: 5px 0;
+    color: var(--help-text-color);
+    font-size: 0.9em;
+}
+
+
 /* Responsive rules for mobile devices */
 @media (max-width: 768px) {
 
@@ -735,7 +755,8 @@ canvas {
     #add-children-with-ai-button,
     #delete-node-button,
     #json-paste-import-button,
-    #copy-prompt-button {
+    #copy-prompt-button,
+    #popUp-help-button {
         padding: 12px;
         font-size: 1.1em;
         width: 90%;
@@ -746,7 +767,8 @@ canvas {
     #add-children-with-ai-button span,
     #delete-node-button span,
     #json-paste-import-button span,
-    #copy-prompt-button span {
+    #copy-prompt-button span,
+    #popUp-help-button span {
         opacity: 1;
         width: auto;
         max-width: none;
@@ -759,7 +781,7 @@ canvas {
     #add-children-with-ai-button:hover span,
     #delete-node-button:hover span,
     #json-paste-import-button:hover span,
-    #copy-prompt-button:hover span {
+    #copy-prompt-button:hover span #popUp-help-button:hover span {
         padding-left: 10px;
     }
 
@@ -889,6 +911,13 @@ body.theme-dark {
     --focus-button-hover-bg: #2563EB;
     --node-info-footer-bg: rgba(249, 250, 251, 0.2);
     --node-info-footer-text: rgba(249, 250, 251, 0.9);
+
+    /* Cores do botão de ajuda e do contêiner de texto no tema escuro */
+    --help-button-bg: #4B5563;
+    --help-button-hover-bg: #6B7280;
+    --help-text-bg: #374151;
+    --help-text-border: #4B5563;
+    --help-text-color: #F9FAFB;
 }
 
 html,

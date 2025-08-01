@@ -56,6 +56,18 @@ class MindMapViewer {
         this.focusPreviousNodeButton = document.getElementById('focus-previous-node-button');
         this.copyAIPromptButton = document.getElementById('copy-ai-prompt-button');
         this.pasteJsonFromClipboardButton = document.getElementById('paste-json-from-clipboard-button');
+        // Novo botão de ajuda da pop-up principal
+        this.popUpHelpButton = document.getElementById('popUp-help-button');
+        // Novo contêiner de texto de ajuda da pop-up principal
+        this.popUpHelpTextContainer = document.getElementById('popUp-help-text-container');
+        // Novo botão de ajuda da pop-up de JSON
+        this.jsonPasteHelpButton = document.getElementById('json-paste-help-button');
+        // Novo contêiner de texto de ajuda da pop-up de JSON
+        this.jsonPasteHelpTextContainer = document.getElementById('json-paste-help-text-container');
+        // Novo botão de ajuda da pop-up de Gerador de Prompt
+        this.promptGeneratorHelpButton = document.getElementById('prompt-generator-help-button');
+        // Novo contêiner de texto de ajuda da pop-up de Gerador de Prompt
+        this.promptGeneratorHelpTextContainer = document.getElementById('prompt-generator-help-text-container');
 
         // --- State Variables ---
         this.nodeMap = new Map();
@@ -303,6 +315,24 @@ class MindMapViewer {
                 this._loadMindMapFromFile('mindmap.json');
             });
         }
+
+        // Adiciona a lógica para o novo botão de ajuda
+        if (this.popUpHelpButton) {
+            this.popUpHelpButton.addEventListener('click', () => this.toggleHelpText(this.popUpHelpTextContainer));
+        }
+
+        if (this.jsonPasteHelpButton) {
+            this.jsonPasteHelpButton.addEventListener('click', () => this.toggleHelpText(this.jsonPasteHelpTextContainer));
+        }
+
+        if (this.promptGeneratorHelpButton) {
+            this.promptGeneratorHelpButton.addEventListener('click', () => this.toggleHelpText(this.promptGeneratorHelpTextContainer));
+        }
+    }
+
+    // Função para mostrar/ocultar o texto de ajuda
+    toggleHelpText(container) {
+        container.classList.toggle('show');
     }
 
     _createVersionInfo() {
