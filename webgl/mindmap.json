@@ -1,112 +1,118 @@
 {
-    "name": "Clique aqui para começar seu novo mapa mental",
-    "definition": "Este é o ponto de partida do seu mapa mental. Aqui você pode editar este nó ou usar a Inteligência Artificial para gerar um novo mapa a partir de um texto ou URL. Você pode navegar, editar nós existentes e adicionar novos, seja manualmente ou com a ajuda da IA. Explore o menu 'Ações' no canto superior direito para salvar, importar e exportar seu mapa.",
+    "name": "Manual do Mapa Mental",
+    "definition": "Este documento lista as funcionalidades da aplicação de mapa mental, cobrindo navegação, edição de nós, uso da IA e o menu de ações, com base nos arquivos da aplicação.",
     "children": [
         {
-            "name": "Como Navegar no Mapa",
-            "definition": "Explore seu mapa mental com facilidade usando os controles de navegação.",
+            "name": "Navegação e Edição",
+            "definition": "Ações de interação e modificação de nós.",
             "children": [
                 {
-                    "name": "Zoom",
-                    "definition": "Use a roda do mouse para aproximar ou afastar. Em dispositivos touch, faça o movimento de 'pinça' (pinching) com dois dedos para controlar o zoom.",
+                    "name": "Controles de Visualização",
+                    "definition": "Navegação e organização do mapa.",
+                    "children": [
+                        {
+                            "name": "Zoom",
+                            "definition": "Controlado pela roda do mouse ou pelo movimento de 'pinça' em telas de toque.",
+                            "children": []
+                        },
+                        {
+                            "name": "Mover (Pan)",
+                            "definition": "Controlado pelo clique e arrasto em áreas vazias da tela com o mouse ou um dedo em telas de toque.",
+                            "children": []
+                        },
+                        {
+                            "name": "Arrastar Nós",
+                            "definition": "O nó e todos os seus filhos podem ser arrastados ao clicar e mover o círculo cinza ao lado do nó. As posições são salvas automaticamente.",
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Pop-up de Edição",
+                    "definition": "Janela de detalhes e edição de nós.",
+                    "children": [
+                        {
+                            "name": "Abertura",
+                            "definition": "Abre ao clicar em qualquer nó, exibindo seu 'Nome' e 'Explicação'.",
+                            "children": []
+                        },
+                        {
+                            "name": "Edição",
+                            "definition": "Permite editar o 'Nome' e a 'Explicação' do nó através de um ícone de lápis. As mudanças são salvas ao clicar em 'Salvar'.",
+                            "children": []
+                        },
+                        {
+                            "name": "Estrutura",
+                            "definition": "É possível adicionar um novo nó filho ou excluir o nó atual e seus filhos. O nó principal não pode ser excluído.",
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Inteligência Artificial (IA)",
+            "definition": "Ferramentas que usam o modelo 'gemini-1.5-flash-latest' da Google para gerar conteúdo.",
+            "children": [
+                {
+                    "name": "Criação de Mapa com IA",
+                    "definition": "A partir de uma chave de API, um texto ou uma URL, a IA analisa o conteúdo e gera um mapa mental hierárquico em formato JSON. O prompt da IA exige nomes de nós com no máximo 35 caracteres, definições completas e todo o texto em português do Brasil. A busca de conteúdo via URL utiliza um proxy para contornar problemas de CORS e extrai apenas o texto principal da página.",
                     "children": []
                 },
                 {
-                    "name": "Mover (Pan)",
-                    "definition": "Clique e arraste a tela com o mouse para mover o mapa. Em dispositivos touch, use um dedo para arrastar a tela e mover o mapa.",
+                    "name": "Expansão com IA",
+                    "definition": "É possível adicionar nós filhos a partir de um nó secundário. A IA analisa o conteúdo do nó pai e sugere automaticamente novos nós filhos.",
                     "children": []
                 },
                 {
-                    "name": "Arrastar Nós",
-                    "definition": "Para reorganizar seu mapa, clique no pequeno círculo cinza ao lado de um nó e arraste-o para a nova posição. Todo o sub-mapa conectado a ele se moverá junto. Suas posições serão salvas automaticamente.",
+                    "name": "Gerenciamento da Chave de API",
+                    "definition": "A chave de API é inserida em uma página dedicada, é salva no 'localStorage' do navegador e pode ser colada a partir da área de transferência.",
                     "children": []
                 }
             ]
         },
         {
-            "name": "Como Editar Nós",
-            "definition": "Personalize o conteúdo de cada nó do seu mapa mental.",
-            "children": [
-                {
-                    "name": "Abrir o Pop-up de Edição",
-                    "definition": "Clique em qualquer nó do mapa para abrir a janela de detalhes e edição. Ela mostrará o 'Nome' (título) e a 'Explicação' (conteúdo) do nó.",
-                    "children": []
-                },
-                {
-                    "name": "Editar Nome ou Explicação",
-                    "definition": "Dentro do pop-up, clique no ícone de lápis ao lado do 'Nome' ou da 'Explicação' para ativar o modo de edição. Digite suas alterações e clique em 'Salvar' para aplicá-las. Se mudar de ideia, clique em 'Cancelar'.",
-                    "children": []
-                },
-                {
-                    "name": "Adicionar um Novo Filho",
-                    "definition": "Com um nó selecionado e o pop-up aberto, clique no botão 'Adicionar Filho'. Será pedido um nome para o novo nó. Ele será adicionado como filho do nó selecionado e você poderá editá-lo em seguida.",
-                    "children": []
-                },
-                {
-                    "name": "Excluir Nó",
-                    "definition": "Para remover um nó e todos os seus filhos, selecione o nó (não o nó principal) e clique no botão 'Excluir Nó' no pop-up de edição. Uma confirmação será solicitada.",
-                    "children": []
-                }
-            ]
-        },
-        {
-            "name": "Utilizando a Inteligência Artificial (IA)",
-            "definition": "Expanda seu mapa mental ou crie um novo usando o poder da IA.",
-            "children": [
-                {
-                    "name": "Novo Mapa Mental com IA",
-                    "definition": "No pop-up do nó principal (este nó) ou através do botão 'Novo Mapa Mental com IA' no menu de ações, você será direcionado a uma página onde pode colar sua Chave de API do Google AI Studio (Gemini) e inserir um texto ou URL. A IA analisará o conteúdo e criará um novo mapa mental para você.",
-                    "children": []
-                },
-                {
-                    "name": "Adicionar Filhos com IA",
-                    "definition": "Para um nó secundário (qualquer nó que não seja o principal), abra o pop-up de edição e clique em 'Adicionar nodes com IA'. A IA vai analisar o conteúdo do nó selecionado e sugerir novos nós filhos relevantes, expandindo seu mapa automaticamente.",
-                    "children": []
-                },
-                {
-                    "name": "Chave de API do Google AI Studio (Gemini)",
-                    "definition": "Para usar as funcionalidades de IA, você precisará de uma chave de API do Google AI Studio. Guarde-a em local seguro e insira-a na página de 'Novo Mapa Mental com IA' quando for solicitado. A chave será salva no seu navegador para uso futuro.",
-                    "children": []
-                }
-            ]
-        },
-        {
-            "name": "Menu de Ações (Canto Superior Direito)",
-            "definition": "Acesse diversas opções para gerenciar seu mapa mental.",
+            "name": "Menu de Ações",
+            "definition": "Opções de gerenciamento do mapa mental. O menu abre com um clique e fecha ao clicar fora ou em um item da lista.",
             "children": [
                 {
                     "name": "Importar Mapa",
-                    "definition": "Carrega um mapa mental de um arquivo JSON salvo no seu computador. Clique e selecione o arquivo.",
+                    "definition": "Carrega um arquivo JSON do computador do usuário, valida a presença da propriedade 'name' e salva o conteúdo no 'localStorage' para renderização.",
                     "children": []
                 },
                 {
                     "name": "Salvar Mapa",
-                    "definition": "Salva o mapa mental atual como um arquivo JSON no seu computador, permitindo que você o importe mais tarde.",
+                    "definition": "Exporta o mapa atual como um arquivo 'mindmap_data.json'. Os dados são recuperados do 'localStorage' do navegador e convertidos para uma string JSON formatada com 2 espaços de indentação.",
                     "children": []
                 },
                 {
                     "name": "Exportar PDF",
-                    "definition": "Cria um documento PDF do seu mapa mental atual, útil para impressão ou compartilhamento.",
+                    "definition": "Cria um documento PDF do mapa usando a biblioteca `jsPDF`. A exportação é feita em formato A4 (paisagem) e as cores dos links são suavizadas para uma melhor visualização.",
                     "children": []
                 },
                 {
                     "name": "Criar Relatório (Markdown)",
-                    "definition": "Transforma o conteúdo do seu mapa mental em um formato de texto estruturado (Markdown), que pode ser facilmente copiado para documentos ou notas.",
+                    "definition": "Transforma o mapa em um texto estruturado em Markdown, usando a biblioteca `marked.js` para renderização. A página de relatório também oferece opções para alternar o tema e exportar para PDF.",
                     "children": []
                 },
                 {
                     "name": "Recalcular Mapa",
-                    "definition": "Organiza automaticamente todos os nós do mapa mental, desconsiderando as posições que você arrastou manualmente. Útil para uma organização limpa.",
+                    "definition": "Organiza automaticamente todos os nós do mapa, desconsiderando as posições arrastadas manualmente.",
                     "children": []
                 },
                 {
                     "name": "Novo Mapa",
-                    "definition": "Inicia um mapa mental completamente novo, carregando uma estrutura padrão sem dados anteriores.",
+                    "definition": "Inicia um mapa mental vazio, carregando uma estrutura padrão sem dados anteriores.",
                     "children": []
                 },
                 {
                     "name": "Manual",
-                    "definition": "Carrega o mapa mental de instruções padrão, útil para resetar e revisar as funcionalidades.",
+                    "definition": "Recarrega o mapa mental de instruções padrão a partir do arquivo 'mindmap.json'.",
+                    "children": []
+                },
+                {
+                    "name": "Alternar Tema",
+                    "definition": "Muda o esquema de cores da aplicação entre o tema claro (`lightTheme`) e o tema escuro (`darkTheme`), conforme definido no arquivo `theme.js`.",
                     "children": []
                 }
             ]
