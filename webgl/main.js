@@ -160,7 +160,19 @@ class MindMapViewer {
 
         // Touch Events
         this.renderer.domElement.addEventListener('touchstart', this._onTouchStart.bind(this), { passive: false });
-        this.renderer.domElement.addEventListener('touchmove', this._onTouchMove.bind(this), { passive: false });
+
+        let touchMoveQueued = false;
+
+        this.renderer.domElement.addEventListener('touchmove', (event) => {
+            if (!touchMoveQueued) {
+                touchMoveQueued = true;
+                requestAnimationFrame(() => {
+                    this._onTouchMove(event);
+                    touchMoveQueued = false;
+                });
+            }
+        }, { passive: false });
+
         this.renderer.domElement.addEventListener('touchend', this._onTouchEnd.bind(this), { passive: false });
 
         if (this.popUpCloseButton) {
@@ -1149,7 +1161,11 @@ class MindMapViewer {
             const currentPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
             let newZoom = this.initialPinchZoom * (currentPinchDistance / this.initialPinchDistance);
             newZoom = Math.max(CONFIG.zoom.min, Math.min(CONFIG.zoom.max, newZoom));
-            this.camera.zoom = newZoom;
+            if (Math.abs(newZoom - this.camera.zoom) > 0.01) {
+                this.camera.zoom = newZoom;
+                this.camera.updateProjectionMatrix();
+            }
+
             this.camera.updateProjectionMatrix();
 
             // Calcular a nova posição do centro do pinch no mundo com o novo zoom
@@ -1249,7 +1265,7 @@ class MindMapViewer {
                     // Exibir o texto no rodapé
                     const nodeId = d3Node.data.id || '';
                     const nodeName = d3Node.data.name || '';
-                    this.nodeInfoFooter.textContent = `ID: ${nodeId} | Nome: ${nodeName}`;
+                    this.nodeInfoFooter.textContent = `${nodeName}`;
                     this.nodeInfoFooter.classList.add('visible');
 
                     this.openPopUp(d3Node.data.name, d3Node.data.definition || 'Nenhuma explicação disponível.');
