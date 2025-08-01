@@ -1,6 +1,41 @@
 // menuHandler.js
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    const popUp = document.getElementById('popUp');
+    const helpButton = document.getElementById('popUp-help-button');
+    const popUpClose = document.getElementById('popUp-close');
+    const titleContentContainer = popUp.querySelector('.title-content-container');
+    const popUpHelpContainer = document.getElementById('popUp-help-text-container');
+
+    // Inicializa o estado: o contêiner de ajuda deve estar oculto por padrão
+    popUpHelpContainer.style.display = 'none';
+
+    // Evento de clique para o botão de ajuda
+    helpButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+
+        const isHelpVisible = popUpHelpContainer.style.display !== 'none';
+
+        if (isHelpVisible) {
+            popUpHelpContainer.style.display = 'none';
+            titleContentContainer.style.display = 'flex'; // ou 'block'
+        } else {
+            titleContentContainer.style.display = 'none';
+            popUpHelpContainer.style.display = 'flex';
+        }
+    });
+
+    // Evento de clique para o botão de fechar
+    popUpClose.addEventListener('click', () => {
+        // ... (código para fechar a pop-up) ...
+
+        // Garante que o conteúdo principal seja exibido ao fechar
+        titleContentContainer.style.display = 'flex'; // ou 'block'
+        popUpHelpContainer.style.display = 'none';
+    });
+
+
     const menuContainer = document.getElementById('action-menu-container');
     const toggleButton = document.getElementById('menu-toggle-button');
 

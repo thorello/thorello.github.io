@@ -31,12 +31,8 @@
     --menu-button-bg: #3498db;
     --menu-button-hover-bg: #2980b9;
     --menu-button-text-color: #ffffff;
-    --version-info-bg: rgba(255, 255, 255, 0.7);
-    --version-info-text: rgba(0, 0, 0, 0.5);
     --focus-button-bg: #3498db;
     --focus-button-hover-bg: #2980b9;
-    --node-info-footer-bg: rgba(0, 0, 0, 0.6);
-    --node-info-footer-text: rgba(255, 255, 255, 0.7);
     /* Cores do botão de ajuda e do contêiner de texto */
     --help-button-bg: #95a5a6;
     --help-button-hover-bg: #7f8c8d;
@@ -90,33 +86,43 @@ canvas {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
     pointer-events: auto;
-    /* overflow: hidden;  <-- REMOVA ESTA LINHA TAMBÉM*/
     padding: 40px;
-    /* Adicione um max-height para controlar o tamanho total da popup */
     max-height: 90vh;
 }
 
-.title-content-container {
+/* Modificação aqui para usar Flexbox e alinhar o conteúdo */
+.title-content-container,
+.help-text-container {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-content: flex-start;
     padding-right: 25px;
+    flex-grow: 1;
+    /* Ocupa todo o espaço vertical disponível */
+    /* Adiciona barra de rolagem se necessário */
+    padding-bottom: 20px;
+    /* Adiciona um espaço antes dos botões */
+}
+
+
+
+/* Esconde o contêiner de ajuda por padrão */
+.help-text-container {
+    display: none;
 }
 
 /* Container para os botões alinhados lado a lado */
 #popUp-buttons-container.button-row {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    /* Adicionado margin-top e border-top para separar do conteúdo */
-    margin-top: 10px;
+    gap: 12px;
+    margin-top: auto;
+    /* Empurra os botões para o final */
     padding-top: 20px;
     border-top: 1px solid #eee;
     margin-bottom: 10px;
-
     flex-wrap: nowrap;
-    /* Garante que os botões fiquem no final do contêiner flex */
     flex-shrink: 0;
 }
 
@@ -129,11 +135,9 @@ canvas {
     padding-left: 25px;
     padding-right: 25px;
     padding-bottom: 10px;
-    padding-top: 50px;
-
+    padding-top: 30px;
     height: 70vh;
     max-width: 90%;
-
 }
 
 #popUp h2,
@@ -159,8 +163,6 @@ canvas {
     margin-top: 0px;
     transition: color 0.5s ease;
 
-    /* ADICIONE ESTAS LINHAS PARA HABILITAR A ROLAGEM APENAS NO PARÁGRAFO */
-    overflow-y: auto;
     flex-grow: 1;
     max-height: 100%;
 }
@@ -439,19 +441,6 @@ canvas {
     background-color: var(--scrollbar-thumb-hover-color);
 }
 
-/* Container para os botões alinhados lado a lado */
-#popUp-buttons-container.button-row {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
-    margin-bottom: 10px;
-
-    flex-wrap: nowrap;
-}
-
 /* Estilo para todos os botões de ação dentro da popup */
 #popUp-buttons-container button {
     background-color: transparent;
@@ -479,22 +468,6 @@ canvas {
 
 #popUp-buttons-container button:active {
     transform: translateY(0);
-}
-
-/* Version information display */
-#version-info {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    color: var(--version-info-text);
-    background-color: var(--version-info-bg);
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-family: 'Open Sans', sans-serif;
-    z-index: 1000;
-    pointer-events: none;
-    transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 /* Action Menu (top right) */
@@ -723,10 +696,7 @@ canvas {
 .help-text-container {
     display: none;
     padding: 15px;
-    border-top: 1px dashed var(--help-text-border);
-    margin-top: 20px;
-    background-color: var(--help-text-bg);
-    border-radius: 6px;
+    background-color: transparent;
     opacity: 0;
     max-height: 0;
     overflow: hidden;
@@ -736,13 +706,14 @@ canvas {
 .help-text-container.show {
     opacity: 1;
     max-height: 500px;
+    overflow-y: auto;
 }
 
 .help-text-container h3 {
     margin-top: 0;
     font-family: 'Roboto', sans-serif;
     color: var(--help-text-color);
-    font-size: 1.2em;
+    font-size: 1.em;
     border-bottom: 1px solid var(--help-text-border);
     padding-bottom: 5px;
 }
@@ -755,7 +726,6 @@ canvas {
 
 
 /* Responsive rules for mobile devices */
-/* Responsive rules for mobile devices */
 @media (max-width: 768px) {
 
     #popUp,
@@ -764,15 +734,12 @@ canvas {
         width: 90vw;
         max-width: 90vw;
         height: 70%;
-
         padding-left: 6px !important;
         padding-right: 12px !important;
         box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
         border-radius: 8px;
-        /* Modificação para esconder a pop-up fora da tela */
         top: auto;
         bottom: -100vh;
-        /* Esconde a pop-up abaixo da tela */
         transform: translateX(-50%) scale(0.95);
         transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), bottom 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
@@ -780,7 +747,6 @@ canvas {
     #popUp.open,
     #json-paste-popUp.open,
     #prompt-generator-popUp.open {
-        /* Posição central quando a pop-up está aberta */
         bottom: 50%;
         transform: translate(-50%, 50%) scale(1);
         padding-right: 12px !important;
@@ -796,7 +762,6 @@ canvas {
     }
 
     #popUp p {
-        overflow-y: auto;
         font-size: 0.9em;
         max-height: 30vh;
     }
@@ -862,12 +827,6 @@ canvas {
     #focus-next-node-button {
         right: 10px;
     }
-
-    #node-info-footer {
-        padding: 6px 12px;
-        font-size: 0.8em;
-        bottom: 10px;
-    }
 }
 
 /* Focus buttons */
@@ -910,32 +869,6 @@ canvas {
 }
 
 
-/* Node info footer */
-#node-info-footer {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 16px;
-    background-color: var(--node-info-footer-bg);
-    color: var(--node-info-footer-text);
-    font-family: 'Open Sans', sans-serif;
-    font-size: 0.9em;
-    border-radius: 5px;
-    z-index: 100;
-    text-align: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease, background-color 0.5s ease, color 0.5s ease;
-}
-
-#node-info-footer.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* --- Dark Theme Styles --- */
-
 /* Aplica o tema escuro quando a classe 'theme-dark' é adicionada ao body */
 body.theme-dark {
     --bg-color: #111827;
@@ -964,12 +897,8 @@ body.theme-dark {
     --menu-button-bg: #3B82F6;
     --menu-button-hover-bg: #2563EB;
     --menu-button-text-color: #F9FAFB;
-    --version-info-bg: rgba(31, 41, 55, 0.7);
-    --version-info-text: rgba(249, 250, 251, 0.5);
     --focus-button-bg: #3B82F6;
     --focus-button-hover-bg: #2563EB;
-    --node-info-footer-bg: rgba(249, 250, 251, 0.2);
-    --node-info-footer-text: rgba(249, 250, 251, 0.9);
 
     /* Cores do botão de ajuda e do contêiner de texto no tema escuro */
     --help-button-bg: #4B5563;
@@ -996,4 +925,9 @@ canvas {
     width: 100vw;
     height: 100vh;
     touch-action: none;
+}
+
+
+#popUp-content {
+    overflow: auto;
 }

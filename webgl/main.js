@@ -10,9 +10,6 @@ import { promptBase } from './prompts.js';
 // --- Importa o tema desejado ---
 import { darkTheme, lightTheme } from './theme.js';
 
-const APP_VERSION = 'v2.0.0';
-
-// Use o tema importado como sua configuração
 const CONFIG = lightTheme;
 
 CONFIG.FIXED_NODE_WIDTH = (CONFIG.font.size * CONFIG.font.characterWidth * CONFIG.FIXED_NODE_CHARACTER_LIMIT) + (CONFIG.padding.x * 2);
@@ -128,12 +125,9 @@ class MindMapViewer {
         this.saveContentBtn = document.getElementById('save-content-btn');
         this.cancelContentBtn = document.getElementById('cancel-content-btn');
 
-        // --- New Bottom Info Element ---
-        this.nodeInfoFooter = document.getElementById('node-info-footer');
 
         this._initScene();
         this._initEventListeners();
-        this._createVersionInfo();
 
         this.animate();
     }
@@ -333,13 +327,6 @@ class MindMapViewer {
     // Função para mostrar/ocultar o texto de ajuda
     toggleHelpText(container) {
         container.classList.toggle('show');
-    }
-
-    _createVersionInfo() {
-        const versionElement = document.getElementById('version-info');
-        if (versionElement) {
-            versionElement.textContent = `Mind Map ${APP_VERSION}`;
-        }
     }
 
     generateAndAssignIds(data) {
@@ -802,8 +789,6 @@ class MindMapViewer {
 
             const nodeId = nextD3Node.data.id || '';
             const nodeName = nextD3Node.data.name || '';
-            this.nodeInfoFooter.textContent = `${nodeName}`;
-            this.nodeInfoFooter.classList.add('visible');
 
             // **Correção:** Se o pop-up estiver aberto, atualize-o para o novo nó.
             if (this.isPopUpOpen) {
@@ -864,8 +849,6 @@ class MindMapViewer {
 
             const nodeId = previousD3Node.data.id || '';
             const nodeName = previousD3Node.data.name || '';
-            this.nodeInfoFooter.textContent = `${nodeName}`;
-            this.nodeInfoFooter.classList.add('visible');
 
             // **Correção:** Se o pop-up estiver aberto, atualize-o para o novo nó.
             if (this.isPopUpOpen) {
@@ -1177,12 +1160,8 @@ class MindMapViewer {
                 }
 
                 const nodeName = d3Node.data.name || '';
-                this.nodeInfoFooter.textContent = `${nodeName}`;
-                this.nodeInfoFooter.classList.add('visible');
 
                 this.openPopUp(nodeName, d3Node.data.definition || 'Nenhuma explicação disponível.');
-            } else {
-                this.nodeInfoFooter.classList.remove('visible');
             }
         }
 
@@ -1726,7 +1705,6 @@ Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou forma
             this.highlightedNode = null;
             this.highlightedLine = null;
         }
-        this.nodeInfoFooter.classList.remove('visible');
 
         await this.recalculateMap();
         alert('Nó e seus filhos excluídos com sucesso.');
