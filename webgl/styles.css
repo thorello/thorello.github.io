@@ -78,7 +78,6 @@ canvas {
     padding: 40px;
     box-sizing: border-box;
     transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.5s ease;
-    overflow-y: auto;
     z-index: 1000;
     opacity: 0;
     pointer-events: none;
@@ -87,20 +86,44 @@ canvas {
     justify-content: space-between;
 }
 
-#popUp.open,
-#json-paste-popUp.open,
-#prompt-generator-popUp.open {
+#popUp.open {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
     pointer-events: auto;
+    /* overflow: hidden;  <-- REMOVA ESTA LINHA TAMBÉM*/
+    padding: 40px;
+    /* Adicione um max-height para controlar o tamanho total da popup */
+    max-height: 90vh;
 }
 
 .title-content-container {
-    display: grid;
-    grid-template-rows: auto auto;
-    row-gap: 12px;
-    place-items: start start;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-content: flex-start;
+    padding-right: 25px;
 }
+
+/* Container para os botões alinhados lado a lado */
+#popUp-buttons-container.button-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    /* Adicionado margin-top e border-top para separar do conteúdo */
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    margin-bottom: 10px;
+
+    flex-wrap: nowrap;
+    /* Garante que os botões fiquem no final do contêiner flex */
+    flex-shrink: 0;
+}
+
+#content-section {
+    padding-top: 12px;
+}
+
 
 #popUp.open {
     padding-left: 25px;
@@ -135,6 +158,11 @@ canvas {
     margin-bottom: 10px;
     margin-top: 0px;
     transition: color 0.5s ease;
+
+    /* ADICIONE ESTAS LINHAS PARA HABILITAR A ROLAGEM APENAS NO PARÁGRAFO */
+    overflow-y: auto;
+    flex-grow: 1;
+    max-height: 100%;
 }
 
 #popUp-close,
@@ -756,6 +784,7 @@ canvas {
         bottom: 50%;
         transform: translate(-50%, 50%) scale(1);
         padding-right: 12px !important;
+        padding-top: 25px;
     }
 
     #popUp h2,
@@ -767,7 +796,9 @@ canvas {
     }
 
     #popUp p {
+        overflow-y: auto;
         font-size: 0.9em;
+        max-height: 30vh;
     }
 
     #popUp-close,
@@ -877,6 +908,7 @@ canvas {
     transform: scale(1);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
 
 /* Node info footer */
 #node-info-footer {
