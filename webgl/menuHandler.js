@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Nova lógica para fechar o menu ao clicar em um item ---
         // Seleciona todos os botões e rótulos dentro do #menu-content
-        const menuItems = menuContainer.querySelectorAll('#menu-content button, #menu-content label');
+        const menuItems = menuContainer.querySelectorAll('#menu-content button:not(#paste-json-button):not(#generate-prompt-button), #menu-content label');
 
         menuItems.forEach(item => {
             item.addEventListener('click', () => {

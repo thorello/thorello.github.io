@@ -267,6 +267,8 @@ class MindMapViewer {
         if (exportJsonButton) {
             exportJsonButton.addEventListener('click', () => {
                 exportMindMapToJson();
+                // Adicione esta linha para fechar o menu
+                document.getElementById('action-menu-container').classList.remove('open');
             });
         }
 
@@ -276,6 +278,8 @@ class MindMapViewer {
                 importMindMapFromJson(event, (importedData) => {
                     this.data = importedData;
                     this.drawMindMap();
+                    // Adicione esta linha para fechar o menu após a importação
+                    document.getElementById('action-menu-container').classList.remove('open');
                 });
             });
         }
@@ -1293,6 +1297,7 @@ class MindMapViewer {
 
     // NEW: Prompt Generator PopUp Methods
     openPromptGeneratorPopUp() {
+        console.log('chegou aqui');
         if (!this.promptGeneratorPopUp) return;
         this.promptGeneratorPopUp.classList.add('open');
         this.isPromptGeneratorPopUpOpen = true;

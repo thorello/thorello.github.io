@@ -87,14 +87,7 @@
         <h2>Gerar Mapa a Partir de JSON</h2>
         <textarea id="json-paste-textarea" placeholder="Crie ou Cole seu JSON de mapa mental aqui..."></textarea>
         <div class="button-row">
-            <button id="json-paste-import-button"><i class="fas fa-paste"></i><span>Criar Mapa</span></button>
-            <button id="json-paste-help-button" class="help-button" title="Ajuda"><i
-                    class="fa-solid fa-circle-question"></i></button>
-        </div>
-        <div id="json-paste-help-text-container" class="help-text-container">
-            <h3>Ajuda</h3>
-            <p>Cole uma estrutura JSON válida de um mapa mental aqui. Isso apagará o mapa atual e criará um novo com
-                base no JSON fornecido.</p>
+            <button id="json-paste-import-button"><span>Criar Mapa</span></button>
         </div>
     </div>
 
@@ -105,14 +98,7 @@
         <textarea id="prompt-input-textarea"
             placeholder="Ex: 'Os principais tipos de programação e suas características...'"></textarea>
         <div class="button-row">
-            <button id="copy-prompt-button"><i class="fas fa-copy"></i><span>Copiar Prompt</span></button>
-            <button id="prompt-generator-help-button" class="help-button" title="Ajuda"><i
-                    class="fa-solid fa-circle-question"></i></button>
-        </div>
-        <div id="prompt-generator-help-text-container" class="help-text-container">
-            <h3>Ajuda</h3>
-            <p>Use esta ferramenta para criar um prompt formatado a partir de um texto base. O prompt pode ser colado em
-                uma ferramenta de IA generativa para criar um novo mapa mental em formato JSON.</p>
+            <button id="copy-prompt-button"><span>Copiar Prompt</span></button>
         </div>
     </div>
 
@@ -128,7 +114,7 @@
             <button id="export-json-button">Salvar Mapa</button>
             <label for="jsonUpload" id="import-json-button">Importar Mapa</label>
             <input type="file" id="jsonUpload" accept=".json">
-            <button id="paste-json-button">Criar JSON</button>
+            <button id="paste-json-button">Criar Mapa JSON</button>
             <button id="generate-prompt-button">Gerar Prompt</button>
             <button id="export-pdf-button">Exportar PDF</button>
             <button id="create-markdown-button">Criar Relatório</button>

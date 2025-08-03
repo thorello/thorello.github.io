@@ -82,12 +82,15 @@ canvas {
     justify-content: space-between;
 }
 
-#popUp.open {
+#popUp.open,
+#json-paste-popUp.open,
+#prompt-generator-popUp.open {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
     pointer-events: auto;
-    padding: 40px;
-    max-height: 90vh;
+    /* O padding e max-height podem ser diferentes,
+       então você pode mantê-los em regras separadas se necessário,
+       mas opacity, transform e pointer-events são essenciais para todos. */
 }
 
 /* Modificação aqui para usar Flexbox e alinhar o conteúdo */
@@ -364,15 +367,7 @@ canvas {
     pointer-events: none;
 }
 
-#json-paste-import-button span,
-#copy-prompt-button span {
-    transition: opacity 0.2s ease, width 0.2s ease;
-    white-space: nowrap;
-    overflow: hidden;
-    width: 0;
-    opacity: 0;
-    pointer-events: none;
-}
+
 
 #add-node-button i,
 #ai-new-map-button-popUp i,
@@ -393,20 +388,6 @@ canvas {
 #popUp-help-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-#add-node-button:hover span,
-#ai-new-map-button-popUp:hover span,
-#add-children-with-ai-button:hover span,
-#delete-node-button:hover span,
-#json-paste-import-button:hover span,
-#copy-prompt-button:hover span,
-#popUp-help-button:hover span {
-    opacity: 1;
-    width: auto;
-    max-width: 200px;
-    pointer-events: auto;
-    padding-left: 5px;
 }
 
 /* Specific colors for action buttons (will be overridden by theme variables if used) */
@@ -544,37 +525,6 @@ canvas {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-#export-json-button {
-    background-color: #28a745;
-}
-
-#export-json-button:hover {
-    background-color: #218838;
-}
-
-#import-json-button {
-    background-color: #f39c12;
-}
-
-#import-json-button:hover {
-    background-color: #e67e22;
-}
-
-#create-markdown-button {
-    background-color: #8A2BE2;
-}
-
-#create-markdown-button:hover {
-    background-color: #6A1BA7;
-}
-
-#recalculate-map-button {
-    background-color: #007bff;
-}
-
-#recalculate-map-button:hover {
-    background-color: #0056b3;
-}
 
 /* Hide the real file input */
 #jsonUpload {
