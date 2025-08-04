@@ -631,7 +631,7 @@ class MindMapViewer {
             if (leftChildren.length > 0) {
                 const leftRoot = hierarchy(this.data);
                 leftRoot.children = leftChildren;
-                const treeLayoutLeft = tree().nodeSize([CONFIG.verticalNodeSpacing, 1]);
+                const treeLayoutLeft = tree().nodeSize([CONFIG.verticalNodeSpacing, CONFIG.horizontalNodeSpacing]);
                 treeLayoutLeft(leftRoot);
 
                 leftRoot.descendants().forEach(node => {
@@ -653,7 +653,7 @@ class MindMapViewer {
             if (rightChildren.length > 0) {
                 const rightRoot = hierarchy(this.data);
                 rightRoot.children = rightChildren;
-                const treeLayoutRight = tree().nodeSize([CONFIG.verticalNodeSpacing, 1]);
+                const treeLayoutRight = tree().nodeSize([CONFIG.verticalNodeSpacing, CONFIG.horizontalNodeSpacing]);
                 treeLayoutRight(rightRoot);
 
                 rightRoot.descendants().forEach(node => {
@@ -699,28 +699,7 @@ class MindMapViewer {
                     finalNodeY = 0;
                 } else {
                     finalNodeY = -d3Node.userData.d3X;
-
-                    let previousNodeWidthForSpacing = CONFIG.FIXED_NODE_WIDTH;
-
-                    if (d3Node.depth === 1) {
-                        const rootNodeGroup = this.nodeMap.get(this.d3RootNode);
-                        const rootWidth = rootNodeGroup ? CONFIG.FIXED_NODE_WIDTH : 0;
-                        finalNodeX = (rootWidth / 2) * direction + CONFIG.depth1HorizontalOffset * direction + (nodeWidth / 2) * direction;
-                    } else if (d3Node.depth >= 2 && d3Node.parent) {
-                        const parentGroup = this.nodeMap.get(d3Node.parent);
-                        if (parentGroup) {
-                            const parentWidth = CONFIG.FIXED_NODE_WIDTH;
-                            const parentDir = parentGroup.userData.direction;
-                            let connectionPointX = parentGroup.position.x;
-                            if (parentDir !== 0) {
-                                connectionPointX += (parentWidth / 2) * parentDir;
-                            } else {
-                                connectionPointX += (parentWidth / 2) * direction;
-                            }
-                            let spacingNeeded = (nodeWidth / 2) + (previousNodeWidthForSpacing / 2) + CONFIG.horizontalNodePadding;
-                            finalNodeX = connectionPointX + (spacingNeeded * direction);
-                        }
-                    }
+                    finalNodeX = d3Node.userData.d3Y * direction;
                     d3Node.data.persistedX = finalNodeX;
                     d3Node.data.persistedY = finalNodeY;
                 }

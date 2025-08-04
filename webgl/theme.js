@@ -35,9 +35,10 @@ export const lightTheme = {
         min: 0.05,
         max: 8,
     },
-    horizontalNodePadding: 0,
+    horizontalNodePadding: 200,
     verticalNodeSpacing: 80,
     depth1HorizontalOffset: 80,
+    horizontalNodeSpacing: 400,
     FIXED_NODE_CHARACTER_LIMIT: 35,
     FIXED_NODE_HEIGHT_MULTIPLIER: 2.5,
 };
