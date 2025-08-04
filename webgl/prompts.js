@@ -1,11 +1,13 @@
 export const promptBase = `
 Generate a comprehensive, hierarchical JSON mind map from the provided content.
-Root node name: coherent, self-assigned.
-All "name" fields (topics) <= 35 chars.
-"definition" fields: dense, complete, objective.
+If the content is too brief, perform a complete analysis of the subject, breaking it down 
+as much as possible and presenting it as a logical, step-by-step guide.
+The output must be ONLY the JSON structure, with no extra text or markdown.
+The root node name should be coherent and self-assigned.
+All "name" fields (topics) must be <= 35 characters.
+"definition" fields should be dense, complete, and objective.
 Maximize child and sub-nodes to cover all content details.
-Arrange the child nodes in a logical order that facilitates the easiest understanding and learning of the content.
-Output MUST be ONLY the JSON structure, no extra text or markdown, no citations.
-All output text MUST be in Brazilian Portuguese.
+Arrange child nodes in a logical order to facilitate easy understanding and learning.
+All text within the JSON, including node names and definitions, MUST be in Brazilian Portuguese.
 Format: { "name": "...", "definition": "...", "children": [ { "name": "...", "definition": "...", "children": [...] } ] }
 `;

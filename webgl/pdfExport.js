@@ -123,7 +123,7 @@ export function exportMindMapToPDF(nodeMap, linkObjects, CONFIG, mainGroupPositi
         let currentColorHex = '#' + new THREE.Color(CONFIG.textColor).getHexString();
         // Verifica se é o nó central (assumindo depth === 0 para o nó raiz D3)
         if (nodeGroup.userData?.d3Node?.depth === 0) {
-            currentColorHex = '#FFFFFF'; // Define a cor do texto como branco para o nó central
+            currentColorHex = '#000000ff'; // Define a cor do texto como branco para o nó central
         }
         doc.setTextColor(currentColorHex);
 
