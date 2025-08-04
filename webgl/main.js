@@ -621,8 +621,12 @@ class MindMapViewer {
         const originalChildren = this.d3RootNode.children || [];
         if (originalChildren.length > 0) {
             const leftCount = Math.ceil(originalChildren.length / 2);
-            const leftChildren = originalChildren.slice(0, leftCount);
-            const rightChildren = originalChildren.slice(leftCount);
+
+            const leftChildren = [];
+            const rightChildren = originalChildren;
+
+            //const leftChildren = originalChildren.slice(0, leftCount);
+            //const rightChildren = originalChildren.slice(leftCount);
 
             if (leftChildren.length > 0) {
                 const leftRoot = hierarchy(this.data);
@@ -694,7 +698,7 @@ class MindMapViewer {
                     finalNodeX = 0;
                     finalNodeY = 0;
                 } else {
-                    finalNodeY = d3Node.userData.d3X;
+                    finalNodeY = -d3Node.userData.d3X;
 
                     let previousNodeWidthForSpacing = CONFIG.FIXED_NODE_WIDTH;
 
