@@ -28,7 +28,7 @@ export const lightTheme = {
         characterWidth: 0.5,
     },
     padding: { x: 30, y: 10 },
-    borderRadius: 6,
+    borderRadius: 20,
     dragHandleRadius: 6,
     zoom: {
         speed: 0.2,
