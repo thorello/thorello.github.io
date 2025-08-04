@@ -1,28 +1,33 @@
 export const lightTheme = {
     // Cores
     backgroundColor: 0xF4F4F5,
-    // Paleta de cores pastel para as ramificações
-    pastelBranchColors: [
-        '#FFF2F5', // Rosa quase branco
-        '#FFFBF2', // Pêssego muito, muito claro
-        '#FFFFF2', // Amarelo pálido
-        '#F2FFF6', // Menta quase branco
-        '#F2FAFF', // Azul muito claro
-        '#F7F7FF', // Lavanda sutil
-        '#FFF5F8', // Rosa pálido
+
+    // Paleta de cores fortes para as BORDAS das ramificações
+    branchBorderColors: [
+        0xE53935, // Vermelho Forte
+        0x43A047, // Verde Escuro
+        0xFB8C00, // Laranja
+        0x8E24AA, // Roxo
+        0xD81B60, // Pink
+        0x00897B, // Verde-azulado (Teal)
+        0x7CB342, // Verde Limão
+        0xFDD835, // Amarelo Queimado (Gold)
+        0x6D4C41, // Marrom
+        0x5E35B1  // Índigo
     ],
-    nodeColors: [
-        0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF
-    ],
+
+    // A cor de fundo dos nós agora é padrão para TODOS os nós
+    nodeBackgroundColor: 0xF4F4F5,
+
     linkColor: 0x4B5563,
     dragHandleColor: 0x111827,
-    textColor: 0x111827,
-    highlightColor: 0x3498db,
-    rootNodeColor: 0x3498db,
-    rootTextColor: 0xFFFFFF,
-    wireframeColor: 0xCCCCCC,
+    textColor: 0x111827, // Cor de texto padrão para TODOS os nós
+    highlightColor: 0x3498db, // Cor de destaque ao selecionar um nó
 
-    // Outras configurações (pode manter aqui ou em outro arquivo de config)
+    // A cor da BORDA do nó raiz
+    rootNodeBorderColor: 0x3498db,
+
+    // Outras configurações
     font: {
         size: 16,
         characterWidth: 0.5,
@@ -43,19 +48,16 @@ export const lightTheme = {
 
 // Exemplo de um tema escuro
 export const darkTheme = {
-    // Reutiliza as configurações de layout do lightTheme primeiro
     ...lightTheme,
 
-    // Em seguida, sobrescreve apenas as cores e outras propriedades que são diferentes no tema escuro
+    // Sobrescreve as cores para o tema escuro
     backgroundColor: 0x111827,
-    nodeColors: [
-        0x1F2937, 0x1F2937, 0x1F2937, 0x1F2937, 0x1F2937, 0x1F2937
-    ],
+    nodeBackgroundColor: 0x111827,
     linkColor: 0x9CA3AF,
     dragHandleColor: 0xF9FAFB,
     textColor: 0xF9FAFB,
     highlightColor: 0x14B8A6,
-    rootNodeColor: 0x2563EB,
-    rootTextColor: 0xF9FAFB,
-    wireframeColor: 0x4B5563,
+
+    // Cor da BORDA do nó raiz no tema escuro
+    rootNodeBorderColor: 0x2563EB,
 };

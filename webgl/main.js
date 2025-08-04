@@ -385,24 +385,10 @@ class MindMapViewer {
 
             const isRootNode = d3Node.depth === 0;
 
-            let nodeColor;
-            const textColor = isRootNode ? CONFIG.rootTextColor : CONFIG.textColor;
-            const idColor = isRootNode ? CONFIG.rootTextColor : 0x888888;
-
-            if (isRootNode) {
-                nodeColor = CONFIG.rootNodeColor;
-            } else {
-                // Nova lógica para atribuir a cor da ramificação
-                const topLevelParent = d3Node.ancestors().find(d => d.depth === 1);
-                if (topLevelParent) {
-                    const parentIndex = this.d3RootNode.children.indexOf(topLevelParent);
-                    nodeColor = CONFIG.pastelBranchColors[parentIndex % CONFIG.pastelBranchColors.length];
-                } else {
-                    // fallback para outros nós (mesmo que a lógica D3 os atribua)
-                    const nodeColorsReversed = CONFIG.nodeColors.slice().reverse();
-                    nodeColor = nodeColorsReversed[d3Node.depth - 1] || 0xFFFFFF;
-                }
-            }
+            // Define a cor de fundo e do texto para ser a mesma para TODOS os nós
+            const nodeColor = CONFIG.nodeBackgroundColor;
+            const textColor = CONFIG.textColor;
+            const idColor = 0x888888; // Cor padrão do ID para todos os nós
 
             // 1. Cria a malha de texto para o nome do nó
             const textMesh = new Text();
@@ -431,19 +417,35 @@ class MindMapViewer {
                     const rectHeight = CONFIG.FIXED_NODE_HEIGHT;
 
                     const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
+                    // Aplica a cor de fundo padrão para TODOS os nós
                     const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
 
                     const rectMesh = new THREE.Mesh(rectGeo, rectMat);
                     rectMesh.name = 'nodeRectMesh';
                     nodeGroup.add(rectMesh);
 
-                    if (!isRootNode) {
-                        const edges = new THREE.EdgesGeometry(rectGeo);
-                        const lineMat = new THREE.LineBasicMaterial({ color: CONFIG.wireframeColor, linewidth: 2 });
-                        const wireframe = new THREE.LineSegments(edges, lineMat);
-                        wireframe.name = 'nodeWireframe';
-                        nodeGroup.add(wireframe);
+                    // Adiciona a borda para TODOS os nós, com lógica de cor diferente
+                    let borderColor;
+                    if (isRootNode) {
+                        // Usa a cor de borda específica para o nó raiz
+                        borderColor = CONFIG.rootNodeBorderColor;
+                    } else {
+                        // Usa a cor da ramificação para os outros nós
+                        borderColor = 0xCCCCCC; // Cor padrão de fallback
+                        const topLevelParent = d3Node.ancestors().find(d => d.depth === 1);
+                        if (topLevelParent) {
+                            const parentIndex = this.d3RootNode.children.indexOf(topLevelParent);
+                            borderColor = CONFIG.branchBorderColors[parentIndex % CONFIG.branchBorderColors.length];
+                        }
                     }
+
+                    const edges = new THREE.EdgesGeometry(rectGeo);
+                    const lineMat = new THREE.LineBasicMaterial({ color: borderColor, linewidth: 0.1, transparent: true, opacity: 0.4 });
+                    const wireframe = new THREE.LineSegments(edges, lineMat);
+                    wireframe.name = 'nodeWireframe';
+                    // Armazena a cor original para restaurar ao desmarcar
+                    wireframe.userData.originalColor = borderColor;
+                    nodeGroup.add(wireframe);
 
                     // 3. Posiciona o texto do nome e o texto do ID
                     textMesh.position.x = 0;
@@ -756,11 +758,9 @@ class MindMapViewer {
 
         if (nextNodeGroup) {
             if (this.highlightedNode) {
-                const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
                 const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
-                if (lineMesh) {
-                    lineMesh.material.color.set(originalColor);
+                if (lineMesh && lineMesh.userData.originalColor) {
+                    lineMesh.material.color.set(lineMesh.userData.originalColor);
                 }
             }
 
@@ -816,11 +816,9 @@ class MindMapViewer {
 
         if (previousNodeGroup) {
             if (this.highlightedNode) {
-                const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
                 const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
-                if (lineMesh) {
-                    lineMesh.material.color.set(originalColor);
+                if (lineMesh && lineMesh.userData.originalColor) {
+                    lineMesh.material.color.set(lineMesh.userData.originalColor);
                 }
             }
 
@@ -1109,11 +1107,9 @@ class MindMapViewer {
 
             // Limpar o destaque do nó anterior, se houver
             if (this.highlightedNode) {
-                const isRootNode = this.highlightedNode.userData.d3Node.depth === 0;
-                const originalColor = isRootNode ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
                 const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
-                if (lineMesh) {
-                    lineMesh.material.color.set(originalColor);
+                if (lineMesh && lineMesh.userData.originalColor) {
+                    lineMesh.material.color.set(lineMesh.userData.originalColor);
                 }
                 this.highlightedNode = null;
                 this.highlightedLine = null;
@@ -1682,13 +1678,11 @@ Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou forma
         }
 
         this.closePopUp();
-        // O highlight e o rodapé serão limpos na próxima vez que o usuário interagir, mas
-        // é uma boa prática limpá-los agora que o nó não existe mais.
+
         if (this.highlightedNode) {
-            const originalColor = this.highlightedNode.userData.d3Node.depth === 0 ? CONFIG.rootNodeColor : CONFIG.wireframeColor;
             const lineMesh = this.highlightedNode.children.find(child => child.name === 'nodeWireframe');
-            if (lineMesh) {
-                lineMesh.material.color.set(originalColor);
+            if (lineMesh && lineMesh.userData.originalColor) {
+                lineMesh.material.color.set(lineMesh.userData.originalColor);
             }
             this.highlightedNode = null;
             this.highlightedLine = null;
