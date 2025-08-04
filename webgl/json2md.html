@@ -50,7 +50,7 @@
         }
 
         /* ------------------------------ */
-        /* ESTILOS DO TEMA ESCURO (NOVO) */
+        /* ESTILOS DO TEMA ESCURO */
         /* ------------------------------ */
         body.dark-theme {
             background-color: var(--dark-background-body);
@@ -83,11 +83,14 @@
             color: var(--dark-tertiary-heading-color);
         }
 
+        body.dark-theme #markdown-output a {
+            color: var(--dark-primary-heading-color);
+        }
+
         body.dark-theme #markdown-output hr {
             background: var(--dark-border-color);
         }
 
-        /* Botões do tema escuro para manter a legibilidade */
         body.dark-theme button {
             background-color: #34495e;
         }
@@ -190,18 +193,21 @@
             font-weight: 600;
         }
 
+        #markdown-output a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        #markdown-output a:hover {
+            text-decoration: underline;
+        }
+
         #markdown-output p {
             margin-bottom: 1em;
         }
 
-        #markdown-output ul {
-            list-style-type: disc;
-            margin-left: 20px;
-            margin-bottom: 1em;
-        }
-
+        #markdown-output ul,
         #markdown-output ol {
-            list-style-type: decimal;
             margin-left: 20px;
             margin-bottom: 1em;
         }
@@ -222,26 +228,83 @@
         }
 
         /* ------------------------------ */
-        /* MEDIA QUERIES (RESPONSIVO) */
+        /* ESTILOS DE TABELA              */
+        /* ------------------------------ */
+
+        /* NOVO: Esconde o cabeçalho da tabela visualmente */
+        #markdown-output thead {
+            display: none;
+        }
+
+        #markdown-output table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2em 0;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        #markdown-output td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Ajuste: A primeira linha agora precisa de uma borda superior já que o thead está oculto */
+        #markdown-output tbody tr:first-of-type td {
+            border-top: none;
+            /* Opcional: remover se a borda da tabela já for suficiente */
+        }
+
+        #markdown-output tbody tr:nth-of-type(even) {
+            background-color: var(--background-light);
+        }
+
+        #markdown-output tbody tr:last-of-type td {
+            border-bottom: 0;
+        }
+
+        #markdown-output tbody tr:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Estilos de Tabela para o Tema Escuro */
+        body.dark-theme #markdown-output table {
+            border-color: var(--dark-border-color);
+        }
+
+        body.dark-theme #markdown-output td {
+            border-color: var(--dark-border-color);
+        }
+
+        body.dark-theme #markdown-output tbody tr:nth-of-type(even) {
+            background-color: rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-theme #markdown-output tbody tr:hover {
+            background-color: #3a506b;
+        }
+
+
+        /* ------------------------------ */
+        /* MEDIA QUERIES (RESPONSIVO)     */
         /* ------------------------------ */
         @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
+
+            .container,
+            body {
+                padding: 15px;
             }
 
             #markdown-output h1 {
                 font-size: 1.8em;
-                margin-bottom: 20px;
             }
 
             button {
                 font-size: 1em;
                 padding: 10px 20px;
-            }
-
-            .button-container {
-                margin-bottom: 20px;
             }
 
             #markdown-output {
@@ -254,53 +317,33 @@
                 padding: 10px;
             }
 
-            .container {
-                padding: 15px;
-            }
-
             #markdown-output h1 {
                 font-size: 1.5em;
             }
         }
 
         /* ------------------------------ */
-        /* ESTILOS PARA IMPRESSÃO */
+        /* ESTILOS PARA IMPRESSÃO         */
         /* ------------------------------ */
         @media print {
             body {
                 background-color: #fff;
-                padding: 2cm;
+                padding: 1.5cm;
                 margin: 0;
                 font-size: 10pt;
             }
 
-            #markdown-output hr {
-                /* Assegure-se de que a linha tenha uma borda ou fundo para ser visível */
-                border-top: 1px solid #4e4e4e;
-                height: 0;
-                /* ou 1px se preferir */
-                margin: 2em 0;
-                background: transparent;
-                /* Certifique-se de que o fundo não está branco invisível */
-            }
-
-            /* Garante que o tema escuro não afete a impressão */
-            body.dark-theme {
-                background-color: #fff;
-                color: #000;
-            }
-
+            body.dark-theme,
             body.dark-theme .container,
-            body.dark-theme #markdown-output {
-                background-color: #fff;
-                color: #000;
-                border-color: #000;
-            }
-
+            body.dark-theme #markdown-output,
             body.dark-theme #markdown-output h1,
             body.dark-theme #markdown-output h2,
-            body.dark-theme #markdown-output h3 {
-                color: #000;
+            body.dark-theme #markdown-output h3,
+            body.dark-theme #markdown-output table,
+            body.dark-theme #markdown-output td {
+                background-color: #fff !important;
+                color: #000 !important;
+                border-color: #ccc !important;
             }
 
             .container {
@@ -309,45 +352,62 @@
                 padding: 0;
                 margin: 0;
                 max-width: 100%;
-                width: 100%;
             }
 
-            .button-container {
+            .button-container,
+            a:link:after,
+            a:visited:after {
                 display: none;
-            }
-
-            #markdown-output h1 {
-                display: block;
-                color: #000;
-                text-align: left;
-                font-size: 24pt;
-                margin-bottom: 1.5cm;
+                content: "";
             }
 
             #markdown-output {
                 border: none;
                 padding: 0;
-                min-height: unset;
-                overflow: visible;
+            }
+
+            #markdown-output h1 {
+                font-size: 22pt;
+                margin-bottom: 1cm;
             }
 
             #markdown-output h2 {
-                font-size: 18pt;
-                color: #333;
+                font-size: 16pt;
             }
 
             #markdown-output h3 {
-                font-size: 14pt;
-                color: #333;
+                font-size: 13pt;
             }
 
-            a:link:after,
-            a:visited:after {
-                content: "";
+            #markdown-output hr {
+                border-top: 1px solid #ccc;
+                margin: 1.5em 0;
+            }
+
+            /* NOVO: Garante que o cabeçalho também seja escondido na impressão */
+            #markdown-output thead {
+                display: none;
+            }
+
+            #markdown-output table {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                margin: 1.5em 0;
+                page-break-inside: auto;
+            }
+
+            #markdown-output tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            #markdown-output td {
+                border: 1px solid #ccc;
+                padding: 8px;
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@13.0.0/lib/marked.umd.min.js"></script>
 </head>
 
 <body>
@@ -362,6 +422,7 @@
     </div>
 
     <script>
+        // O JSON de dados permanece o mesmo
         let jsonData = {
             "name": "Ataques a Redes",
             "definition": "Visão geral dos principais ataques a redes, incluindo Negação de Serviço, Força Bruta, Varredura de Portas, Decepção, Falsificação e Interceptação, com suas definições, variações, impactos e contramedidas.",
@@ -472,12 +533,11 @@
             }]
         };
 
-        // NOVO: Tenta carregar os dados do sessionStorage primeiro
+        // O JavaScript NÃO precisa ser alterado, pois o CSS resolve a questão do cabeçalho.
         const storedMarkdownData = sessionStorage.getItem('markdownData');
         if (storedMarkdownData) {
             try {
                 jsonData = JSON.parse(storedMarkdownData);
-                // Opcional: Limpar sessionStorage depois de usar para não persistir dados
                 sessionStorage.removeItem('markdownData');
             } catch (error) {
                 console.error('Erro ao parsear dados do sessionStorage:', error);
@@ -488,21 +548,28 @@
             let markdown = '';
             const headingPrefix = '#'.repeat(level + 1);
 
+            const renderAsTable = data.children && data.children.length > 0 &&
+                data.children.every(child => !child.children || child.children.length === 0);
+
             if (level === 0) {
-                // Adiciona o título principal como H1 no Markdown
                 markdown += `# ${data.name}\n\n`;
-                markdown += `${data.definition}\n\n`;
-                markdown += `---\n\n`;
-            } else if (level === 1) {
+                markdown += `${data.definition}\n\n---\n\n`;
+            } else if (renderAsTable) {
                 markdown += `${headingPrefix} ${data.name}\n\n`;
                 markdown += `${data.definition}\n\n`;
-            } else if (level === 2) {
-                markdown += `${headingPrefix} ${data.name}\n\n`;
-                markdown += `${data.definition}\n\n`;
-            } else if (level === 3) {
-                markdown += `* **${data.name}**: ${data.definition}\n`;
+                // O cabeçalho ainda é gerado aqui, mas será escondido pelo CSS
+                markdown += '| Termo | Descrição |\n';
+                markdown += '|:---|:---|\n';
+                data.children.forEach(child => {
+                    const cleanDefinition = child.definition.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+                    const cleanName = child.name.replace(/\|/g, '\\|');
+                    markdown += `| **${cleanName}** | ${cleanDefinition} |\n`;
+                });
+                markdown += '\n';
+                return markdown;
             } else {
-                markdown += `    * **${data.name}**: ${data.definition}\n`;
+                markdown += `${headingPrefix} ${data.name}\n\n`;
+                markdown += `${data.definition}\n\n`;
             }
 
             if (data.children && data.children.length > 0) {
@@ -511,7 +578,7 @@
                 });
             }
 
-            if (level === 1 && data.children && data.children.length > 0) {
+            if (level === 1) {
                 markdown += `---\n\n`;
             }
 
@@ -526,21 +593,17 @@
 
         document.getElementById('export-pdf-btn').addEventListener('click', () => {
             if (document.getElementById('markdown-output').innerHTML.trim() === '') {
-                // Se o markdown não foi gerado, gera antes de imprimir
                 generateAndDisplayMarkdown();
-                // Pequeno atraso para o DOM ser atualizado antes de imprimir
                 setTimeout(window.print, 200);
             } else {
                 window.print();
             }
         });
 
-        // NOVO: Event listener para o botão de tema
         document.getElementById('theme-toggle-btn').addEventListener('click', () => {
             document.body.classList.toggle('dark-theme');
         });
 
-        // Chama a função para gerar e exibir o Markdown quando a página carrega
         document.addEventListener('DOMContentLoaded', generateAndDisplayMarkdown);
     </script>
 </body>
