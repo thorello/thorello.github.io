@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colar e Renderizar Markdown (Sem Sanitização)</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css">
+
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #212529;
+            --primary-color: #007bff;
+            --primary-text-color: #ffffff;
+            --secondary-bg-color: #f8f9fa;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-theme {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --primary-color: #3f93ff;
+            --secondary-bg-color: #2a2a2a;
+            --border-color: #444444;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        #paste-button {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: var(--primary-text-color);
+            margin-bottom: 1.5rem;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px var(--shadow-color);
+        }
+
+        #paste-button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        #output {
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            background-color: var(--secondary-bg-color);
+            min-height: 200px;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        #output:empty::before {
+            content: "O conteúdo renderizado aparecerá aqui...";
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+
+        .theme-switcher {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            width: 50px;
+            height: 28px;
+        }
+
+        .theme-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            border-radius: 28px;
+            transition: background-color 0.3s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        input:checked+.slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
+
+        .markdown-body {
+            background-color: var(--secondary-bg-color) !important;
+            color: var(--text-color) !important;
+        }
+
+        .markdown-body h1,
+        .markdown-body h2 {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.4em;
+            margin-top: 2rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .markdown-body blockquote {
+            border-left: 5px solid var(--primary-color);
+            padding: 1em 1.5em;
+            margin-left: 0;
+            margin-right: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            opacity: 0.95;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .markdown-body blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        .markdown-body code {
+            background-color: var(--bg-color);
+            padding: 0.2em 0.5em;
+            margin: 0;
+            font-size: 88%;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        .markdown-body pre {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2em;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .markdown-body pre>code {
+            padding: 0;
+            margin: 0;
+            font-size: 100%;
+            border: none;
+            background-color: transparent;
+        }
+
+        .markdown-body a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: text-decoration 0.2s ease-in-out, filter 0.2s ease;
+        }
+
+        .markdown-body a:hover {
+            text-decoration: underline;
+            filter: brightness(1.2);
+        }
+
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            display: table;
+        }
+
+        .markdown-body th,
+        .markdown-body td {
+            border: 1px solid var(--border-color);
+            padding: 0.7em 1em;
+        }
+
+        .markdown-body th {
+            background-color: var(--bg-color);
+            font-weight: 700;
+        }
+
+        .markdown-body tr:nth-of-type(2n) {
+            background-color: var(--bg-color);
+        }
+
+        .markdown-body hr {
+            height: 4px;
+            padding: 0;
+            margin: 2.5rem 0;
+            background-color: var(--border-color);
+            border: 0;
+        }
+    </style>
+</head>
+
+<body class="">
+
+    <header>
+        <h1>Renderizador de Markdown (Sem Sanitização)</h1>
+        <div class="theme-switcher">
+            <span>☀️</span>
+            <label class="theme-toggle">
+                <input type="checkbox" id="theme-toggle-checkbox">
+                <span class="slider"></span>
+            </label>
+            <span>🌙</span>
+        </div>
+    </header>
+
+    <p>Clique no botão para colar o conteúdo Markdown da sua área de transferência. O estilo será adaptado ao tema
+        selecionado.</p>
+
+    <button id="paste-button">Colar Conteúdo Markdown</button>
+
+    <div id="output" class="markdown-body" data-theme="light">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pasteButton = document.getElementById('paste-button');
+            const outputDiv = document.getElementById('output');
+            const themeToggle = document.getElementById('theme-toggle-checkbox');
+
+            marked.setOptions({
+                gfm: true,
+                breaks: true,
+                headerIds: true,
+                mangle: false,
+            });
+
+            const applyTheme = (theme) => {
+                document.body.className = theme;
+                const markdownTheme = (theme === 'dark-theme') ? 'dark' : 'light';
+                outputDiv.setAttribute('data-theme', markdownTheme);
+                localStorage.setItem('theme', theme);
+                themeToggle.checked = (theme === 'dark-theme');
+            };
+
+            themeToggle.addEventListener('change', () => {
+                const newTheme = themeToggle.checked ? 'dark-theme' : '';
+                applyTheme(newTheme);
+            });
+
+            const savedTheme = localStorage.getItem('theme') || '';
+            applyTheme(savedTheme);
+
+            // --- Lógica de Colar e Renderizar (SEM SANITIZAÇÃO) ---
+            pasteButton.addEventListener('click', () => {
+                navigator.clipboard.readText()
+                    .then(text => {
+                        if (text) {
+                            // AVISO: A conversão é feita diretamente sem sanitização.
+                            // Isto é um risco de segurança se o conteúdo não for confiável.
+                            const rawHtml = marked.parse(text);
+                            outputDiv.innerHTML = rawHtml;
+                        } else {
+                            alert('A área de transferência está vazia ou não contém texto.');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Falha ao ler a área de transferência: ', err);
+                        alert('Não foi possível acessar a área de transferência. Verifique as permissões do seu navegador.');
+                    });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
