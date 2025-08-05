@@ -32,11 +32,10 @@ mermaid.initialize({
         edgeLabelBackground: '#ffffff'
     },
 
-    // Adiciona as configurações de fluxograma do HTML original,
-    // garantindo que elas sejam aplicadas.
+    // Adiciona uma configuração específica para fluxogramas para aumentar
+    // o espaço interno (padding) dos nós. Isso serve como uma garantia
+    // extra, complementando a solução de sincronia de fontes.
     flowchart: {
-        useMaxWidth: false,
-        htmlLabels: false,
         padding: 15
     }
 });
