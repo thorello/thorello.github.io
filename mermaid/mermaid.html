@@ -4,213 +4,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagrama Mermaid</title>
+    <title>Editor de Diagrama Mermaid</title>
 
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script src="meu-tema-mermaid.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg2pdf.js@2.2.2/dist/svg2pdf.umd.min.js"></script>
+
+
     <style>
-        html {
+        html,
+        body {
+            margin: 0;
+            padding: 0;
             height: 100vh;
             width: 100vw;
-            display: flex;
-            align-items: stretch;
-            justify-content: stretch;
+            overflow: hidden;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f7f6;
-            color: #333;
             display: flex;
             flex-direction: column;
-            align-items: stretch;
-            width: 100vw;
-            margin: 0px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #005f73;
-            flex-shrink: 0;
+            background-color: #f4f7f6;
+            color: #333;
         }
 
         .container {
             display: flex;
-            flex-grow: 1;
+            flex: 1;
             gap: 20px;
-            align-items: stretch;
-
+            padding: 20px;
+            height: calc(100% - 40px);
         }
 
         .input-area,
         .output-area {
-            display: flex;
-            padding: 20px;
-            background-color: #ffffff;
+            background: white;
             border-radius: 8px;
+            padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
             flex-direction: column;
+            height: 100%;
+            box-sizing: border-box;
         }
 
         .input-area {
+            flex-basis: 30%;
             flex-grow: 1;
+            min-width: 300px;
             transition: all 0.4s ease-in-out;
             overflow: hidden;
         }
 
-        /* Classe que representa o estado colapsado */
         .input-area.collapsed {
+            flex-basis: 0;
             flex-grow: 0;
             width: 0;
-            padding-left: 0;
-            padding-right: 0;
-            border-width: 0;
+            padding: 0 0;
+            margin-right: -20px;
+            /* Compensa o gap */
+            border: none;
             min-width: 0;
-            /* Garante que possa encolher para 0 */
+            opacity: 0;
         }
 
         .output-area {
-            flex-grow: 6;
+            flex-basis: 70%;
+            flex-grow: 1;
             position: relative;
-            /* Essencial para posicionar o botão filho */
         }
 
-        /* Estilo para o botão de colapso */
-        #toggleInputBtn {
-            position: absolute;
-            left: -20px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            border-radius: 50%;
-            font-size: 20px;
-            line-height: 40px;
-            text-align: center;
-        }
-
-        label {
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #005f73;
-        }
-
-        select,
-        button {
-            padding: 10px 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        button,
+        select {
             font-size: 16px;
-            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         button {
             background-color: #0a9396;
             color: white;
-            font-weight: bold;
             border: none;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
         }
 
         button:hover {
             background-color: #005f73;
         }
 
-        .mermaid {
-            height: 100%;
-            width: 100%;
-        }
-
-        #outputContainer svg {
-            height: 100% !important;
-            width: 100% !important;
-            max-width: none !important;
-        }
-
-        #mermaid-graph {
-            height: 100%;
-            width: 100%;
-        }
-
         textarea {
             flex: 1;
-            width: 100%;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 14px;
             resize: none;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
         }
 
-        .output-area h2 {
-            margin-top: 0;
+        h2 {
             color: #005f73;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        #toggleInputBtn {
+            position: absolute;
+            left: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            line-height: 36px;
+            text-align: center;
+            z-index: 10;
+            padding: 0;
         }
 
         #outputContainer {
             flex: 1;
-            background-color: #ffffff;
+            background-color: white;
+            border: 1px solid #eee;
             border-radius: 5px;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         #outputContainer svg {
-            width: 100%;
-            height: auto;
-        }
-
-        .svg-pan-zoom-control-background {
-            fill: rgba(0, 95, 115, 0.7);
-        }
-
-        .svg-pan-zoom-control-element {
-            fill: white;
-        }
-
-        .svg-pan-zoom-control-element:hover {
-            fill: #9eeaf9;
-        }
-
-        .mermaid .node rect,
-        .mermaid .node polygon {
-            rx: 8px;
-            ry: 8px;
-        }
-
-        .mermaid .node>* {
-            filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.1));
-        }
-
-        .mermaid .node .label {
-            font-weight: 400;
-        }
-
-        .mermaid .arrowheadPath {
-            fill: #495057;
-        }
-
-        .mermaid .highlight-node>rect {
-            fill: #0a9396 !important;
-            stroke: #005f73 !important;
-            stroke-width: 2px !important;
-        }
-
-        .mermaid .highlight-node .label {
-            color: #ffffff !important;
-            font-weight: 700 !important;
+            max-width: 100%;
+            max-height: 100%;
         }
     </style>
 </head>
@@ -218,21 +154,25 @@
 <body>
     <div class="container">
         <div class="input-area">
-            <label for="diagramType">1. Escolha um tipo de diagrama para começar:</label>
+            <label for="diagramType">1. Escolha o tipo de diagrama:</label>
             <select id="diagramType">
-                <option value="flowchart">Fluxograma (Flowchart)</option>
-                <option value="sequence">Diagrama de Sequência</option>
-                <option value="gantt">Diagrama de Gantt</option>
-                <option value="class">Diagrama de Classes</option>
-                <option value="state">Diagrama de Estado</option>
-                <option value="pie">Gráfico de Pizza (Pie Chart)</option>
-                <option value="mindmap">Mapa Mental (Mindmap)</option>
+                <option value="flowchart">Fluxograma</option>
+                <option value="sequence">Sequência</option>
+                <option value="gantt">Gantt</option>
+                <option value="class">Classes</option>
+                <option value="state">Estado</option>
+                <option value="pie">Pizza</option>
+                <option value="mindmap">Mapa Mental</option>
             </select>
-            <label for="mermaidInput">2. Edite o código Mermaid abaixo:</label>
+
+            <label for="mermaidInput">2. Edite o código:</label>
             <textarea id="mermaidInput" spellcheck="false"></textarea>
-            <label for="generateBtn" style="margin-top: 15px;">3. Gere o diagrama:</label>
+
+            <label>3. Ações:</label>
             <button id="generateBtn">Gerar Diagrama</button>
+            <button id="exportPdfBtn">Exportar para PDF</button>
         </div>
+
         <div class="output-area">
             <button id="toggleInputBtn" title="Ocultar Painel de Entrada">&lt;</button>
             <h2>Diagrama Gerado</h2>
@@ -242,55 +182,50 @@
         </div>
     </div>
 
+
+
+
     <script>
-        const diagramTypeSelect = document.getElementById('diagramType');
-        const mermaidInput = document.getElementById('mermaidInput');
-        const generateBtn = document.getElementById('generateBtn');
-        const outputContainer = document.getElementById('outputContainer');
-        let panZoomInstance = null;
+        document.addEventListener('DOMContentLoaded', function () {
 
-        // ---- LÓGICA DO BOTÃO DE COLAPSO ----
-        const toggleInputBtn = document.getElementById('toggleInputBtn');
-        const inputArea = document.querySelector('.input-area');
+            // --- Seletores de Elementos ---
+            const diagramTypeSelect = document.getElementById('diagramType');
+            const mermaidInput = document.getElementById('mermaidInput');
+            const generateBtn = document.getElementById('generateBtn');
+            const exportPdfBtn = document.getElementById('exportPdfBtn');
+            const outputContainer = document.getElementById('outputContainer');
+            const toggleInputBtn = document.getElementById('toggleInputBtn');
+            const inputArea = document.querySelector('.input-area');
 
-        toggleInputBtn.addEventListener('click', () => {
-            inputArea.classList.toggle('collapsed');
+            // Referência às bibliotecas globais para clareza
+            const { jsPDF } = window.jspdf;
+            const SvgPanZoom = window.svgPanZoom;
 
-            const isCollapsed = inputArea.classList.contains('collapsed');
-            toggleInputBtn.innerHTML = isCollapsed ? '>' : '<';
-            toggleInputBtn.title = isCollapsed ? 'Mostrar Painel de Entrada' : 'Ocultar Painel de Entrada';
+            let panZoomInstance = null;
 
-            if (panZoomInstance) {
-                setTimeout(() => {
-                    panZoomInstance.resize();
-                    panZoomInstance.center();
-                }, 400); // Deve corresponder à duração da transição CSS
-            }
-        });
-        // ---- FIM DA LÓGICA DO BOTÃO ----
-
-        const exampleDiagrams = {
-            flowchart: `graph TD
+            // --- Dados e Configurações ---
+            const exampleDiagrams = {
+                flowchart: `graph TD
     A[Natal] -->|Um passo| B(Ano Novo)
     B --> C{É feriado?}
     C -->|Sim| D[Descansar]
     C -->|Não| E(Trabalhar)
     D --> F((Fim))
     E --> F`,
-            sequence: `sequenceDiagram
+                sequence: `sequenceDiagram
     participant Alice
     participant Bob
     Alice->>Bob: Olá Bob, como vai?
     Bob-->>Alice: Bem, obrigado! E você?
     Alice-xBob: Estou ótima!`,
-            gantt: `gantt
+                gantt: `gantt
     title Exemplo de Cronograma
     dateFormat  YYYY-MM-DD
     section Projeto Alfa
     Planejamento      :done,    des1, 2025-08-01, 7d
     Desenvolvimento   :active,  des2, after des1, 20d
     Testes            :         des3, after des2, 10d`,
-            class: `classDiagram
+                class: `classDiagram
     class Animal {
       +int idade
       +float peso
@@ -301,91 +236,143 @@
       +latir()
     }
     Animal <|-- Cachorro`,
-            state: `stateDiagram-v2
+                state: `stateDiagram-v2
     [*] --> Quieto
     Quieto --> [*]
     Quieto --> Andando : Usuário anda
     Andando --> Quieto : Usuário para
     Andando --> Correndo : Usuário corre
     Correndo --> Andando : Usuário desacelera`,
-            pie: `pie title Pets
+                pie: `pie title Pets
     "Cachorros" : 386
     "Gatos" : 85
     "Pássaros" : 15`,
-            mindmap: `mindmap
+                mindmap: `mindmap
   root((Tópico Central))
     Assunto 1
       Sub-assunto 1.1
       Sub-assunto 1.2
     Assunto 2
       Sub-assunto 2.1`
-        };
+            };
 
-        const renderDiagram = async () => {
-            if (panZoomInstance) {
-                panZoomInstance.destroy();
-                panZoomInstance = null;
-            }
-            outputContainer.innerHTML = '';
-            const mermaidCode = mermaidInput.value;
-            if (!mermaidCode.trim()) {
-                outputContainer.innerHTML = '<p>Digite um código Mermaid para gerar um diagrama.</p>';
-                return;
-            }
-            try {
-                const {
-                    svg
-                } = await mermaid.render('mermaid-graph', mermaidCode);
-                outputContainer.innerHTML = svg;
-                const svgElement = outputContainer.querySelector('svg');
-                if (svgElement) {
-                    panZoomInstance = svgPanZoom(svgElement, {
-                        zoomEnabled: true,
-                        controlIconsEnabled: true,
-                        fit: true,
-                        center: true,
-                        minZoom: 0.2,
-                        maxZoom: 100,
-                        zoomScaleSensitivity: 0.8
-                    });
+
+            function updateTextareaWithExample() {
+                const tipo = diagramTypeSelect.value;
+                if (exampleDiagrams[tipo]) {
+                    mermaidInput.value = exampleDiagrams[tipo];
                 }
-            } catch (e) {
-                const errorMessage = e.message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                outputContainer.innerHTML = `<p style="color: red; font-weight: bold;">Erro na sintaxe do Mermaid:</p><pre>${errorMessage}</pre>`;
             }
-        };
 
-        const updateTextareaWithExample = () => {
-            const selectedType = diagramTypeSelect.value;
-            if (exampleDiagrams[selectedType]) {
-                mermaidInput.value = exampleDiagrams[selectedType];
+            async function renderDiagram() {
+                if (panZoomInstance) {
+                    panZoomInstance.destroy();
+                    panZoomInstance = null;
+                }
+
+                const code = mermaidInput.value.trim();
+                if (!code) {
+                    outputContainer.innerHTML = '<p>Digite um código Mermaid para gerar o diagrama.</p>';
+                    return;
+                }
+
+                try {
+                    const { svg } = await mermaid.render('mermaid-graph-' + Date.now(), code);
+                    outputContainer.innerHTML = svg;
+                    const svgElement = outputContainer.querySelector('svg');
+
+                    if (svgElement) {
+                        svgElement.style.width = '100%';
+                        svgElement.style.height = '100%';
+
+                        panZoomInstance = SvgPanZoom(svgElement, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: true,
+                            center: true,
+                            minZoom: 0.2,
+                            maxZoom: 100,
+                            zoomScaleSensitivity: 0.5
+                        });
+                    }
+                } catch (e) {
+                    outputContainer.innerHTML = `<p style="color: red; font-family: monospace; white-space: pre-wrap;"><b>Erro ao renderizar o diagrama:</b>\n\n${e.message}</p>`;
+                }
             }
-        };
 
-        generateBtn.addEventListener('click', renderDiagram);
-        diagramTypeSelect.addEventListener('change', () => {
+            async function exportToPdf() {
+                const svgElement = outputContainer.querySelector('svg');
+                if (!svgElement) {
+                    alert('Nenhum diagrama para exportar foi encontrado.');
+                    return;
+                }
+
+                try {
+                    const viewBox = svgElement.getAttribute('viewBox');
+                    let width, height;
+                    if (viewBox) {
+                        const parts = viewBox.split(' ');
+                        width = parseFloat(parts[2]);
+                        height = parseFloat(parts[3]);
+                    } else {
+                        const bounds = svgElement.getBoundingClientRect();
+                        width = bounds.width;
+                        height = bounds.height;
+                    }
+
+                    const pdf = new jsPDF({
+                        orientation: width > height ? 'landscape' : 'portrait',
+                        unit: 'pt',
+                        format: [width, height]
+                    });
+
+                    await pdf.svg(svgElement, {
+                        x: 0,
+                        y: 0,
+                        width: width,
+                        height: height
+                    });
+
+                    pdf.save('diagrama-mermaid-vetorial.pdf');
+
+                } catch (err) {
+                    console.error("Erro ao gerar PDF vetorial:", err);
+                    alert(`Ocorreu um erro ao tentar gerar o PDF:\n${err.message}`);
+                }
+            }
+
+            // --- Event Listeners ---
+            generateBtn.addEventListener('click', renderDiagram);
+            exportPdfBtn.addEventListener('click', exportToPdf);
+
+            diagramTypeSelect.addEventListener('change', () => {
+                updateTextareaWithExample();
+                renderDiagram();
+            });
+
+            toggleInputBtn.addEventListener('click', () => {
+                inputArea.classList.toggle('collapsed');
+                const colapsado = inputArea.classList.contains('collapsed');
+                toggleInputBtn.innerHTML = colapsado ? '>' : '<';
+                toggleInputBtn.title = colapsado ? 'Mostrar Painel' : 'Ocultar Painel';
+
+                if (panZoomInstance) {
+                    setTimeout(() => {
+                        panZoomInstance.resize();
+                        panZoomInstance.center();
+                    }, 400);
+                }
+            });
+
+            // --- Inicialização ---
             updateTextareaWithExample();
             renderDiagram();
+
         });
-
-        // ====================================================================
-        // CÓDIGO CORRIGIDO
-        // Este bloco garante que a renderização inicial só aconteça DEPOIS
-        // que a fonte 'Inter' do Google Fonts for totalmente carregada.
-        // ====================================================================
-
-        // Primeiro, preenche o textarea com o código do diagrama inicial.
-        updateTextareaWithExample();
-
-        // Agora, aguarda todas as fontes da página estarem prontas.
-        document.fonts.ready.then(() => {
-            // Apenas quando as fontes estiverem prontas, mandamos o Mermaid
-            // renderizar o diagrama pela primeira vez.
-            console.log('Fontes carregadas, renderizando o diagrama inicial.');
-            renderDiagram();
-        });
-
     </script>
+
+
+
 </body>
 
 </html>
