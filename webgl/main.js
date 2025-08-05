@@ -1310,22 +1310,38 @@ class MindMapViewer {
         }
 
         const selectedD3NodeToProcess = this.currentSelectedD3Node;
-        const nodeContent = {
-            name: selectedD3NodeToProcess.data.name,
-            definition: selectedD3NodeToProcess.data.definition || '',
-        };
 
-        const geminiPrompt = `Dada a seguinte informação de um nó de mapa mental:
-Nome: "${nodeContent.name}"
-Definição: "${nodeContent.definition}"
+        // Obter ancestrais para criar o contexto de hierarquia
+        const ancestors = selectedD3NodeToProcess.ancestors().reverse();
+        const contextPath = ancestors.map(d => d.data.name).join(' -> ');
+        const parentNodeForNewChildren = ancestors[ancestors.length - 1];
 
-Por favor, gere um array JSON de até 5 nós filhos relacionados a este conteúdo. Cada nó filho deve ter um "name" (título curto) e uma "definition" (breve explicação). O idioma deve ser português.
-A estrutura deve ser estritamente:
+        const geminiPrompt = `Você é um assistente especialista em criar mapas mentais.
+Sua tarefa é expandir um tópico específico dentro de um mapa mental já existente.
+
+**Contexto da Hierarquia (caminho do nó raiz até o tópico atual):**
+\`\`\`
+${contextPath}
+\`\`\`
+
+**Tópico a ser Detalhado (o último item da hierarquia acima):**
+- Nome: "${parentNodeForNewChildren.data.name}"
+- Definição: "${parentNodeForNewChildren.data.definition || 'Nenhuma.'}"
+
+Por favor, gere um array JSON de até 5 nós filhos para o tópico "${parentNodeForNewChildren.data.name}".
+Estes nós filhos devem ser sub-tópicos que detalham o tópico pai, introduzindo conceitos novos e específicos.
+**IMPORTANTE:** Evite criar filhos com os mesmos nomes de tópicos que já aparecem na **Contexto da Hierarquia** para não haver redundância.
+
+**REGRAS DE SAÍDA:**
+1. O idioma deve ser português.
+2. A resposta deve ser **APENAS** o array JSON, sem nenhum texto introdutório, explicação ou formatação de markdown (como \`\`\`json).
+3. A estrutura de cada objeto no array deve ser estritamente: \`{ "name": "...", "definition": "..." }\`
+
+**Exemplo de Saída Válida:**
 [
-    { "name": "Nome do Nó Filho 1", "definition": "Breve explicação do nó filho 1." },
-    { "name": "Nome do Nó Filho 2", "definition": "Breve explicação do nó filho 2." }
-]
-Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou formatação de markdown (como \`\`\`json).`;
+    { "name": "Nome do Novo Sub-tópico 1", "definition": "Breve explicação do novo sub-tópico 1." },
+    { "name": "Nome do Novo Sub-tópico 2", "definition": "Breve explicação do novo sub-tópico 2." }
+]`;
 
         try {
             await navigator.clipboard.writeText(geminiPrompt);
@@ -1525,10 +1541,6 @@ Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou forma
         }
 
         const selectedD3NodeToProcess = this.currentSelectedD3Node;
-        const nodeContent = {
-            name: selectedD3NodeToProcess.data.name,
-            definition: selectedD3NodeToProcess.data.definition || '',
-        };
 
         this.closePopUp();
         this.showLoadingOverlay(true);
@@ -1540,17 +1552,37 @@ Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou forma
             return;
         }
 
-        const geminiPrompt = `Dada a seguinte informação de um nó de mapa mental:
-        Nome: "${nodeContent.name}"
-        Definição: "${nodeContent.definition}"
+        // Obter ancestrais para criar o contexto de hierarquia
+        const ancestors = selectedD3NodeToProcess.ancestors().reverse();
+        const contextPath = ancestors.map(d => d.data.name).join(' -> ');
+        const parentNodeForNewChildren = ancestors[ancestors.length - 1];
 
-        Por favor, gere um array JSON de até 5 nós filhos relacionados a este conteúdo. Cada nó filho deve ter um "name" (título curto) e uma "definition" (breve explicação). O idioma deve ser português.
-        A estrutura deve ser estritamente:
-        [
-            { "name": "Nome do Nó Filho 1", "definition": "Breve explicação do nó filho 1." },
-            { "name": "Nome do Nó Filho 2", "definition": "Breve explicação do nó filho 2." }
-        ]
-        Garanta que a resposta seja APENAS o array JSON, sem nenhum texto extra ou formatação de markdown (como \`\`\`json).`;
+        const geminiPrompt = `Você é um assistente especialista em criar mapas mentais.
+Sua tarefa é expandir um tópico específico dentro de um mapa mental já existente.
+
+**Contexto da Hierarquia (caminho do nó raiz até o tópico atual):**
+\`\`\`
+${contextPath}
+\`\`\`
+
+**Tópico a ser Detalhado (o último item da hierarquia acima):**
+- Nome: "${parentNodeForNewChildren.data.name}"
+- Definição: "${parentNodeForNewChildren.data.definition || 'Nenhuma.'}"
+
+Por favor, gere um array JSON de até 5 nós filhos para o tópico "${parentNodeForNewChildren.data.name}".
+Estes nós filhos devem ser sub-tópicos que detalham o tópico pai, introduzindo conceitos novos e específicos.
+**IMPORTANTE:** Evite criar filhos com os mesmos nomes de tópicos que já aparecem na **Contexto da Hierarquia** para não haver redundância.
+
+**REGRAS DE SAÍDA:**
+1. O idioma deve ser português.
+2. A resposta deve ser **APENAS** o array JSON, sem nenhum texto introdutório, explicação ou formatação de markdown (como \`\`\`json).
+3. A estrutura de cada objeto no array deve ser estritamente: \`{ "name": "...", "definition": "..." }\`
+
+**Exemplo de Saída Válida:**
+[
+    { "name": "Nome do Novo Sub-tópico 1", "definition": "Breve explicação do novo sub-tópico 1." },
+    { "name": "Nome do Novo Sub-tópico 2", "definition": "Breve explicação do novo sub-tópico 2." }
+]`;
 
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
 
