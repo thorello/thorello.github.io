@@ -14,7 +14,6 @@
 <body>
     <div id="popUp">
         <button id="popUp-close">&times;</button>
-
         <div class="title-content-container">
             <div id="title-section">
                 <div class="display-view">
@@ -31,7 +30,6 @@
                     </div>
                 </div>
             </div>
-
             <div id="content-section">
                 <div class="display-view">
                     <button id="edit-content-btn" class="edit-btn" title="Editar Explicação">
@@ -48,7 +46,6 @@
                 </div>
             </div>
         </div>
-
         <div id="popUp-help-text-container" class="help-text-container">
             <h3>Ajuda</h3>
             <p><strong>Criar Nó (<i class="fas fa-plus"></i>):</strong> Adiciona um novo nó filho vazio ao nó
@@ -64,7 +61,6 @@
             <p><strong>Criar Nós com IA (<i class="fas fa-magic"></i>):</strong> Gera nós filhos usando IA com base no
                 conteúdo do nó selecionado.</p>
         </div>
-
         <div id="popUp-buttons-container" class="button-row">
             <button id="popUp-help-button" class="hidden-button" title="Ajuda"><i
                     class="fas fa-circle-question"></i></button>
@@ -102,7 +98,6 @@
         </div>
     </div>
 
-
     <div id="loading-overlay">
         <div id="loading-spinner"></div>
     </div>
@@ -119,9 +114,13 @@
             <button id="export-pdf-button">Exportar PDF</button>
             <button id="create-markdown-button">Criar Relatório</button>
             <button id="recalculate-map-button">Recalcular Mapa</button>
+            <!-- MODIFICAÇÃO: Botão movido para dentro do menu de ações -->
+            <button id="toggle-view-button" title="Mudar para visualização simples">Visão Simples</button>
             <button id="load-manual-map-button">Manual</button>
         </div>
     </div>
+
+    <!-- O div 'view-controls' foi removido daqui -->
 
     <button id="focus-previous-node-button" class="focus-button">
         <i class="fas fa-arrow-left"></i>
@@ -133,18 +132,18 @@
     <div id="mindmap-container"></div>
 
     <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-                "three/addons": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
-                "d3-hierarchy": "https://cdn.skypack.dev/d3-hierarchy",
-                "troika-three-text": "https://unpkg.com/troika-three-text@latest/dist/troika-three-text.esm.js",
-                "troika-three-utils": "https://unpkg.com/troika-three-utils@latest/dist/troika-three-utils.esm.js",
-                "troika-worker-utils": "https://unpkg.com/troika-worker-utils@latest/dist/troika-worker-utils.esm.js",
-                "webgl-sdf-generator": "https://unpkg.com/webgl-sdf-generator@latest/dist/webgl-sdf-generator.mjs",
-                "bidi-js": "https://unpkg.com/bidi-js@latest/dist/bidi.mjs"
-            }
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+            "d3-hierarchy": "https://cdn.skypack.dev/d3-hierarchy",
+            "troika-three-text": "https://unpkg.com/troika-three-text@latest/dist/troika-three-text.esm.js",
+            "troika-three-utils": "https://unpkg.com/troika-three-utils@latest/dist/troika-three-utils.esm.js",
+            "troika-worker-utils": "https://unpkg.com/troika-worker-utils@latest/dist/troika-worker-utils.esm.js",
+            "webgl-sdf-generator": "https://unpkg.com/webgl-sdf-generator@latest/dist/webgl-sdf-generator.mjs",
+            "bidi-js": "https://unpkg.com/bidi-js@latest/dist/bidi.mjs"
         }
+    }
     </script>
     <script type="module" src="main.js"></script>
 </body>

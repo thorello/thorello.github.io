@@ -48,6 +48,7 @@ class MindMapViewer {
     constructor(container, data) {
         this.container = container;
         this.data = data;
+        this.toggleViewButton = document.getElementById('toggle-view-button');
         this.addNodeButton = document.getElementById('add-node-button');
         this.aiNewMapButton = document.getElementById('ai-new-map-button-popUp');
         this.addChildrenWithAIButton = document.getElementById('add-children-with-ai-button');
@@ -70,7 +71,7 @@ class MindMapViewer {
         this.promptGeneratorHelpButton = document.getElementById('prompt-generator-help-button');
         // Novo contêiner de texto de ajuda da pop-up de Gerador de Prompt
         this.promptGeneratorHelpTextContainer = document.getElementById('prompt-generator-help-text-container');
-
+        this.viewMode = 'detailed';
         // --- State Variables ---
         this.nodeMap = new Map();
         this.linkObjects = [];
@@ -162,6 +163,11 @@ class MindMapViewer {
     }
 
     _initEventListeners() {
+
+        if (this.toggleViewButton) {
+            this.toggleViewButton.addEventListener('click', this._toggleViewMode.bind(this));
+        }
+
         window.addEventListener('resize', this._onWindowResize.bind(this));
 
         // Detecta se é um dispositivo móvel usando a user agent string
@@ -333,6 +339,20 @@ class MindMapViewer {
         }
     }
 
+    _toggleViewMode() {
+        // Alterna o modo de visualização
+        this.viewMode = (this.viewMode === 'detailed') ? 'simple' : 'detailed';
+
+        // Atualiza o texto do botão para refletir o estado atual (opcional, mas bom para UX)
+        if (this.toggleViewButton) {
+            this.toggleViewButton.textContent = this.viewMode === 'detailed' ? 'Visão Simples' : 'Visão Detalhada';
+            this.toggleViewButton.title = this.viewMode === 'detailed' ? 'Mudar para visualização simples' : 'Mudar para visualização detalhada';
+        }
+
+        // Força o mapa a ser recalculado e redesenhado com a nova configuração
+        this.recalculateMap();
+    }
+
     // Função para mostrar/ocultar o texto de ajuda
     toggleHelpText(container) {
         container.classList.toggle('show');
@@ -390,114 +410,142 @@ class MindMapViewer {
             const nodeGroup = new THREE.Group();
             nodeGroup.userData = { d3Node: d3Node, isNode: true, direction: direction };
 
-            const isRootNode = d3Node.depth === 0;
+            // --- Lógica de Configuração Dinâmica ---
+            const rectWidth = CONFIG.FIXED_NODE_WIDTH;
 
-            const nodeColor = CONFIG.nodeBackgroundColor;
-            const textColor = CONFIG.textColor;
-            const idColor = 0x888888;
+            // A altura agora depende do modo de visualização
+            let nodeHeightMultiplier = (this.viewMode === 'detailed') ? 9 : 3.5;
+            const rectHeight = (CONFIG.font.size * nodeHeightMultiplier) + (CONFIG.padding.y * 2);
 
-            // 1. Cria a malha de texto para o NOME do nó
+            // --- Criação do Texto do Nome (comum a ambos os modos) ---
             const textMesh = new Text();
             textMesh.text = d3Node.data.name;
             textMesh.fontSize = CONFIG.font.size;
-            // Fonte mais forte para o título
-            textMesh.color = textColor;
+            textMesh.color = CONFIG.textColor;
             textMesh.position.z = 0.1;
             textMesh.anchorX = 'center';
-            textMesh.anchorY = 'top'; // Ancorado no topo para posicionar melhor
-            textMesh.maxWidth = CONFIG.FIXED_NODE_WIDTH - (CONFIG.padding.x * 2);
+            textMesh.maxWidth = rectWidth - (CONFIG.padding.x * 2);
             textMesh.name = 'nodeTextMesh';
-            // Posição Y ajustada para o nome ficar na parte superior do nó
-            textMesh.position.y = (CONFIG.FIXED_NODE_HEIGHT / 2) - (CONFIG.padding.y * 2);
 
-            // 2. Cria a malha de texto para a DEFINIÇÃO do nó
-            const definitionTextMesh = new Text();
-            definitionTextMesh.text = d3Node.data.definition || '';
-            definitionTextMesh.fontSize = CONFIG.font.size * 0.8; // Fonte um pouco menor
-            definitionTextMesh.fontStyle = 'italic'; // Estilo para diferenciar
-            definitionTextMesh.color = textColor;
-            definitionTextMesh.position.z = 0.1;
-            definitionTextMesh.anchorX = 'center';
-            definitionTextMesh.anchorY = 'top'; // Alinha pelo topo para o texto fluir para baixo
-            definitionTextMesh.maxWidth = CONFIG.FIXED_NODE_WIDTH - (CONFIG.padding.x * 2);
-            definitionTextMesh.lineHeight = 1.2; // Espaçamento entre linhas para melhor legibilidade
-            definitionTextMesh.name = 'nodeDefinitionMesh';
-            // Posição Y ajustada para a definição ficar abaixo do nome
-            definitionTextMesh.position.y = textMesh.position.y - (CONFIG.font.size * 1.5);
+            // Posição do nome também depende do modo
+            if (this.viewMode === 'detailed') {
+                textMesh.anchorY = 'top';
+                textMesh.position.y = (rectHeight / 2) - (CONFIG.padding.y * 1.5);
+            } else {
+                textMesh.anchorY = 'middle';
+                textMesh.position.y = 0; // Centralizado no modo simples
+            }
 
-            // Sincroniza o NOME primeiro
-            textMesh.sync(() => {
-                // Em seguida, sincroniza a DEFINIÇÃO
-                definitionTextMesh.sync(() => {
-                    // Por último, sincroniza o ID
+            // --- Lógica Condicional para Modo Detalhado vs. Simples ---
+            if (this.viewMode === 'detailed') {
+                // MODO DETALHADO: Cria texto para nome, definição e ID
+                const definitionTextMesh = new Text();
+                definitionTextMesh.text = d3Node.data.definition || '';
+                definitionTextMesh.fontSize = CONFIG.font.size * 0.8;
+                definitionTextMesh.fontStyle = 'italic';
+                definitionTextMesh.color = CONFIG.textColor;
+                definitionTextMesh.position.z = 0.1;
+                definitionTextMesh.anchorX = 'center';
+                definitionTextMesh.anchorY = 'top';
+                definitionTextMesh.maxWidth = rectWidth - (CONFIG.padding.x * 2);
+                definitionTextMesh.lineHeight = 1.2;
+                definitionTextMesh.name = 'nodeDefinitionMesh';
+                definitionTextMesh.position.y = textMesh.position.y - (CONFIG.font.size * 1.5);
+
+                textMesh.sync(() => {
+                    definitionTextMesh.sync(() => {
+                        const idTextMesh = new Text();
+                        idTextMesh.text = d3Node.data.id !== undefined ? d3Node.data.id : '';
+                        idTextMesh.fontSize = CONFIG.font.size * 0.7;
+                        idTextMesh.color = 0x888888;
+                        idTextMesh.position.z = 0.1;
+                        idTextMesh.anchorX = 'left';
+                        idTextMesh.anchorY = 'top';
+                        idTextMesh.name = 'nodeIdMesh';
+
+                        idTextMesh.sync(() => {
+                            // Adiciona todos os elementos ao grupo
+                            this._finalizeNodeMesh(nodeGroup, d3Node, direction, rectWidth, rectHeight, [textMesh, definitionTextMesh, idTextMesh]);
+                            resolve(nodeGroup);
+                        });
+                    });
+                });
+
+            } else {
+                // MODO SIMPLES: Cria texto apenas para nome e ID
+                textMesh.sync(() => {
                     const idTextMesh = new Text();
                     idTextMesh.text = d3Node.data.id !== undefined ? d3Node.data.id : '';
                     idTextMesh.fontSize = CONFIG.font.size * 0.7;
-                    idTextMesh.color = idColor;
+                    idTextMesh.color = 0x888888;
                     idTextMesh.position.z = 0.1;
                     idTextMesh.anchorX = 'left';
                     idTextMesh.anchorY = 'top';
                     idTextMesh.name = 'nodeIdMesh';
 
                     idTextMesh.sync(() => {
-                        const rectWidth = CONFIG.FIXED_NODE_WIDTH;
-                        // A altura do nó agora é maior, conforme calculado no início do script
-                        const rectHeight = CONFIG.FIXED_NODE_HEIGHT;
-
-                        const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
-                        const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
-                        const rectMesh = new THREE.Mesh(rectGeo, rectMat);
-                        rectMesh.name = 'nodeRectMesh';
-                        nodeGroup.add(rectMesh);
-
-                        // Lógica da borda (permanece a mesma)
-                        let borderColor;
-                        if (isRootNode) {
-                            borderColor = CONFIG.rootNodeBorderColor;
-                        } else {
-                            borderColor = 0xCCCCCC;
-                            const topLevelParent = d3Node.ancestors().find(d => d.depth === 1);
-                            if (topLevelParent) {
-                                const parentIndex = this.d3RootNode.children.indexOf(topLevelParent);
-                                borderColor = CONFIG.branchBorderColors[parentIndex % CONFIG.branchBorderColors.length];
-                            }
-                        }
-
-                        const edges = new THREE.EdgesGeometry(rectGeo);
-                        const lineMat = new THREE.LineBasicMaterial({ color: borderColor, linewidth: 0.1, transparent: true, opacity: 0.4 });
-                        const wireframe = new THREE.LineSegments(edges, lineMat);
-                        wireframe.name = 'nodeWireframe';
-                        wireframe.userData.originalColor = borderColor;
-                        nodeGroup.add(wireframe);
-
-                        // Posiciona o texto do ID no canto superior esquerdo
-                        idTextMesh.position.x = -rectWidth / 2 + CONFIG.padding.x / 2;
-                        idTextMesh.position.y = rectHeight / 2 - CONFIG.padding.y / 2;
-
-                        // Adiciona todos os textos ao grupo do nó
-                        nodeGroup.add(textMesh);
-                        nodeGroup.add(definitionTextMesh); // Adiciona a definição ao grupo
-                        nodeGroup.add(idTextMesh);
-                        nodeGroup.userData.nodeWidth = rectWidth;
-                        nodeGroup.userData.nodeHeight = rectHeight;
-
-                        // Lógica do manipulador de arrastar (permanece a mesma)
-                        if (direction !== 0) {
-                            const handleGeo = new THREE.CircleGeometry(CONFIG.dragHandleRadius, 32);
-                            const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.6 });
-                            const handleMesh = new THREE.Mesh(handleGeo, handleMat);
-                            handleMesh.position.set((rectWidth / 2) * direction, 0, 0.2);
-                            handleMesh.userData = { isDragHandle: true, nodeGroup };
-                            this.dragHandles.push(handleMesh);
-                            nodeGroup.add(handleMesh);
-                        }
-
-                        this.nodeMap.set(d3Node, nodeGroup);
+                        // Adiciona apenas os elementos do modo simples
+                        this._finalizeNodeMesh(nodeGroup, d3Node, direction, rectWidth, rectHeight, [textMesh, idTextMesh]);
                         resolve(nodeGroup);
                     });
                 });
-            });
+            }
         });
+    }
+
+    _finalizeNodeMesh(nodeGroup, d3Node, direction, rectWidth, rectHeight, textMeshes) {
+        // Cria retângulo de fundo
+        const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
+        const rectMat = new THREE.MeshBasicMaterial({ color: CONFIG.nodeBackgroundColor });
+        const rectMesh = new THREE.Mesh(rectGeo, rectMat);
+        rectMesh.name = 'nodeRectMesh';
+        nodeGroup.add(rectMesh);
+
+        // Cria borda
+        const isRootNode = d3Node.depth === 0;
+        let borderColor;
+        if (isRootNode) {
+            borderColor = CONFIG.rootNodeBorderColor;
+        } else {
+            borderColor = 0xCCCCCC;
+            const topLevelParent = d3Node.ancestors().find(d => d.depth === 1);
+            if (topLevelParent) {
+                const parentIndex = this.d3RootNode.children.indexOf(topLevelParent);
+                borderColor = CONFIG.branchBorderColors[parentIndex % CONFIG.branchBorderColors.length];
+            }
+        }
+        const edges = new THREE.EdgesGeometry(rectGeo);
+        const lineMat = new THREE.LineBasicMaterial({ color: borderColor, linewidth: 0.1, transparent: true, opacity: 0.4 });
+        const wireframe = new THREE.LineSegments(edges, lineMat);
+        wireframe.name = 'nodeWireframe';
+        wireframe.userData.originalColor = borderColor;
+        nodeGroup.add(wireframe);
+
+        // Adiciona os textos passados como argumento
+        textMeshes.forEach(text => {
+            // Posiciona o ID de forma especial no canto superior esquerdo
+            if (text.name === 'nodeIdMesh') {
+                text.position.x = -rectWidth / 2 + CONFIG.padding.x / 2;
+                text.position.y = rectHeight / 2 - CONFIG.padding.y / 2;
+            }
+            nodeGroup.add(text);
+        });
+
+        nodeGroup.userData.nodeWidth = rectWidth;
+        nodeGroup.userData.nodeHeight = rectHeight;
+
+        // Adiciona o manipulador de arrastar
+        if (direction !== 0) {
+            const handleGeo = new THREE.CircleGeometry(CONFIG.dragHandleRadius, 32);
+            const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.6 });
+            const handleMesh = new THREE.Mesh(handleGeo, handleMat);
+            handleMesh.position.set((rectWidth / 2) * direction, 0, 0.2);
+            handleMesh.userData = { isDragHandle: true, nodeGroup };
+            this.dragHandles.push(handleMesh);
+            nodeGroup.add(handleMesh);
+        }
+
+        this.nodeMap.set(d3Node, nodeGroup);
     }
 
     _createLinkMesh(linkData) {
@@ -609,6 +657,7 @@ class MindMapViewer {
     }
 
     // --- Main Logic ---
+    // --- Main Logic ---
     async drawMindMap() {
         while (this.mainGroup.children.length > 0) {
             const object = this.mainGroup.children[0];
@@ -646,20 +695,24 @@ class MindMapViewer {
         const d3Links = this.d3RootNode.links();
         const d3Nodes = this.d3RootNode.descendants();
 
+        // --- MODIFICAÇÃO: Lógica para escolher o espaçamento vertical ---
+        // Escolhe o valor do espaçamento com base no modo de visualização atual.
+        const currentVerticalSpacing = (this.viewMode === 'detailed')
+            ? CONFIG.verticalNodeSpacingDetailed
+            : CONFIG.verticalNodeSpacingSimple;
+
         const originalChildren = this.d3RootNode.children || [];
         if (originalChildren.length > 0) {
             const leftCount = Math.ceil(originalChildren.length / 2);
 
-            //const leftChildren = [];
-            //const rightChildren = originalChildren;
-
-            const leftChildren = originalChildren.slice(0, leftCount);
-            const rightChildren = originalChildren.slice(leftCount);
+            const leftChildren = []; // Deixando a divisão 0/100 para a direita
+            const rightChildren = originalChildren;
 
             if (leftChildren.length > 0) {
                 const leftRoot = hierarchy(this.data);
                 leftRoot.children = leftChildren;
-                const treeLayoutLeft = tree().nodeSize([CONFIG.verticalNodeSpacing, CONFIG.horizontalNodeSpacing]);
+                // --- MODIFICAÇÃO: Usa a variável de espaçamento dinâmico ---
+                const treeLayoutLeft = tree().nodeSize([currentVerticalSpacing, CONFIG.horizontalNodeSpacing]);
                 treeLayoutLeft(leftRoot);
 
                 leftRoot.descendants().forEach(node => {
@@ -681,7 +734,8 @@ class MindMapViewer {
             if (rightChildren.length > 0) {
                 const rightRoot = hierarchy(this.data);
                 rightRoot.children = rightChildren;
-                const treeLayoutRight = tree().nodeSize([CONFIG.verticalNodeSpacing, CONFIG.horizontalNodeSpacing]);
+                // --- MODIFICAÇÃO: Usa a variável de espaçamento dinâmico ---
+                const treeLayoutRight = tree().nodeSize([currentVerticalSpacing, CONFIG.horizontalNodeSpacing]);
                 treeLayoutRight(rightRoot);
 
                 rightRoot.descendants().forEach(node => {
@@ -717,8 +771,6 @@ class MindMapViewer {
                 nodeGroup.position.set(d3Node.data.persistedX, d3Node.data.persistedY, 0);
             } else {
                 const direction = nodeGroup.userData.direction;
-                const nodeWidth = CONFIG.FIXED_NODE_WIDTH;
-
                 let finalNodeX = 0;
                 let finalNodeY = 0;
 
