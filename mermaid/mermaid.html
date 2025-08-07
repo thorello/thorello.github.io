@@ -22,7 +22,6 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            /* Evita barras de rolagem indesejadas */
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f4f7f6;
             color: #333;
@@ -34,13 +33,6 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-        }
-
-        h1 {
-            text-align: center;
-            color: #005f73;
-            flex-shrink: 0;
-            margin: 20px 0;
         }
 
         /* --- Botão de Menu (Hamburger) --- */
@@ -100,7 +92,6 @@
 
         .sidebar textarea {
             flex-grow: 1;
-            /* Faz o textarea preencher o espaço vertical */
             width: 100%;
             box-sizing: border-box;
             border: 1px solid #ccc;
@@ -149,17 +140,14 @@
         /* --- Área de Saída do Diagrama --- */
         .output-area {
             flex-grow: 1;
-
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             height: calc(100vh - 70px);
-            /* Ajuste para o H1 */
         }
 
         .output-area h2 {
             display: none;
-            /* O H1 principal já serve como título */
         }
 
         #outputContainer {
@@ -169,7 +157,6 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            /* Essencial para o pan-zoom */
             width: 100%;
             height: 100%;
         }
@@ -192,10 +179,43 @@
         .svg-pan-zoom-control-element:hover {
             fill: #9eeaf9;
         }
+
+        /* --- NOVO: Estilos para Drag and Drop --- */
+        #drag-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 95, 115, 0.85);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            border: 5px dashed #9eeaf9;
+            box-sizing: border-box;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
+            pointer-events: none;
+        }
+
+        body.dragover-active #drag-overlay {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 
 <body>
+    <div id="drag-overlay">
+        <p style="padding: 20px;">Solte o arquivo .txt para gerar o diagrama</p>
+    </div>
+
     <button id="menuBtn" title="Abrir Menu de Edição">&#9776;</button>
 
     <div id="overlay"></div>
@@ -209,7 +229,8 @@
     <div class="main-container">
         <div class="output-area">
             <div id="outputContainer">
-                <p style="padding: 20px;">Seu diagrama aparecerá aqui. Clique no menu ☰ para editar o código.</p>
+                <p style="padding: 20px;">Seu diagrama aparecerá aqui. Clique no menu ☰ para editar ou <b>arraste um
+                        arquivo .txt</b> para a tela.</p>
             </div>
         </div>
     </div>
@@ -220,7 +241,7 @@
             startOnLoad: false,
             theme: 'default',
             flowchart: {
-                useMaxWidth: false // Permite que o diagrama use o espaço disponível
+                useMaxWidth: false
             }
         });
 
@@ -249,24 +270,23 @@
             overlay.classList.toggle('open');
 
             if (isOpen) {
-                menuBtn.innerHTML = '&times;'; // Ícone 'X' para fechar
+                menuBtn.innerHTML = '&times;';
                 menuBtn.title = 'Fechar Menu';
             } else {
-                menuBtn.innerHTML = '&#9776;'; // Ícone 'hamburger'
+                menuBtn.innerHTML = '&#9776;';
                 menuBtn.title = 'Abrir Menu de Edição';
             }
 
-            // Redimensionar o diagrama após a transição da sidebar
             if (panZoomInstance) {
                 setTimeout(() => {
                     panZoomInstance.resize();
                     panZoomInstance.center();
-                }, 300); // Corresponde à duração da transição CSS
+                }, 300);
             }
         }
 
         menuBtn.addEventListener('click', toggleSidebar);
-        overlay.addEventListener('click', toggleSidebar); // Fecha ao clicar fora
+        overlay.addEventListener('click', toggleSidebar);
 
         // --- LÓGICA DE RENDERIZAÇÃO DO DIAGRAMA ---
         const renderDiagram = async () => {
@@ -278,14 +298,15 @@
 
             const mermaidCode = mermaidInput.value;
             if (!mermaidCode.trim()) {
-                outputContainer.innerHTML = '<p style="padding: 20px;">Digite um código Mermaid na sidebar para gerar um diagrama.</p>';
+                outputContainer.innerHTML = '<p style="padding: 20px;">Digite um código Mermaid na sidebar ou arraste um arquivo .txt para gerar um diagrama.</p>';
                 return;
             }
 
             try {
-                // Adiciona um ID único para cada renderização para evitar conflitos
                 const renderId = 'mermaid-graph-' + Date.now();
-                const { svg } = await mermaid.render(renderId, mermaidCode);
+                const {
+                    svg
+                } = await mermaid.render(renderId, mermaidCode);
                 outputContainer.innerHTML = svg;
 
                 const svgElement = outputContainer.querySelector('svg');
@@ -308,27 +329,62 @@
 
         generateBtn.addEventListener('click', () => {
             renderDiagram();
-            // Opcional: fechar a sidebar após gerar o diagrama
             if (sidebar.classList.contains('open')) {
                 toggleSidebar();
             }
         });
 
+        // --- NOVA LÓGICA DE DRAG AND DROP ---
+        const handleFileDrop = (file) => {
+            if (file && file.type === "text/plain") {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    mermaidInput.value = e.target.result;
+                    renderDiagram();
+                };
+                reader.readAsText(file);
+            } else {
+                alert("Por favor, solte apenas um arquivo do tipo .txt");
+            }
+        };
+
+        document.body.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        document.body.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            document.body.classList.add('dragover-active');
+        });
+
+        document.body.addEventListener('dragleave', (e) => {
+            if (e.relatedTarget === null || !document.body.contains(e.relatedTarget)) {
+                document.body.classList.remove('dragover-active');
+            }
+        });
+
+        document.body.addEventListener('drop', (e) => {
+            e.preventDefault();
+            document.body.classList.remove('dragover-active');
+            if (e.dataTransfer.items && e.dataTransfer.items[0].kind === 'file') {
+                const file = e.dataTransfer.items[0].getAsFile();
+                handleFileDrop(file);
+            } else {
+                const file = e.dataTransfer.files[0];
+                handleFileDrop(file);
+            }
+        });
+
         // --- INICIALIZAÇÃO DA PÁGINA ---
         function initializeApp() {
-            // Preenche o textarea com o código do fluxograma inicial
             mermaidInput.value = flowchartExample;
-
-            // Aguarda as fontes da página estarem prontas para a renderização inicial
             document.fonts.ready.then(() => {
                 console.log('Fontes carregadas, renderizando o diagrama inicial.');
                 renderDiagram();
             });
         }
 
-        // Inicia a aplicação
         initializeApp();
-
     </script>
 </body>
 
