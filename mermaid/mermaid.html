@@ -61,6 +61,34 @@
             transform: scale(1.1);
         }
 
+        /* --- NOVO: Botão de Reset/Tela Cheia --- */
+        #resetViewBtn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            width: 50px;
+            height: 50px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            background-color: #0a9396;
+            color: white;
+            font-size: 24px;
+            line-height: 50px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.3s;
+            display: none;
+            /* Começa escondido */
+        }
+
+        #resetViewBtn:hover {
+            background-color: #005f73;
+            transform: scale(1.1);
+        }
+
         /* --- Sidebar de Entrada --- */
         .sidebar {
             position: fixed;
@@ -159,7 +187,22 @@
             overflow: hidden;
             width: 100%;
             height: 100%;
+            transition: all 0.3s ease-in-out;
+            /* Transição suave para tela cheia */
         }
+
+        /* --- NOVO: Classe para o Modo Tela Cheia --- */
+        #outputContainer.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 998;
+            border-radius: 0;
+            border: none;
+        }
+
 
         #outputContainer svg {
             width: 100% !important;
@@ -217,6 +260,7 @@
     </div>
 
     <button id="menuBtn" title="Abrir Menu de Edição">&#9776;</button>
+    <button id="resetViewBtn" title="Tela Cheia / Resetar Visão">&#10530;</button>
 
     <div id="overlay"></div>
 
@@ -236,12 +280,24 @@
     </div>
 
     <script>
-        // Inicialização do Mermaid
+        // Inicialização do Mermaid com o TEMA PERSONALIZADO
         mermaid.initialize({
             startOnLoad: false,
-            theme: 'default',
+            theme: 'base', // Usamos 'base' para ter um ponto de partida neutro
             flowchart: {
                 useMaxWidth: false
+            },
+            themeVariables: {
+                // --- SUAS CONFIGURAÇÕES DE COR ---
+                primaryColor: '#ffffff',         // Fundo dos nós (símbolos)
+                primaryBorderColor: '#007bff',   // Cor da borda dos nós
+                labelBackgroundColor: '#ffffff', // Fundo do texto nas setas
+
+                // --- Ajustes adicionais para harmonia visual ---
+                lineColor: '#555555',            // Cor das setas e linhas
+                textColor: '#333333',            // Cor do texto dentro dos nós
+                primaryTextColor: '#333333',     // Garante que o texto dentro dos nós seja escuro
+                edgeLabelBackground: '#ffffff'   // Outra forma de garantir o fundo do texto da seta
             }
         });
 
@@ -252,6 +308,7 @@
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.querySelector('.sidebar');
         const overlay = document.getElementById('overlay');
+        const resetViewBtn = document.getElementById('resetViewBtn'); // NOVO
         let panZoomInstance = null;
 
         const flowchartExample = `graph TD
@@ -295,6 +352,7 @@
                 panZoomInstance = null;
             }
             outputContainer.innerHTML = '';
+            resetViewBtn.style.display = 'none'; // Esconde o botão por padrão
 
             const mermaidCode = mermaidInput.value;
             if (!mermaidCode.trim()) {
@@ -320,6 +378,7 @@
                         maxZoom: 50,
                         zoomScaleSensitivity: 0.7
                     });
+                    resetViewBtn.style.display = 'block'; // Mostra o botão após sucesso
                 }
             } catch (e) {
                 const errorMessage = e.message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -334,7 +393,31 @@
             }
         });
 
-        // --- NOVA LÓGICA DE DRAG AND DROP ---
+        // --- NOVO: LÓGICA DO BOTÃO DE RESET/TELA CHEIA ---
+        const toggleFullscreenAndReset = () => {
+            if (!panZoomInstance) return; // Segurança
+
+            outputContainer.classList.toggle('fullscreen');
+
+            if (outputContainer.classList.contains('fullscreen')) {
+                resetViewBtn.innerHTML = '&#10529;'; // Ícone "encolher"
+                resetViewBtn.title = 'Sair da Tela Cheia';
+            } else {
+                resetViewBtn.innerHTML = '&#10530;'; // Ícone "expandir"
+                resetViewBtn.title = 'Tela Cheia / Resetar Visão';
+            }
+
+            setTimeout(() => {
+                panZoomInstance.resize();
+                panZoomInstance.fit();
+                panZoomInstance.center();
+            }, 100);
+        };
+
+        resetViewBtn.addEventListener('click', toggleFullscreenAndReset);
+
+
+        // --- LÓGICA DE DRAG AND DROP ---
         const handleFileDrop = (file) => {
             if (file && file.type === "text/plain") {
                 const reader = new FileReader();
