@@ -61,8 +61,8 @@
             transform: scale(1.1);
         }
 
-        /* --- NOVO: Botão de Reset/Tela Cheia --- */
-        #resetViewBtn {
+        /* --- Botão de Reset --- (ALTERADO) --- */
+        #resetZoomBtn {
             position: fixed;
             top: 20px;
             right: 20px;
@@ -84,7 +84,7 @@
             /* Começa escondido */
         }
 
-        #resetViewBtn:hover {
+        #resetZoomBtn:hover {
             background-color: #005f73;
             transform: scale(1.1);
         }
@@ -165,44 +165,32 @@
             visibility: visible;
         }
 
-        /* --- Área de Saída do Diagrama --- */
+        /* --- ÁREA DE SAÍDA DO DIAGRAMA --- */
         .output-area {
             flex-grow: 1;
-            box-sizing: border-box;
             display: flex;
-            flex-direction: column;
-            height: calc(100vh - 70px);
-        }
-
-        .output-area h2 {
-            display: none;
-        }
-
-        #outputContainer {
-            flex-grow: 1;
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            width: 100%;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
             height: 100%;
+        }
+
+        /* --- CONTÊINER DO DIAGRAMA - O "PAPEL A4" --- */
+        #outputContainer {
+            aspect-ratio: 297 / 210;
+            height: 90vh;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             transition: all 0.3s ease-in-out;
-            /* Transição suave para tela cheia */
+            padding: 18px !important;
         }
-
-        /* --- NOVO: Classe para o Modo Tela Cheia --- */
-        #outputContainer.fullscreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 998;
-            border-radius: 0;
-            border: none;
-        }
-
 
         #outputContainer svg {
             width: 100% !important;
@@ -210,9 +198,12 @@
             max-width: none !important;
         }
 
-        /* Estilos para o controle de Pan/Zoom */
+        /* Estilos para o controle de Pan/Zoom (ALTERADO) */
         .svg-pan-zoom-control-background {
-            fill: rgba(0, 95, 115, 0.7);
+            fill: #0a9396;
+            /* Cor alinhada ao tema principal */
+            stroke: #005f73;
+            stroke-width: 0.5;
         }
 
         .svg-pan-zoom-control-element {
@@ -223,7 +214,7 @@
             fill: #9eeaf9;
         }
 
-        /* --- NOVO: Estilos para Drag and Drop --- */
+        /* --- Estilos para Drag and Drop --- */
         #drag-overlay {
             position: fixed;
             top: 0;
@@ -251,6 +242,64 @@
             visibility: visible;
             opacity: 1;
         }
+
+        /* --- ESTILOS PARA IMPRESSÃO (ALTERADO) --- */
+        @page {
+            size: A4 landscape;
+        }
+
+        @media print {
+
+            /* Esconde todos os elementos de interface */
+            #menuBtn,
+            #resetZoomBtn,
+            /* ALTERADO */
+            .sidebar,
+            #overlay,
+            #drag-overlay,
+            .svg-pan-zoom-controls {
+                /* Garante que os controles de zoom também sumam */
+                display: none !important;
+            }
+
+            /* Reseta o corpo e os contêineres para a impressão */
+            body,
+            html {
+                background-color: #ffffff;
+                height: 100%;
+                width: 100%;
+                overflow: visible;
+            }
+
+            .main-container,
+            .output-area {
+                height: 100% !important;
+                width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: block;
+            }
+
+            /* Faz o contêiner do diagrama e o SVG ocuparem a área de impressão */
+            #outputContainer {
+                width: 100% !important;
+                height: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                aspect-ratio: auto !important;
+            }
+
+            #outputContainer p {
+                display: none;
+            }
+
+            #outputContainer svg {
+                max-width: 100% !important;
+                max-height: 100% !important;
+            }
+        }
     </style>
 </head>
 
@@ -260,7 +309,7 @@
     </div>
 
     <button id="menuBtn" title="Abrir Menu de Edição">&#9776;</button>
-    <button id="resetViewBtn" title="Tela Cheia / Resetar Visão">&#10530;</button>
+    <button id="resetZoomBtn" title="Resetar Zoom">&#8634;</button>
 
     <div id="overlay"></div>
 
@@ -273,42 +322,39 @@
     <div class="main-container">
         <div class="output-area">
             <div id="outputContainer">
-                <p style="padding: 20px;">Seu diagrama aparecerá aqui. Clique no menu ☰ para editar ou <b>arraste um
-                        arquivo .txt</b> para a tela.</p>
+                <p style="padding: 20px; text-align: center;">Seu diagrama aparecerá aqui.<br>Clique no menu ☰ para
+                    editar ou <b>arraste um arquivo .txt</b> para a tela.</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Inicialização do Mermaid com o TEMA PERSONALIZADO
+        // --- INÍCIO DO SCRIPT ---
         mermaid.initialize({
             startOnLoad: false,
-            theme: 'base', // Usamos 'base' para ter um ponto de partida neutro
+            theme: 'base',
             flowchart: {
                 useMaxWidth: false
             },
             themeVariables: {
-                // --- SUAS CONFIGURAÇÕES DE COR ---
-                primaryColor: '#ffffff',         // Fundo dos nós (símbolos)
-                primaryBorderColor: '#007bff',   // Cor da borda dos nós
-                labelBackgroundColor: '#ffffff', // Fundo do texto nas setas
-
-                // --- Ajustes adicionais para harmonia visual ---
-                lineColor: '#555555',            // Cor das setas e linhas
-                textColor: '#333333',            // Cor do texto dentro dos nós
-                primaryTextColor: '#333333',     // Garante que o texto dentro dos nós seja escuro
-                edgeLabelBackground: '#ffffff'   // Outra forma de garantir o fundo do texto da seta
+                primaryColor: '#ffffff',
+                primaryBorderColor: '#007bff',
+                labelBackgroundColor: '#ffffff',
+                lineColor: '#555555',
+                textColor: '#333333',
+                primaryTextColor: '#333333',
+                edgeLabelBackground: '#ffffff'
             }
         });
 
-        // --- Elementos do DOM ---
+        // --- Seletores de Elementos ---
         const mermaidInput = document.getElementById('mermaidInput');
         const generateBtn = document.getElementById('generateBtn');
         const outputContainer = document.getElementById('outputContainer');
         const menuBtn = document.getElementById('menuBtn');
         const sidebar = document.querySelector('.sidebar');
         const overlay = document.getElementById('overlay');
-        const resetViewBtn = document.getElementById('resetViewBtn'); // NOVO
+        const resetZoomBtn = document.getElementById('resetZoomBtn'); // ALTERADO
         let panZoomInstance = null;
 
         const flowchartExample = `graph TD
@@ -321,11 +367,11 @@
     F -->|Não| E;
     G --> A;`;
 
-        // --- LÓGICA DA SIDEBAR E OVERLAY ---
+        // --- Funções Principais ---
+
         function toggleSidebar() {
             const isOpen = sidebar.classList.toggle('open');
             overlay.classList.toggle('open');
-
             if (isOpen) {
                 menuBtn.innerHTML = '&times;';
                 menuBtn.title = 'Fechar Menu';
@@ -333,52 +379,45 @@
                 menuBtn.innerHTML = '&#9776;';
                 menuBtn.title = 'Abrir Menu de Edição';
             }
-
             if (panZoomInstance) {
                 setTimeout(() => {
                     panZoomInstance.resize();
                     panZoomInstance.center();
-                }, 300);
+                }, 300); // Aguarda a transição da sidebar
             }
         }
 
-        menuBtn.addEventListener('click', toggleSidebar);
-        overlay.addEventListener('click', toggleSidebar);
-
-        // --- LÓGICA DE RENDERIZAÇÃO DO DIAGRAMA ---
         const renderDiagram = async () => {
             if (panZoomInstance) {
                 panZoomInstance.destroy();
                 panZoomInstance = null;
             }
             outputContainer.innerHTML = '';
-            resetViewBtn.style.display = 'none'; // Esconde o botão por padrão
-
+            resetZoomBtn.style.display = 'none'; // ALTERADO
             const mermaidCode = mermaidInput.value;
+
             if (!mermaidCode.trim()) {
-                outputContainer.innerHTML = '<p style="padding: 20px;">Digite um código Mermaid na sidebar ou arraste um arquivo .txt para gerar um diagrama.</p>';
+                outputContainer.innerHTML = '<p style="padding: 20px; text-align: center;">Digite um código Mermaid na sidebar ou arraste um arquivo .txt para gerar um diagrama.</p>';
                 return;
             }
 
             try {
                 const renderId = 'mermaid-graph-' + Date.now();
-                const {
-                    svg
-                } = await mermaid.render(renderId, mermaidCode);
+                const { svg } = await mermaid.render(renderId, mermaidCode);
                 outputContainer.innerHTML = svg;
-
                 const svgElement = outputContainer.querySelector('svg');
+
                 if (svgElement) {
                     panZoomInstance = svgPanZoom(svgElement, {
                         zoomEnabled: true,
-                        controlIconsEnabled: true,
+                        controlIconsEnabled: false,
                         fit: true,
                         center: true,
                         minZoom: 0.2,
                         maxZoom: 50,
                         zoomScaleSensitivity: 0.7
                     });
-                    resetViewBtn.style.display = 'block'; // Mostra o botão após sucesso
+                    resetZoomBtn.style.display = 'block'; // ALTERADO
                 }
             } catch (e) {
                 const errorMessage = e.message.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -386,38 +425,15 @@
             }
         };
 
-        generateBtn.addEventListener('click', () => {
-            renderDiagram();
-            if (sidebar.classList.contains('open')) {
-                toggleSidebar();
-            }
-        });
-
-        // --- NOVO: LÓGICA DO BOTÃO DE RESET/TELA CHEIA ---
-        const toggleFullscreenAndReset = () => {
-            if (!panZoomInstance) return; // Segurança
-
-            outputContainer.classList.toggle('fullscreen');
-
-            if (outputContainer.classList.contains('fullscreen')) {
-                resetViewBtn.innerHTML = '&#10529;'; // Ícone "encolher"
-                resetViewBtn.title = 'Sair da Tela Cheia';
-            } else {
-                resetViewBtn.innerHTML = '&#10530;'; // Ícone "expandir"
-                resetViewBtn.title = 'Tela Cheia / Resetar Visão';
-            }
-
-            setTimeout(() => {
+        // ALTERADO: Função de reset simplificada
+        const resetZoom = () => {
+            if (panZoomInstance) {
                 panZoomInstance.resize();
                 panZoomInstance.fit();
                 panZoomInstance.center();
-            }, 100);
+            }
         };
 
-        resetViewBtn.addEventListener('click', toggleFullscreenAndReset);
-
-
-        // --- LÓGICA DE DRAG AND DROP ---
         const handleFileDrop = (file) => {
             if (file && file.type === "text/plain") {
                 const reader = new FileReader();
@@ -431,43 +447,52 @@
             }
         };
 
+        // --- Event Listeners ---
+
+        menuBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        generateBtn.addEventListener('click', () => {
+            renderDiagram();
+            if (sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
+        });
+
+        // ALTERADO: Event listener para o novo botão e nova função
+        resetZoomBtn.addEventListener('click', resetZoom);
+
         document.body.addEventListener('dragover', (e) => {
             e.preventDefault();
         });
-
         document.body.addEventListener('dragenter', (e) => {
             e.preventDefault();
             document.body.classList.add('dragover-active');
         });
-
         document.body.addEventListener('dragleave', (e) => {
             if (e.relatedTarget === null || !document.body.contains(e.relatedTarget)) {
                 document.body.classList.remove('dragover-active');
             }
         });
-
         document.body.addEventListener('drop', (e) => {
             e.preventDefault();
             document.body.classList.remove('dragover-active');
-            if (e.dataTransfer.items && e.dataTransfer.items[0].kind === 'file') {
-                const file = e.dataTransfer.items[0].getAsFile();
-                handleFileDrop(file);
-            } else {
-                const file = e.dataTransfer.files[0];
-                handleFileDrop(file);
-            }
+            const file = e.dataTransfer.files[0];
+            handleFileDrop(file);
         });
 
-        // --- INICIALIZAÇÃO DA PÁGINA ---
+        // --- Inicialização ---
+
         function initializeApp() {
             mermaidInput.value = flowchartExample;
+            // Garante que as fontes carregaram antes da primeira renderização para o tamanho ser correto
             document.fonts.ready.then(() => {
-                console.log('Fontes carregadas, renderizando o diagrama inicial.');
                 renderDiagram();
             });
         }
 
         initializeApp();
+
     </script>
 </body>
 
