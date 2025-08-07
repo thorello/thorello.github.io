@@ -12,6 +12,11 @@ import { darkTheme, lightTheme } from './theme.js';
 
 const CONFIG = lightTheme;
 
+// --- MODIFICAÇÃO ---
+// Aumentamos o multiplicador de altura para dar espaço suficiente para o nome e a definição.
+// Você pode ajustar este valor se o texto estiver cortando ou se houver muito espaço vazio.
+CONFIG.FIXED_NODE_HEIGHT_MULTIPLIER = 9;
+
 CONFIG.FIXED_NODE_WIDTH = (CONFIG.font.size * CONFIG.font.characterWidth * CONFIG.FIXED_NODE_CHARACTER_LIMIT) + (CONFIG.padding.x * 2);
 CONFIG.FIXED_NODE_HEIGHT = (CONFIG.font.size * CONFIG.FIXED_NODE_HEIGHT_MULTIPLIER) + (CONFIG.padding.y * 2);
 
@@ -372,6 +377,8 @@ class MindMapViewer {
         return new THREE.ShapeGeometry(shape);
     }
 
+    // --- MODIFICAÇÃO ---
+    // A função _createNodeMesh foi reescrita para incluir a definição.
     /**
      * Cria a malha (mesh) para um nó do mapa mental, incluindo o retângulo, o texto e, opcionalmente, o manipulador de arrastar.
      * @param {object} d3Node - O objeto de nó da hierarquia D3.
@@ -385,90 +392,109 @@ class MindMapViewer {
 
             const isRootNode = d3Node.depth === 0;
 
-            // Define a cor de fundo e do texto para ser a mesma para TODOS os nós
             const nodeColor = CONFIG.nodeBackgroundColor;
             const textColor = CONFIG.textColor;
-            const idColor = 0x888888; // Cor padrão do ID para todos os nós
+            const idColor = 0x888888;
 
-            // 1. Cria a malha de texto para o nome do nó
+            // 1. Cria a malha de texto para o NOME do nó
             const textMesh = new Text();
             textMesh.text = d3Node.data.name;
             textMesh.fontSize = CONFIG.font.size;
+            // Fonte mais forte para o título
             textMesh.color = textColor;
             textMesh.position.z = 0.1;
             textMesh.anchorX = 'center';
-            textMesh.anchorY = 'middle';
+            textMesh.anchorY = 'top'; // Ancorado no topo para posicionar melhor
             textMesh.maxWidth = CONFIG.FIXED_NODE_WIDTH - (CONFIG.padding.x * 2);
             textMesh.name = 'nodeTextMesh';
+            // Posição Y ajustada para o nome ficar na parte superior do nó
+            textMesh.position.y = (CONFIG.FIXED_NODE_HEIGHT / 2) - (CONFIG.padding.y * 2);
 
+            // 2. Cria a malha de texto para a DEFINIÇÃO do nó
+            const definitionTextMesh = new Text();
+            definitionTextMesh.text = d3Node.data.definition || '';
+            definitionTextMesh.fontSize = CONFIG.font.size * 0.8; // Fonte um pouco menor
+            definitionTextMesh.fontStyle = 'italic'; // Estilo para diferenciar
+            definitionTextMesh.color = textColor;
+            definitionTextMesh.position.z = 0.1;
+            definitionTextMesh.anchorX = 'center';
+            definitionTextMesh.anchorY = 'top'; // Alinha pelo topo para o texto fluir para baixo
+            definitionTextMesh.maxWidth = CONFIG.FIXED_NODE_WIDTH - (CONFIG.padding.x * 2);
+            definitionTextMesh.lineHeight = 1.2; // Espaçamento entre linhas para melhor legibilidade
+            definitionTextMesh.name = 'nodeDefinitionMesh';
+            // Posição Y ajustada para a definição ficar abaixo do nome
+            definitionTextMesh.position.y = textMesh.position.y - (CONFIG.font.size * 1.5);
+
+            // Sincroniza o NOME primeiro
             textMesh.sync(() => {
-                // 2. Cria a malha de texto para o ID
-                const idTextMesh = new Text();
-                idTextMesh.text = d3Node.data.id !== undefined ? d3Node.data.id : '';
-                idTextMesh.fontSize = CONFIG.font.size * 0.7;
-                idTextMesh.color = idColor;
-                idTextMesh.position.z = 0.1;
-                idTextMesh.anchorX = 'left';
-                idTextMesh.anchorY = 'top';
-                idTextMesh.name = 'nodeIdMesh';
+                // Em seguida, sincroniza a DEFINIÇÃO
+                definitionTextMesh.sync(() => {
+                    // Por último, sincroniza o ID
+                    const idTextMesh = new Text();
+                    idTextMesh.text = d3Node.data.id !== undefined ? d3Node.data.id : '';
+                    idTextMesh.fontSize = CONFIG.font.size * 0.7;
+                    idTextMesh.color = idColor;
+                    idTextMesh.position.z = 0.1;
+                    idTextMesh.anchorX = 'left';
+                    idTextMesh.anchorY = 'top';
+                    idTextMesh.name = 'nodeIdMesh';
 
-                idTextMesh.sync(() => {
-                    const rectWidth = CONFIG.FIXED_NODE_WIDTH;
-                    const rectHeight = CONFIG.FIXED_NODE_HEIGHT;
+                    idTextMesh.sync(() => {
+                        const rectWidth = CONFIG.FIXED_NODE_WIDTH;
+                        // A altura do nó agora é maior, conforme calculado no início do script
+                        const rectHeight = CONFIG.FIXED_NODE_HEIGHT;
 
-                    const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
-                    // Aplica a cor de fundo padrão para TODOS os nós
-                    const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
+                        const rectGeo = createRoundedRectGeometry(rectWidth, rectHeight, CONFIG.borderRadius);
+                        const rectMat = new THREE.MeshBasicMaterial({ color: nodeColor });
+                        const rectMesh = new THREE.Mesh(rectGeo, rectMat);
+                        rectMesh.name = 'nodeRectMesh';
+                        nodeGroup.add(rectMesh);
 
-                    const rectMesh = new THREE.Mesh(rectGeo, rectMat);
-                    rectMesh.name = 'nodeRectMesh';
-                    nodeGroup.add(rectMesh);
-
-                    // Adiciona a borda para TODOS os nós, com lógica de cor diferente
-                    let borderColor;
-                    if (isRootNode) {
-                        // Usa a cor de borda específica para o nó raiz
-                        borderColor = CONFIG.rootNodeBorderColor;
-                    } else {
-                        // Usa a cor da ramificação para os outros nós
-                        borderColor = 0xCCCCCC; // Cor padrão de fallback
-                        const topLevelParent = d3Node.ancestors().find(d => d.depth === 1);
-                        if (topLevelParent) {
-                            const parentIndex = this.d3RootNode.children.indexOf(topLevelParent);
-                            borderColor = CONFIG.branchBorderColors[parentIndex % CONFIG.branchBorderColors.length];
+                        // Lógica da borda (permanece a mesma)
+                        let borderColor;
+                        if (isRootNode) {
+                            borderColor = CONFIG.rootNodeBorderColor;
+                        } else {
+                            borderColor = 0xCCCCCC;
+                            const topLevelParent = d3Node.ancestors().find(d => d.depth === 1);
+                            if (topLevelParent) {
+                                const parentIndex = this.d3RootNode.children.indexOf(topLevelParent);
+                                borderColor = CONFIG.branchBorderColors[parentIndex % CONFIG.branchBorderColors.length];
+                            }
                         }
-                    }
 
-                    const edges = new THREE.EdgesGeometry(rectGeo);
-                    const lineMat = new THREE.LineBasicMaterial({ color: borderColor, linewidth: 0.1, transparent: true, opacity: 0.4 });
-                    const wireframe = new THREE.LineSegments(edges, lineMat);
-                    wireframe.name = 'nodeWireframe';
-                    // Armazena a cor original para restaurar ao desmarcar
-                    wireframe.userData.originalColor = borderColor;
-                    nodeGroup.add(wireframe);
+                        const edges = new THREE.EdgesGeometry(rectGeo);
+                        const lineMat = new THREE.LineBasicMaterial({ color: borderColor, linewidth: 0.1, transparent: true, opacity: 0.4 });
+                        const wireframe = new THREE.LineSegments(edges, lineMat);
+                        wireframe.name = 'nodeWireframe';
+                        wireframe.userData.originalColor = borderColor;
+                        nodeGroup.add(wireframe);
 
-                    // 3. Posiciona o texto do nome e o texto do ID
-                    textMesh.position.x = 0;
-                    idTextMesh.position.x = -rectWidth / 2 + CONFIG.padding.x / 2;
-                    idTextMesh.position.y = rectHeight / 2 - CONFIG.padding.y / 2;
+                        // Posiciona o texto do ID no canto superior esquerdo
+                        idTextMesh.position.x = -rectWidth / 2 + CONFIG.padding.x / 2;
+                        idTextMesh.position.y = rectHeight / 2 - CONFIG.padding.y / 2;
 
-                    nodeGroup.add(textMesh);
-                    nodeGroup.add(idTextMesh);
-                    nodeGroup.userData.nodeWidth = rectWidth;
-                    nodeGroup.userData.nodeHeight = rectHeight;
+                        // Adiciona todos os textos ao grupo do nó
+                        nodeGroup.add(textMesh);
+                        nodeGroup.add(definitionTextMesh); // Adiciona a definição ao grupo
+                        nodeGroup.add(idTextMesh);
+                        nodeGroup.userData.nodeWidth = rectWidth;
+                        nodeGroup.userData.nodeHeight = rectHeight;
 
-                    if (direction !== 0) {
-                        const handleGeo = new THREE.CircleGeometry(CONFIG.dragHandleRadius, 32);
-                        const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.6 });
-                        const handleMesh = new THREE.Mesh(handleGeo, handleMat);
-                        handleMesh.position.set((rectWidth / 2) * direction, 0, 0.2);
-                        handleMesh.userData = { isDragHandle: true, nodeGroup };
-                        this.dragHandles.push(handleMesh);
-                        nodeGroup.add(handleMesh);
-                    }
+                        // Lógica do manipulador de arrastar (permanece a mesma)
+                        if (direction !== 0) {
+                            const handleGeo = new THREE.CircleGeometry(CONFIG.dragHandleRadius, 32);
+                            const handleMat = new THREE.MeshBasicMaterial({ color: CONFIG.dragHandleColor, transparent: true, opacity: 0.6 });
+                            const handleMesh = new THREE.Mesh(handleGeo, handleMat);
+                            handleMesh.position.set((rectWidth / 2) * direction, 0, 0.2);
+                            handleMesh.userData = { isDragHandle: true, nodeGroup };
+                            this.dragHandles.push(handleMesh);
+                            nodeGroup.add(handleMesh);
+                        }
 
-                    this.nodeMap.set(d3Node, nodeGroup);
-                    resolve(nodeGroup);
+                        this.nodeMap.set(d3Node, nodeGroup);
+                        resolve(nodeGroup);
+                    });
                 });
             });
         });
@@ -624,11 +650,11 @@ class MindMapViewer {
         if (originalChildren.length > 0) {
             const leftCount = Math.ceil(originalChildren.length / 2);
 
-            const leftChildren = [];
-            const rightChildren = originalChildren;
+            //const leftChildren = [];
+            //const rightChildren = originalChildren;
 
-            //const leftChildren = originalChildren.slice(0, leftCount);
-            //const rightChildren = originalChildren.slice(leftCount);
+            const leftChildren = originalChildren.slice(0, leftCount);
+            const rightChildren = originalChildren.slice(leftCount);
 
             if (leftChildren.length > 0) {
                 const leftRoot = hierarchy(this.data);
